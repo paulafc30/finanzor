@@ -1,14 +1,23 @@
 import { useMemo, useState } from 'react'
-import { TrendingUp, TrendingDown, Wallet, PiggyBank } from 'lucide-react'
+import { TrendingUp, TrendingDown, Wallet, Percent, Plus } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
+import Button from '../components/ui/Button.jsx'
 import TransactionForm from '../components/transactions/TransactionForm.jsx'
+import KpiCard from '../components/dashboard/KpiCard.jsx'
+import CategoryDonut from '../components/dashboard/CategoryDonut.jsx'
+import MonthBudgetBar from '../components/dashboard/MonthBudgetBar.jsx'
+import RecentTransactions from '../components/dashboard/RecentTransactions.jsx'
 import { useTransactions } from '../hooks/useTransactions.js'
-import { formatEuro } from '../lib/formatters.js'
+import { usePreviousMonthSummary } from '../hooks/usePreviousMonthSummary.js'
+import { useMonth } from '../hooks/useMonth.jsx'
+import { formatEuro, formatMonthLabel } from '../lib/formatters.js'
 
 export default function Dashboard() {
   const [open, setOpen] = useState(false)
   const { data: transactions = [], isLoading } = useTransactions()
+  const { data: prev } = usePreviousMonthSummary()
+  const { month } = useMonth()
 
   const summary = useMemo(() => {
     let income = 0
@@ -22,17 +31,36 @@ export default function Dashboard() {
     return { income, expense, balance, savingsRate }
   }, [transactions])
 
+  const prevIncome = prev?.income ?? 0
+  const prevExpense = prev?.expense ?? 0
+  const prevBalance = prev?.balance ?? 0
+
   return (
     <section className="space-y-4">
-      <h1 className="text-xl font-semibold">Inicio</h1>
+      {/* Header con título grande y acción Añadir */}
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold leading-tight">
+            {formatMonthLabel(month)}
+          </h1>
+          <p className="text-xs text-white/50">Resumen financiero del mes</p>
+        </div>
+        <Button size="sm" onClick={() => setOpen(true)}>
+          <Plus size={16} />
+          Añadir
+        </Button>
+      </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      {/* KPIs en grid 2x2 (móvil) / 4x1 (desktop) */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <KpiCard
           label="Ingresos"
           value={formatEuro(summary.income)}
           icon={TrendingUp}
           tone="success"
           loading={isLoading}
+          delta={diffPct(summary.income, prevIncome)}
+          deltaPositiveIsGood
         />
         <KpiCard
           label="Gastos"
@@ -40,27 +68,33 @@ export default function Dashboard() {
           icon={TrendingDown}
           tone="danger"
           loading={isLoading}
+          delta={diffPct(summary.expense, prevExpense)}
+          deltaPositiveIsGood={false}
         />
         <KpiCard
-          label="Balance"
+          label="Saldo Actual"
           value={formatEuro(summary.balance)}
           icon={Wallet}
-          tone={summary.balance >= 0 ? 'success' : 'danger'}
+          tone="info"
           loading={isLoading}
+          delta={diffAbs(summary.balance, prevBalance)}
+          deltaPositiveIsGood
+          deltaIsAbsolute
         />
         <KpiCard
-          label="Tasa de ahorro"
-          value={summary.income > 0 ? `${summary.savingsRate.toFixed(0)}%` : '—'}
-          icon={PiggyBank}
-          tone={summary.savingsRate >= 0 ? 'accent' : 'danger'}
+          label="Tasa de Ahorro"
+          value={summary.income > 0 ? `${summary.savingsRate.toFixed(1)}%` : '—'}
+          icon={Percent}
+          tone="accent"
           loading={isLoading}
         />
       </div>
 
-      <div className="rounded-xl bg-bg-elevated p-4 text-sm text-white/60">
-        En las próximas fases aquí aparecerá la donut por categorías, la barra
-        del presupuesto del mes, los últimos movimientos y la comparativa con el
-        mes anterior.
+      <MonthBudgetBar />
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <CategoryDonut />
+        <RecentTransactions limit={6} />
       </div>
 
       <Fab onClick={() => setOpen(true)} ariaLabel="Añadir movimiento" />
@@ -71,28 +105,13 @@ export default function Dashboard() {
   )
 }
 
-const tones = {
-  success: 'text-success',
-  danger: 'text-danger',
-  accent: 'text-accent',
+function diffPct(current, prev) {
+  if (prev === 0 && current === 0) return null
+  if (prev === 0) return null
+  return ((current - prev) / Math.abs(prev)) * 100
 }
 
-function KpiCard({ label, value, icon: Icon, tone, loading }) {
-  return (
-    <div className="rounded-xl bg-bg-elevated p-3">
-      <div className="mb-1 flex items-center justify-between text-xs text-white/50">
-        <span>{label}</span>
-        <Icon size={14} className={tones[tone] ?? 'text-white/50'} />
-      </div>
-      <p
-        className={[
-          'text-lg font-semibold',
-          tones[tone] ?? 'text-white',
-          loading ? 'opacity-40' : '',
-        ].join(' ')}
-      >
-        {loading ? '…' : value}
-      </p>
-    </div>
-  )
+function diffAbs(current, prev) {
+  if (current === 0 && prev === 0) return null
+  return current - prev
 }

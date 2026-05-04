@@ -1,0 +1,106 @@
+import { useMemo } from 'react'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
+import { PieChart as PieIcon } from 'lucide-react'
+import { useTransactions } from '../../hooks/useTransactions.js'
+import { formatEuro } from '../../lib/formatters.js'
+
+/**
+ * Donut de gastos del mes agrupados por categoría.
+ * Solo cuenta transacciones de tipo 'expense'.
+ * Usa el color asignado a cada categoría.
+ */
+export default function CategoryDonut() {
+  const { data: transactions = [] } = useTransactions()
+
+  const data = useMemo(() => {
+    const map = new Map()
+    for (const t of transactions) {
+      if (t.type !== 'expense') continue
+      const key = t.category?.id ?? '__none__'
+      const name = t.category?.name ?? 'Sin categoría'
+      const color = t.category?.color ?? '#94a3b8'
+      const cur = map.get(key) ?? { name, color, value: 0 }
+      cur.value += Number(t.amount)
+      map.set(key, cur)
+    }
+    return Array.from(map.values()).sort((a, b) => b.value - a.value)
+  }, [transactions])
+
+  const total = data.reduce((acc, d) => acc + d.value, 0)
+
+  if (data.length === 0) {
+    return (
+      <div className="flex h-48 items-center justify-center rounded-xl bg-bg-elevated ring-1 ring-white/5">
+        <p className="text-sm text-white/50">Sin gastos este mes</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5">
+      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
+        <PieIcon size={16} className="text-info" />
+        Gastos por categoría
+      </h3>
+
+      <div className="relative h-48">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              innerRadius={50}
+              outerRadius={80}
+              paddingAngle={1}
+              stroke="none"
+            >
+              {data.map((entry, idx) => (
+                <Cell key={idx} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1c2030',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 8,
+                color: 'white',
+                fontSize: 12,
+              }}
+              formatter={(value, name) => [formatEuro(value), name]}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+
+        {/* Total centrado */}
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-[10px] uppercase tracking-wide text-white/40">
+            Total
+          </span>
+          <span className="text-base font-semibold text-white">
+            {formatEuro(total)}
+          </span>
+        </div>
+      </div>
+
+      {/* Leyenda */}
+      <ul className="mt-3 grid grid-cols-2 gap-x-2 gap-y-1">
+        {data.map((d) => {
+          const pct = total > 0 ? (d.value / total) * 100 : 0
+          return (
+            <li key={d.name} className="flex items-center gap-1.5 text-xs">
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: d.color }}
+              />
+              <span className="truncate text-white/80">{d.name}</span>
+              <span className="ml-auto shrink-0 text-white/40">
+                {pct.toFixed(0)}%
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}

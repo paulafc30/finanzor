@@ -18,6 +18,7 @@ export default {
         success: '#22c55e',
         warning: '#f59e0b',
         danger: '#ef4444',
+        info: '#3b82f6', // azul para "Saldo actual"
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
