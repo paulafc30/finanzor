@@ -2,9 +2,13 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { format } from 'date-fns'
+import { Repeat } from 'lucide-react'
 import Button from '../ui/Button.jsx'
 import { useCategories } from '../../hooks/useCategories.js'
-import { useCreateTransaction } from '../../hooks/useTransactions.js'
+import {
+  useCreateTransaction,
+  useUpdateTransaction,
+} from '../../hooks/useTransactions.js'
 import { useMonth } from '../../hooks/useMonth.jsx'
 
 const schema = z
@@ -23,19 +27,37 @@ const schema = z
   )
 
 /**
- * Formulario para alta de un movimiento.
- * Por defecto: tipo "expense", fecha = primer día del mes seleccionado o hoy
- * (lo que sea más reciente, para que al cambiar de mes la fecha por defecto
- * caiga dentro del mes que estás viendo).
+ * Formulario para alta o edición de un movimiento.
+ * - Si recibe `transaction`, prellena y llama a useUpdateTransaction.
+ * - Si no, crea con los defaults habituales.
  */
-export default function TransactionForm({ onSuccess }) {
+export default function TransactionForm({ transaction, onSuccess }) {
+  const isEdit = !!transaction
   const { data: categories = [] } = useCategories()
   const createMutation = useCreateTransaction()
+  const updateMutation = useUpdateTransaction()
   const { month, rangeStart, rangeEnd } = useMonth()
 
-  // Fecha por defecto: hoy si está dentro del mes seleccionado, si no el día 1 del mes seleccionado
+  // Defaults: en edición usamos los valores actuales; en creación, hoy o
+  // el primer día del mes seleccionado si estás navegando otro mes.
   const today = format(new Date(), 'yyyy-MM-dd')
   const defaultDate = today >= rangeStart && today < rangeEnd ? today : rangeStart
+
+  const initial = isEdit
+    ? {
+        type: transaction.type,
+        amount: String(transaction.amount),
+        description: transaction.description ?? '',
+        category_id: transaction.category?.id ?? '',
+        occurred_on: transaction.occurred_on,
+      }
+    : {
+        type: 'expense',
+        amount: '',
+        description: '',
+        category_id: '',
+        occurred_on: defaultDate,
+      }
 
   const {
     register,
@@ -44,41 +66,45 @@ export default function TransactionForm({ onSuccess }) {
     reset,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm({
-    defaultValues: {
-      type: 'expense',
-      amount: '',
-      description: '',
-      category_id: '',
-      occurred_on: defaultDate,
-    },
-  })
+  } = useForm({ defaultValues: initial })
 
-  // Si cambia el mes seleccionado mientras el modal está abierto, ajusta la fecha por defecto
+  // Si cambia el mes seleccionado mientras está abierto el modal de creación,
+  // ajusta la fecha por defecto. En edición no tocamos.
   useEffect(() => {
-    setValue('occurred_on', defaultDate)
+    if (!isEdit) setValue('occurred_on', defaultDate)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [month])
 
+  // Re-inicializar si cambia la transaction (otro item) abierta
+  useEffect(() => {
+    reset(initial)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transaction?.id])
+
   const type = watch('type')
+  const busy = createMutation.isPending || updateMutation.isPending
 
   async function onSubmit(values) {
     const parsed = schema.safeParse(values)
-    if (!parsed.success) {
-      // los errores de zod los puede pintar el usuario manualmente, pero RHF
-      // ya gestiona los required/min básicos. Para mantenerlo simple:
-      return
-    }
+    if (!parsed.success) return
+
     try {
-      await createMutation.mutateAsync(parsed.data)
-      reset({
-        type: parsed.data.type, // mantener el tipo para añadir varios seguidos
-        amount: '',
-        description: '',
-        category_id: '',
-        occurred_on: parsed.data.occurred_on,
-      })
-      onSuccess?.()
+      if (isEdit) {
+        await updateMutation.mutateAsync({ id: transaction.id, ...parsed.data })
+        onSuccess?.()
+      } else {
+        await createMutation.mutateAsync(parsed.data)
+        // Tras crear, dejamos el form listo para añadir otro: limpiamos campos
+        // pero conservamos tipo y fecha para encadenar varios.
+        reset({
+          type: parsed.data.type,
+          amount: '',
+          description: '',
+          category_id: '',
+          occurred_on: parsed.data.occurred_on,
+        })
+        onSuccess?.()
+      }
     } catch (err) {
       alert('No se pudo guardar: ' + (err.message ?? 'error desconocido'))
     }
@@ -86,6 +112,18 @@ export default function TransactionForm({ onSuccess }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* Aviso si es un movimiento recurrente */}
+      {isEdit && transaction.recurring_id && (
+        <div className="flex items-start gap-2 rounded-lg bg-accent/10 p-2.5 text-xs text-white/80 ring-1 ring-accent/20">
+          <Repeat size={14} className="mt-0.5 shrink-0 text-accent" />
+          <p>
+            Este movimiento viene de un gasto fijo. Editarlo solo cambia este mes
+            concreto, no la configuración del gasto fijo en sí (eso se edita en
+            Presupuesto).
+          </p>
+        </div>
+      )}
+
       {/* Toggle tipo */}
       <div className="grid grid-cols-2 gap-2 rounded-lg bg-bg-card p-1">
         <button
@@ -196,10 +234,10 @@ export default function TransactionForm({ onSuccess }) {
       <div className="flex gap-2 pt-2">
         <Button
           type="submit"
-          disabled={isSubmitting || createMutation.isPending}
+          disabled={isSubmitting || busy}
           className="flex-1"
         >
-          {createMutation.isPending ? 'Guardando…' : 'Guardar'}
+          {busy ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Guardar'}
         </Button>
       </div>
     </form>

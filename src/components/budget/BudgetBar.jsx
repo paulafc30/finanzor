@@ -12,7 +12,7 @@ const colorByStatus = {
 export default function BudgetBar({ percentage, status }) {
   const width = Math.min(100, Math.max(0, percentage))
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-bg-card">
+    <div className="h-2 w-full overflow-hidden rounded-full bg-white/10 ring-1 ring-white/5">
       <div
         className={[
           'h-full rounded-full transition-all',

@@ -9,6 +9,7 @@ import CalendarPage from './pages/Calendar.jsx'
 import Budget from './pages/Budget.jsx'
 import Savings from './pages/Savings.jsx'
 import Settings from './pages/Settings.jsx'
+import Categories from './pages/Categories.jsx'
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/presupuesto" element={<Budget />} />
         <Route path="/ahorro" element={<Savings />} />
         <Route path="/ajustes" element={<Settings />} />
+        <Route path="/categorias" element={<Categories />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

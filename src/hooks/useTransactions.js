@@ -75,6 +75,45 @@ export function useCreateTransaction() {
 }
 
 /**
+ * Mutación para editar un movimiento.
+ * Solo se actualizan los campos presentes en el patch.
+ */
+export function useUpdateTransaction() {
+  const { user } = useSession()
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, ...patch }) => {
+      const cleaned = {}
+      if (patch.type !== undefined) cleaned.type = patch.type
+      if (patch.amount !== undefined) cleaned.amount = Number(patch.amount)
+      if (patch.description !== undefined) {
+        cleaned.description = patch.description?.trim() || null
+      }
+      if (patch.category_id !== undefined) {
+        cleaned.category_id = patch.category_id || null
+      }
+      if (patch.occurred_on !== undefined) cleaned.occurred_on = patch.occurred_on
+
+      const { data, error } = await supabase
+        .from('transactions')
+        .update(cleaned)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['transactions', user?.id] })
+      qc.invalidateQueries({ queryKey: ['monthly-summary', user?.id] })
+      qc.invalidateQueries({ queryKey: ['budgets', user?.id] })
+    },
+  })
+}
+
+/**
  * Mutación para borrar un movimiento.
  */
 export function useDeleteTransaction() {

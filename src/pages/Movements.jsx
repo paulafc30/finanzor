@@ -5,18 +5,27 @@ import TransactionForm from '../components/transactions/TransactionForm.jsx'
 import TransactionList from '../components/transactions/TransactionList.jsx'
 
 export default function Movements() {
-  const [open, setOpen] = useState(false)
+  // null = cerrado, 'new' = creando, transaction object = editando
+  const [editing, setEditing] = useState(null)
+  const open = editing !== null
 
   return (
     <section className="space-y-4">
       <h1 className="text-xl font-semibold">Movimientos</h1>
 
-      <TransactionList />
+      <TransactionList onEdit={(t) => setEditing(t)} />
 
-      <Fab onClick={() => setOpen(true)} ariaLabel="Añadir movimiento" />
+      <Fab onClick={() => setEditing('new')} ariaLabel="Añadir movimiento" />
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Nuevo movimiento">
-        <TransactionForm onSuccess={() => setOpen(false)} />
+      <Modal
+        open={open}
+        onClose={() => setEditing(null)}
+        title={editing === 'new' ? 'Nuevo movimiento' : 'Editar movimiento'}
+      >
+        <TransactionForm
+          transaction={editing && editing !== 'new' ? editing : null}
+          onSuccess={() => setEditing(null)}
+        />
       </Modal>
     </section>
   )
