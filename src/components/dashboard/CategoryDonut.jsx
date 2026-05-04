@@ -60,13 +60,17 @@ export default function CategoryDonut() {
               ))}
             </Pie>
             <Tooltip
+              cursor={{ fill: 'rgba(255,255,255,0.05)' }}
               contentStyle={{
                 backgroundColor: '#1c2030',
-                border: '1px solid rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.15)',
                 borderRadius: 8,
                 color: 'white',
                 fontSize: 12,
+                padding: '6px 10px',
               }}
+              itemStyle={{ color: 'white' }}
+              labelStyle={{ color: 'rgba(255,255,255,0.6)' }}
               formatter={(value, name) => [formatEuro(value), name]}
             />
           </PieChart>

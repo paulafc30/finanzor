@@ -1,14 +1,24 @@
-import { Outlet } from 'react-router-dom'
-import { Link } from 'react-router-dom'
+import { Outlet, Link, useLocation } from 'react-router-dom'
 import { UserCircle2 } from 'lucide-react'
 import MonthSwitcher from './MonthSwitcher.jsx'
 import BottomNav from './BottomNav.jsx'
 
+// Rutas donde NO tiene sentido el selector de mes (ajustes, gestión de
+// categorías, etc.) — son configuración, no datos del mes.
+const HIDE_MONTH_SWITCHER_ON = ['/ajustes', '/categorias']
+
 export default function AppShell() {
+  const location = useLocation()
+  const showMonthSwitcher = !HIDE_MONTH_SWITCHER_ON.includes(location.pathname)
+
   return (
     <div className="flex min-h-screen flex-col bg-bg-base text-white">
       <header className="sticky top-0 z-10 flex items-center justify-between border-b border-white/5 bg-bg-base/80 px-4 py-3 backdrop-blur">
-        <MonthSwitcher />
+        {showMonthSwitcher ? (
+          <MonthSwitcher />
+        ) : (
+          <span className="text-sm font-semibold text-white/80">Finanzor</span>
+        )}
         <Link
           to="/ajustes"
           aria-label="Ajustes"
