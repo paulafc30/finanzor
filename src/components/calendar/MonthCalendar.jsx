@@ -58,14 +58,17 @@ export default function MonthCalendar({ onDayClick }) {
       {/* Encabezado de días de la semana */}
       <div className="mb-2 grid grid-cols-7 gap-1 text-center">
         {WEEKDAYS.map((d) => (
-          <div key={d} className="text-[10px] font-semibold uppercase text-white/40">
+          <div
+            key={d}
+            className="text-[11px] font-semibold uppercase tracking-wide text-white/40"
+          >
             {d}
           </div>
         ))}
       </div>
 
-      {/* Grid de días */}
-      <div className="grid grid-cols-7 gap-1">
+      {/* Grid de días — altura mínima generosa para que se vean bien en móvil */}
+      <div className="grid grid-cols-7 gap-1.5">
         {days.map((day) => {
           const key = format(day, 'yyyy-MM-dd')
           const inMonth = isSameMonth(day, month)
@@ -78,15 +81,15 @@ export default function MonthCalendar({ onDayClick }) {
               type="button"
               onClick={() => onDayClick?.(key, day)}
               className={[
-                'group relative flex aspect-square flex-col items-center justify-start rounded-lg p-1.5 text-xs transition',
-                inMonth ? 'bg-bg-card/40 hover:bg-bg-card' : 'opacity-30 hover:opacity-60',
+                'group relative flex min-h-[64px] flex-col items-center justify-between rounded-lg p-2 transition sm:min-h-[80px]',
+                inMonth ? 'bg-bg-card/50 hover:bg-bg-card' : 'opacity-30 hover:opacity-60',
                 isToday ? 'ring-2 ring-accent' : '',
               ].join(' ')}
               aria-label={format(day, "EEEE d 'de' LLLL", { locale: es })}
             >
               <span
                 className={[
-                  'text-[11px] font-medium',
+                  'text-sm font-semibold tabular-nums',
                   inMonth ? 'text-white' : 'text-white/50',
                   isToday ? 'text-accent' : '',
                 ].join(' ')}
@@ -95,21 +98,23 @@ export default function MonthCalendar({ onDayClick }) {
               </span>
 
               {/* Indicadores de actividad */}
-              {data && (
-                <div className="mt-auto flex items-center gap-0.5">
+              {data ? (
+                <div className="flex items-center gap-1">
                   {data.income > 0 && (
                     <span
-                      className="h-1.5 w-1.5 rounded-full bg-success"
-                      title={`Ingresos`}
+                      className="h-2 w-2 rounded-full bg-success"
+                      title="Ingresos"
                     />
                   )}
                   {data.expense > 0 && (
                     <span
-                      className="h-1.5 w-1.5 rounded-full bg-danger"
-                      title={`Gastos`}
+                      className="h-2 w-2 rounded-full bg-danger"
+                      title="Gastos"
                     />
                   )}
                 </div>
+              ) : (
+                <span className="h-2" />
               )}
             </button>
           )
@@ -117,17 +122,17 @@ export default function MonthCalendar({ onDayClick }) {
       </div>
 
       {/* Leyenda */}
-      <div className="mt-3 flex items-center justify-center gap-4 text-[11px] text-white/50">
-        <span className="inline-flex items-center gap-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-success" />
+      <div className="mt-4 flex items-center justify-center gap-4 text-xs text-white/60">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-success" />
           Ingresos
         </span>
-        <span className="inline-flex items-center gap-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-danger" />
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-danger" />
           Gastos
         </span>
-        <span className="inline-flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full ring-2 ring-accent" />
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full ring-2 ring-accent" />
           Hoy
         </span>
       </div>
