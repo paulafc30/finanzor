@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ChevronRight, Tags, LogOut } from 'lucide-react'
+import { ChevronRight, Tags, LogOut, Upload } from 'lucide-react'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from '../hooks/useSession.js'
 
@@ -27,6 +27,16 @@ export default function Settings() {
           >
             <Tags size={18} className="text-white/60" />
             <span className="flex-1 text-sm text-white">Gestionar categorías</span>
+            <ChevronRight size={16} className="text-white/40" />
+          </Link>
+        </li>
+        <li className="border-t border-white/5">
+          <Link
+            to="/importar"
+            className="flex items-center gap-3 px-4 py-3 hover:bg-white/5"
+          >
+            <Upload size={18} className="text-white/60" />
+            <span className="flex-1 text-sm text-white">Importar desde CSV</span>
             <ChevronRight size={16} className="text-white/40" />
           </Link>
         </li>

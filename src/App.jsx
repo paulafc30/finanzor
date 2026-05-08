@@ -10,6 +10,7 @@ import Budget from './pages/Budget.jsx'
 import Savings from './pages/Savings.jsx'
 import Settings from './pages/Settings.jsx'
 import Categories from './pages/Categories.jsx'
+import ImportPage from './pages/Import.jsx'
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/ahorro" element={<Savings />} />
         <Route path="/ajustes" element={<Settings />} />
         <Route path="/categorias" element={<Categories />} />
+        <Route path="/importar" element={<ImportPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

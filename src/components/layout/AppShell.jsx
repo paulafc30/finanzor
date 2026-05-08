@@ -5,7 +5,7 @@ import BottomNav from './BottomNav.jsx'
 
 // Rutas donde NO tiene sentido el selector de mes (ajustes, gestión de
 // categorías, etc.) — son configuración, no datos del mes.
-const HIDE_MONTH_SWITCHER_ON = ['/ajustes', '/categorias']
+const HIDE_MONTH_SWITCHER_ON = ['/ajustes', '/categorias', '/importar']
 
 export default function AppShell() {
   const location = useLocation()
