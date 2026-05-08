@@ -54,20 +54,20 @@ export default function MonthCalendar({ onDayClick }) {
   const today = new Date()
 
   return (
-    <div className="rounded-xl bg-bg-elevated p-3 ring-1 ring-white/5">
+    <div className="rounded-2xl bg-bg-elevated p-4 ring-1 ring-white/5 sm:p-5">
       {/* Encabezado de días de la semana */}
-      <div className="mb-2 grid grid-cols-7 gap-1 text-center">
+      <div className="mb-3 grid grid-cols-7 gap-1.5 text-center">
         {WEEKDAYS.map((d) => (
           <div
             key={d}
-            className="text-[11px] font-semibold uppercase tracking-wide text-white/40"
+            className="text-xs font-semibold uppercase tracking-wide text-white/40"
           >
             {d}
           </div>
         ))}
       </div>
 
-      {/* Grid de días — altura mínima generosa para que se vean bien en móvil */}
+      {/* Grid de días — celdas grandes para móvil */}
       <div className="grid grid-cols-7 gap-1.5">
         {days.map((day) => {
           const key = format(day, 'yyyy-MM-dd')
@@ -81,7 +81,7 @@ export default function MonthCalendar({ onDayClick }) {
               type="button"
               onClick={() => onDayClick?.(key, day)}
               className={[
-                'group relative flex min-h-[64px] flex-col items-center justify-between rounded-lg p-2 transition sm:min-h-[80px]',
+                'group relative flex min-h-[88px] flex-col items-center justify-between rounded-lg p-2 transition sm:min-h-[110px] sm:p-3',
                 inMonth ? 'bg-bg-card/50 hover:bg-bg-card' : 'opacity-30 hover:opacity-60',
                 isToday ? 'ring-2 ring-accent' : '',
               ].join(' ')}
@@ -89,7 +89,7 @@ export default function MonthCalendar({ onDayClick }) {
             >
               <span
                 className={[
-                  'text-sm font-semibold tabular-nums',
+                  'text-lg font-semibold tabular-nums leading-none sm:text-xl',
                   inMonth ? 'text-white' : 'text-white/50',
                   isToday ? 'text-accent' : '',
                 ].join(' ')}
@@ -99,22 +99,22 @@ export default function MonthCalendar({ onDayClick }) {
 
               {/* Indicadores de actividad */}
               {data ? (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   {data.income > 0 && (
                     <span
-                      className="h-2 w-2 rounded-full bg-success"
+                      className="h-2.5 w-2.5 rounded-full bg-success"
                       title="Ingresos"
                     />
                   )}
                   {data.expense > 0 && (
                     <span
-                      className="h-2 w-2 rounded-full bg-danger"
+                      className="h-2.5 w-2.5 rounded-full bg-danger"
                       title="Gastos"
                     />
                   )}
                 </div>
               ) : (
-                <span className="h-2" />
+                <span className="h-2.5" />
               )}
             </button>
           )
@@ -122,17 +122,17 @@ export default function MonthCalendar({ onDayClick }) {
       </div>
 
       {/* Leyenda */}
-      <div className="mt-4 flex items-center justify-center gap-4 text-xs text-white/60">
+      <div className="mt-5 flex items-center justify-center gap-5 text-xs text-white/60">
         <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-success" />
+          <span className="h-2.5 w-2.5 rounded-full bg-success" />
           Ingresos
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-danger" />
+          <span className="h-2.5 w-2.5 rounded-full bg-danger" />
           Gastos
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full ring-2 ring-accent" />
+          <span className="h-3 w-3 rounded-full ring-2 ring-accent" />
           Hoy
         </span>
       </div>
