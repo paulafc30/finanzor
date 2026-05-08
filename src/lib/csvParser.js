@@ -1,14 +1,42 @@
 import Papa from 'papaparse'
 import { parse as parseDate, isValid as isValidDate, format as formatDate } from 'date-fns'
 
+// Palabras clave que típicamente aparecen en una cabecera de CSV bancario.
+// Si una línea contiene 2+ de estas palabras, asumimos que es la fila de headers.
+const HEADER_KEYWORDS = /\b(fecha|date|importe|amount|concepto|descripc|detalle|operaci[oó]n|haber|debe|cargo|abono|movimiento)\b/gi
+
+/**
+ * Detecta en qué línea empieza la tabla real de movimientos.
+ * Algunos bancos (CaixaBank, BBVA…) anteponen un preámbulo con datos de la
+ * cuenta (titular, IBAN, periodo, saldo) antes de la cabecera real.
+ */
+function findHeaderLineIndex(lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const matches = lines[i].toLowerCase().match(HEADER_KEYWORDS)
+    if (matches && matches.length >= 2) return i
+  }
+  return 0
+}
+
 /**
  * Parsea un archivo CSV/TSV usando PapaParse.
+ * - Soporta el preámbulo de bancos como CaixaBank: detecta automáticamente la
+ *   primera línea que parezca cabecera real (con al menos 2 palabras clave).
+ * - Quita BOM UTF-8 si lo hay.
+ *
  * Devuelve { headers, rows } donde rows es array de objetos { col: valor }.
- * Si no hay headers reconocibles, los genera como col1, col2, ...
  */
-export function parseCsvFile(file) {
+export async function parseCsvFile(file) {
+  const rawText = await file.text()
+  // Quitar BOM si existe
+  const text = rawText.replace(/^﻿/, '')
+  const lines = text.split(/\r?\n/)
+
+  const headerIdx = findHeaderLineIndex(lines)
+  const cleanText = lines.slice(headerIdx).join('\n')
+
   return new Promise((resolve, reject) => {
-    Papa.parse(file, {
+    Papa.parse(cleanText, {
       header: true,
       skipEmptyLines: true,
       dynamicTyping: false,
