@@ -39,15 +39,15 @@ export default function Dashboard() {
     <section className="space-y-4">
       {/* Header con título grande y acción Añadir */}
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold leading-tight">
+        <div className="min-w-0">
+          <h1 className="truncate text-2xl font-bold leading-tight">
             {formatMonthLabel(month)}
           </h1>
           <p className="text-xs text-white/50">Resumen financiero del mes</p>
         </div>
-        <Button size="sm" onClick={() => setOpen(true)}>
+        <Button size="sm" onClick={() => setOpen(true)} className="shrink-0">
           <Plus size={16} />
-          Añadir
+          <span className="hidden sm:inline">Añadir</span>
         </Button>
       </div>
 

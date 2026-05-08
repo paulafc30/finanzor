@@ -73,7 +73,7 @@ export default function RecentTransactions({ limit = 5 }) {
 
               <p
                 className={[
-                  'shrink-0 text-sm font-semibold',
+                  'shrink-0 text-sm font-semibold tabular-nums',
                   t.type === 'expense' ? 'text-danger' : 'text-success',
                 ].join(' ')}
               >

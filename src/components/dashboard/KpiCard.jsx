@@ -100,7 +100,7 @@ export default function KpiCard({
       <p className={`text-xs font-medium ${palette.label}`}>{label}</p>
       <p
         className={[
-          'mt-0.5 text-xl font-bold leading-tight',
+          'mt-0.5 truncate text-lg font-bold leading-tight tabular-nums sm:text-xl',
           palette.text,
           loading ? 'opacity-40' : '',
         ].join(' ')}

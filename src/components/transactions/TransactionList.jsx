@@ -126,7 +126,7 @@ export default function TransactionList({ onEdit }) {
                   <div className="shrink-0 text-right">
                     <p
                       className={[
-                        'text-sm font-semibold',
+                        'text-sm font-semibold tabular-nums',
                         t.type === 'expense' ? 'text-danger' : 'text-success',
                       ].join(' ')}
                     >

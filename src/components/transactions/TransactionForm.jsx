@@ -30,8 +30,10 @@ const schema = z
  * Formulario para alta o edición de un movimiento.
  * - Si recibe `transaction`, prellena y llama a useUpdateTransaction.
  * - Si no, crea con los defaults habituales.
+ * - Si recibe `defaultDate` (string YYYY-MM-DD) y NO hay transaction,
+ *   usa esa fecha en vez del default normal (útil al añadir desde el calendario).
  */
-export default function TransactionForm({ transaction, onSuccess }) {
+export default function TransactionForm({ transaction, defaultDate: defaultDateProp, onSuccess }) {
   const isEdit = !!transaction
   const { data: categories = [] } = useCategories()
   const createMutation = useCreateTransaction()
@@ -40,8 +42,10 @@ export default function TransactionForm({ transaction, onSuccess }) {
 
   // Defaults: en edición usamos los valores actuales; en creación, hoy o
   // el primer día del mes seleccionado si estás navegando otro mes.
+  // Si nos pasan defaultDate explícito (calendario), tiene prioridad.
   const today = format(new Date(), 'yyyy-MM-dd')
-  const defaultDate = today >= rangeStart && today < rangeEnd ? today : rangeStart
+  const computedDefaultDate = today >= rangeStart && today < rangeEnd ? today : rangeStart
+  const defaultDate = defaultDateProp || computedDefaultDate
 
   const initial = isEdit
     ? {
