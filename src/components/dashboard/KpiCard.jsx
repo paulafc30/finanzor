@@ -63,17 +63,22 @@ export default function KpiCard({
 
   let deltaNode = null
   if (delta !== null && delta !== undefined && !loading) {
-    const isPositive = delta > 0
-    const isNeutral = Math.abs(delta) < 0.5
+    // Si el delta es un objeto { fallbackToAbs, value }, lo tratamos como absoluto
+    const isFallback = typeof delta === 'object' && delta?.fallbackToAbs
+    const numeric = isFallback ? delta.value : delta
+    const useAbsolute = deltaIsAbsolute || isFallback
+
+    const isPositive = numeric > 0
+    const isNeutral = Math.abs(numeric) < 0.5
     let colorClass = 'text-white/50'
     if (!isNeutral) {
       const good = deltaPositiveIsGood ? isPositive : !isPositive
       colorClass = good ? 'text-success' : 'text-danger'
     }
     const ArrowIcon = isPositive ? ArrowUp : ArrowDown
-    const text = deltaIsAbsolute
-      ? `${isPositive ? '+' : ''}${formatEuro(delta)}`
-      : `${isPositive ? '+' : ''}${delta.toFixed(0)}%`
+    const text = useAbsolute
+      ? `${isPositive ? '+' : ''}${formatEuro(numeric)}`
+      : `${isPositive ? '+' : ''}${numeric.toFixed(0)}%`
     deltaNode = (
       <span className={`inline-flex items-center gap-0.5 text-[11px] font-medium ${colorClass}`}>
         {!isNeutral && <ArrowIcon size={11} />}

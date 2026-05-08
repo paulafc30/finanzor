@@ -107,10 +107,20 @@ export default function Dashboard() {
   )
 }
 
+/**
+ * Diferencia porcentual respecto al valor previo. Si el porcentaje resulta
+ * absurdamente grande (>999%) — pasa cuando el mes anterior tenía un valor
+ * muy pequeño — devolvemos un objeto con la diferencia absoluta para que la
+ * card pinte "+1.234,56 €" en lugar de un "+12350%" inútil.
+ */
 function diffPct(current, prev) {
   if (prev === 0 && current === 0) return null
   if (prev === 0) return null
-  return ((current - prev) / Math.abs(prev)) * 100
+  const pct = ((current - prev) / Math.abs(prev)) * 100
+  if (Math.abs(pct) > 999) {
+    return { fallbackToAbs: true, value: current - prev }
+  }
+  return pct
 }
 
 function diffAbs(current, prev) {

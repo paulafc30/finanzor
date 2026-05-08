@@ -11,6 +11,7 @@ import Savings from './pages/Savings.jsx'
 import Settings from './pages/Settings.jsx'
 import Categories from './pages/Categories.jsx'
 import ImportPage from './pages/Import.jsx'
+import FeedbackPage from './pages/Feedback.jsx'
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/ajustes" element={<Settings />} />
         <Route path="/categorias" element={<Categories />} />
         <Route path="/importar" element={<ImportPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
