@@ -10,6 +10,7 @@ import MonthBudgetBar from '../components/dashboard/MonthBudgetBar.jsx'
 import RecentTransactions from '../components/dashboard/RecentTransactions.jsx'
 import { useTransactions } from '../hooks/useTransactions.js'
 import { usePreviousMonthSummary } from '../hooks/usePreviousMonthSummary.js'
+import { useAccumulatedBalance } from '../hooks/useAccumulatedBalance.js'
 import { useMonth } from '../hooks/useMonth.jsx'
 import { formatEuro, formatMonthLabel } from '../lib/formatters.js'
 
@@ -17,6 +18,7 @@ export default function Dashboard() {
   const [open, setOpen] = useState(false)
   const { data: transactions = [], isLoading } = useTransactions()
   const { data: prev } = usePreviousMonthSummary()
+  const { data: accumulatedBalance, isLoading: accLoading } = useAccumulatedBalance()
   const { month } = useMonth()
 
   const summary = useMemo(() => {
@@ -33,7 +35,6 @@ export default function Dashboard() {
 
   const prevIncome = prev?.income ?? 0
   const prevExpense = prev?.expense ?? 0
-  const prevBalance = prev?.balance ?? 0
 
   return (
     <section className="space-y-4">
@@ -73,13 +74,14 @@ export default function Dashboard() {
         />
         <KpiCard
           label="Saldo Actual"
-          value={formatEuro(summary.balance)}
+          value={formatEuro(accumulatedBalance ?? 0)}
           icon={Wallet}
           tone="info"
-          loading={isLoading}
-          delta={diffAbs(summary.balance, prevBalance)}
+          loading={accLoading}
+          delta={summary.balance}
           deltaPositiveIsGood
           deltaIsAbsolute
+          deltaLabel="este mes"
         />
         <KpiCard
           label="Tasa de Ahorro"

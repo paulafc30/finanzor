@@ -50,6 +50,7 @@ export function useBulkImportTransactions() {
       qc.invalidateQueries({ queryKey: ['transactions', user?.id] })
       qc.invalidateQueries({ queryKey: ['monthly-summary', user?.id] })
       qc.invalidateQueries({ queryKey: ['previous-month-summary', user?.id] })
+      qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
       qc.invalidateQueries({ queryKey: ['budgets', user?.id] })
     },
   })

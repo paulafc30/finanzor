@@ -70,6 +70,8 @@ export function useCreateTransaction() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['transactions', user?.id] })
       qc.invalidateQueries({ queryKey: ['monthly-summary', user?.id] })
+      qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
+      qc.invalidateQueries({ queryKey: ['previous-month-summary', user?.id] })
     },
   })
 }
@@ -109,6 +111,8 @@ export function useUpdateTransaction() {
       qc.invalidateQueries({ queryKey: ['transactions', user?.id] })
       qc.invalidateQueries({ queryKey: ['monthly-summary', user?.id] })
       qc.invalidateQueries({ queryKey: ['budgets', user?.id] })
+      qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
+      qc.invalidateQueries({ queryKey: ['previous-month-summary', user?.id] })
     },
   })
 }
@@ -129,6 +133,8 @@ export function useDeleteTransaction() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['transactions', user?.id] })
       qc.invalidateQueries({ queryKey: ['monthly-summary', user?.id] })
+      qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
+      qc.invalidateQueries({ queryKey: ['previous-month-summary', user?.id] })
     },
   })
 }

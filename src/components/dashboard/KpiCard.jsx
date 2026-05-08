@@ -57,6 +57,7 @@ export default function KpiCard({
   delta,
   deltaPositiveIsGood = true,
   deltaIsAbsolute = false,
+  deltaLabel = null,
 }) {
   const palette = tonePalette[tone] ?? tonePalette.accent
 
@@ -77,6 +78,7 @@ export default function KpiCard({
       <span className={`inline-flex items-center gap-0.5 text-[11px] font-medium ${colorClass}`}>
         {!isNeutral && <ArrowIcon size={11} />}
         {text}
+        {deltaLabel && <span className="ml-0.5 text-white/40">{deltaLabel}</span>}
       </span>
     )
   }
