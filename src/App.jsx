@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { MonthProvider } from './hooks/useMonth.jsx'
+import { useAuthCacheSync } from './hooks/useAuthCacheSync.js'
 import RequireAuth from './components/auth/RequireAuth.jsx'
 import AppShell from './components/layout/AppShell.jsx'
 import Login from './pages/Login.jsx'
@@ -14,6 +15,9 @@ import ImportPage from './pages/Import.jsx'
 import FeedbackPage from './pages/Feedback.jsx'
 
 export default function App() {
+  // Limpia cache de queries y flags de localStorage al cambiar de usuario
+  useAuthCacheSync()
+
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
