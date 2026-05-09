@@ -1,8 +1,18 @@
 import { useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
+import { UserPlus, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from '../hooks/useSession.js'
 
+/**
+ * Pantalla de login / signup.
+ *
+ * UX: si el login falla (email no registrado o contraseña incorrecta —
+ * Supabase no distingue por seguridad), mostramos un botón para "Crear
+ * cuenta con este email" que cambia al modo signup manteniendo los
+ * campos rellenos. Si el email ya existía, signup devolverá "User already
+ * registered" y mostraremos el mensaje correspondiente.
+ */
 export default function Login() {
   const { user, loading } = useSession()
   const location = useLocation()
@@ -10,7 +20,9 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
+  const [info, setInfo] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [signinFailed, setSigninFailed] = useState(false)
 
   if (loading) return null
   if (user) {
@@ -18,17 +30,51 @@ export default function Login() {
     return <Navigate to={to} replace />
   }
 
+  function clearMessages() {
+    setError(null)
+    setInfo(null)
+    setSigninFailed(false)
+  }
+
+  function switchMode(newMode) {
+    setMode(newMode)
+    clearMessages()
+    // Mantenemos email y password rellenos al cambiar de modo
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
-    setError(null)
+    clearMessages()
     setBusy(true)
     try {
-      const fn =
-        mode === 'signin'
-          ? supabase.auth.signInWithPassword({ email, password })
-          : supabase.auth.signUp({ email, password })
-      const { error } = await fn
-      if (error) throw error
+      if (mode === 'signin') {
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) {
+          setSigninFailed(true)
+          throw error
+        }
+      } else {
+        const { data, error } = await supabase.auth.signUp({ email, password })
+        if (error) {
+          // Supabase puede devolver "User already registered" si el email existe
+          if (
+            error.message?.toLowerCase().includes('already') ||
+            error.message?.toLowerCase().includes('registered')
+          ) {
+            setError(
+              'Este email ya está registrado. Si has olvidado tu contraseña, contacta con soporte.',
+            )
+            return
+          }
+          throw error
+        }
+        // Si el email requiere confirmación, data.user existe pero session es null
+        if (data?.user && !data.session) {
+          setInfo(
+            'Te hemos enviado un correo para confirmar tu cuenta. Revisa tu bandeja de entrada (y la carpeta de spam).',
+          )
+        }
+      }
     } catch (err) {
       setError(err.message ?? 'Algo no fue bien')
     } finally {
@@ -37,12 +83,19 @@ export default function Login() {
   }
 
   async function handleGoogle() {
-    setError(null)
+    clearMessages()
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin },
     })
     if (error) setError(error.message)
+  }
+
+  function offerSignup() {
+    setMode('signup')
+    setSigninFailed(false)
+    setError(null)
+    setInfo('Rellena la contraseña que quieras para crear tu cuenta con este email.')
   }
 
   return (
@@ -59,7 +112,10 @@ export default function Login() {
             required
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value)
+              clearMessages()
+            }}
             className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white placeholder-white/40 outline-none ring-1 ring-white/5 focus:ring-accent"
           />
           <input
@@ -68,11 +124,26 @@ export default function Login() {
             minLength={6}
             placeholder="Contraseña"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value)
+              clearMessages()
+            }}
             className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white placeholder-white/40 outline-none ring-1 ring-white/5 focus:ring-accent"
           />
 
-          {error && <p className="text-sm text-danger">{error}</p>}
+          {error && (
+            <div className="flex items-start gap-2 rounded-lg bg-danger/10 p-2.5 text-xs text-white ring-1 ring-danger/20">
+              <AlertTriangle size={14} className="mt-0.5 shrink-0 text-danger" />
+              <p className="flex-1">{error}</p>
+            </div>
+          )}
+
+          {info && !error && (
+            <div className="flex items-start gap-2 rounded-lg bg-success/10 p-2.5 text-xs text-white ring-1 ring-success/20">
+              <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-success" />
+              <p className="flex-1">{info}</p>
+            </div>
+          )}
 
           <button
             type="submit"
@@ -81,6 +152,18 @@ export default function Login() {
           >
             {busy ? '…' : mode === 'signin' ? 'Entrar' : 'Crear cuenta'}
           </button>
+
+          {/* Si el signin falla, sugerimos crear cuenta con el mismo email */}
+          {signinFailed && mode === 'signin' && email && (
+            <button
+              type="button"
+              onClick={offerSignup}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-bg-card py-2.5 text-sm font-medium text-white ring-1 ring-white/10 hover:bg-bg-card/70"
+            >
+              <UserPlus size={15} />
+              Crear cuenta con este email
+            </button>
+          )}
         </form>
 
         <div className="my-4 flex items-center gap-2 text-xs text-white/40">
@@ -115,7 +198,7 @@ export default function Login() {
 
         <button
           type="button"
-          onClick={() => setMode((m) => (m === 'signin' ? 'signup' : 'signin'))}
+          onClick={() => switchMode(mode === 'signin' ? 'signup' : 'signin')}
           className="mt-4 w-full text-center text-sm text-white/60 hover:text-white"
         >
           {mode === 'signin'

@@ -1,16 +1,18 @@
 import { useMemo, useState } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, PiggyBank, TrendingUp } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
 import GoalCard from '../components/savings/GoalCard.jsx'
 import GoalForm from '../components/savings/GoalForm.jsx'
 import GoalDetailModal from '../components/savings/GoalDetailModal.jsx'
 import { useGoals } from '../hooks/useGoals.js'
+import { useSavingsFromExpenses } from '../hooks/useSavingsFromExpenses.js'
 import { formatEuro } from '../lib/formatters.js'
 
 export default function Savings() {
   const [showArchived, setShowArchived] = useState(false)
   const { goals, isLoading, error } = useGoals({ includeArchived: showArchived })
+  const { data: savingsExp } = useSavingsFromExpenses()
 
   const [creating, setCreating] = useState(false)
   const [openGoal, setOpenGoal] = useState(null) // goal seleccionada para detalle
@@ -66,12 +68,48 @@ export default function Savings() {
         </button>
       </div>
 
+      {/* Aportaciones de la categoría "Ahorro" (gastos clasificados como Ahorro) */}
+      <div className="rounded-xl bg-success/10 p-4 ring-1 ring-success/20">
+        <div className="mb-3 flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-success">
+            <PiggyBank size={16} className="text-white" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-white">Categoría Ahorro</h2>
+            <p className="text-[11px] text-white/50">
+              Suma de tus gastos categorizados como "Ahorro"
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-white/50">
+              Este mes
+            </p>
+            <p className="mt-0.5 text-lg font-bold text-success tabular-nums">
+              {formatEuro(savingsExp?.monthTotal ?? 0)}
+            </p>
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-wide text-white/50">
+              Total acumulado
+            </p>
+            <p className="mt-0.5 text-lg font-bold text-success tabular-nums">
+              {formatEuro(savingsExp?.allTotal ?? 0)}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Resumen total de metas activas */}
       {activeGoals.length > 0 && (
-        <div className="rounded-xl bg-bg-elevated p-3">
+        <div className="rounded-xl bg-bg-elevated p-3 ring-1 ring-white/5">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-white/60">Progreso total</span>
-            <span className="font-semibold text-white">
+            <span className="flex items-center gap-1.5 text-white/60">
+              <TrendingUp size={14} />
+              Progreso total de metas
+            </span>
+            <span className="font-semibold text-white tabular-nums">
               {formatEuro(totals.contributed)}{' '}
               <span className="text-white/40">/ {formatEuro(totals.target)}</span>
             </span>
