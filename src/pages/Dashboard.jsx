@@ -60,8 +60,10 @@ export default function Dashboard() {
           icon={TrendingUp}
           tone="success"
           loading={isLoading}
-          delta={diffPct(summary.income, prevIncome)}
-          deltaPositiveIsGood
+          // Delta vs mes anterior desactivado temporalmente: la comparativa
+          // sale rara cuando el mes anterior tiene importes muy distintos.
+          // delta={diffPct(summary.income, prevIncome)}
+          // deltaPositiveIsGood
         />
         <KpiCard
           label="Gastos"
@@ -78,10 +80,11 @@ export default function Dashboard() {
           icon={Wallet}
           tone="info"
           loading={accLoading}
-          delta={summary.balance}
-          deltaPositiveIsGood
-          deltaIsAbsolute
-          deltaLabel="este mes"
+          // Delta "este mes" desactivado temporalmente hasta revisar el cálculo.
+          // delta={summary.balance}
+          // deltaPositiveIsGood
+          // deltaIsAbsolute
+          // deltaLabel="este mes"
         />
         <KpiCard
           label="Tasa de Ahorro"
