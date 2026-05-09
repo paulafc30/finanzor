@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { UserPlus, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from '../hooks/useSession.js'
+import { translateAuthError } from '../lib/authErrors.js'
 
 /**
  * Pantalla de login / signup.
@@ -55,19 +56,7 @@ export default function Login() {
         }
       } else {
         const { data, error } = await supabase.auth.signUp({ email, password })
-        if (error) {
-          // Supabase puede devolver "User already registered" si el email existe
-          if (
-            error.message?.toLowerCase().includes('already') ||
-            error.message?.toLowerCase().includes('registered')
-          ) {
-            setError(
-              'Este email ya está registrado. Si has olvidado tu contraseña, contacta con soporte.',
-            )
-            return
-          }
-          throw error
-        }
+        if (error) throw error
         // Si el email requiere confirmación, data.user existe pero session es null
         if (data?.user && !data.session) {
           setInfo(
@@ -76,7 +65,7 @@ export default function Login() {
         }
       }
     } catch (err) {
-      setError(err.message ?? 'Algo no fue bien')
+      setError(translateAuthError(err))
     } finally {
       setBusy(false)
     }
@@ -88,7 +77,7 @@ export default function Login() {
       provider: 'google',
       options: { redirectTo: window.location.origin },
     })
-    if (error) setError(error.message)
+    if (error) setError(translateAuthError(error))
   }
 
   function offerSignup() {
