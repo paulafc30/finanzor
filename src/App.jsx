@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { MonthProvider } from './hooks/useMonth.jsx'
+import { OnboardingProvider } from './hooks/useOnboarding.jsx'
 import { useAuthCacheSync } from './hooks/useAuthCacheSync.js'
 import RequireAuth from './components/auth/RequireAuth.jsx'
 import AppShell from './components/layout/AppShell.jsx'
@@ -25,9 +26,11 @@ export default function App() {
       <Route
         element={
           <RequireAuth>
-            <MonthProvider>
-              <AppShell />
-            </MonthProvider>
+            <OnboardingProvider>
+              <MonthProvider>
+                <AppShell />
+              </MonthProvider>
+            </OnboardingProvider>
           </RequireAuth>
         }
       >
