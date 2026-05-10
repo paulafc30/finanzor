@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
-import { TrendingUp, TrendingDown, Wallet, Percent, Plus } from 'lucide-react'
+import { TrendingUp, TrendingDown, Wallet, Percent } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
-import Button from '../components/ui/Button.jsx'
 import TransactionForm from '../components/transactions/TransactionForm.jsx'
 import KpiCard from '../components/dashboard/KpiCard.jsx'
 import CategoryDonut from '../components/dashboard/CategoryDonut.jsx'
@@ -38,18 +37,12 @@ export default function Dashboard() {
 
   return (
     <section className="space-y-4">
-      {/* Header con título grande y acción Añadir */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="truncate text-2xl font-bold leading-tight">
-            {formatMonthLabel(month)}
-          </h1>
-          <p className="text-xs text-white/50">Resumen financiero del mes</p>
-        </div>
-        <Button size="sm" onClick={() => setOpen(true)} className="shrink-0">
-          <Plus size={16} />
-          <span className="hidden sm:inline">Añadir</span>
-        </Button>
+      {/* Header con título grande del mes */}
+      <div className="min-w-0">
+        <h1 className="truncate text-2xl font-bold leading-tight">
+          {formatMonthLabel(month)}
+        </h1>
+        <p className="text-xs text-white/50">Resumen financiero del mes</p>
       </div>
 
       {/* KPIs en grid 2x2 (móvil) / 4x1 (desktop) */}
