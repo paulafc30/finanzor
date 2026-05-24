@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useTransactions } from '../../hooks/useTransactions.js'
+import { useMonth } from '../../hooks/useMonth.jsx'
 import { formatEuro } from '../../lib/formatters.js'
 
 /**
@@ -11,6 +12,7 @@ import { formatEuro } from '../../lib/formatters.js'
  */
 export default function RecentTransactions({ limit = 5 }) {
   const { data: transactions = [], isLoading } = useTransactions()
+  const { isYearView } = useMonth()
 
   const items = transactions.slice(0, limit)
 
@@ -36,7 +38,7 @@ export default function RecentTransactions({ limit = 5 }) {
         </div>
       ) : items.length === 0 ? (
         <p className="px-4 py-6 text-center text-sm text-white/50">
-          Sin movimientos este mes.
+          {isYearView ? 'Sin movimientos este año.' : 'Sin movimientos este mes.'}
         </p>
       ) : (
         <ul>

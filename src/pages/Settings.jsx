@@ -3,6 +3,7 @@ import { ChevronRight, Tags, LogOut, Upload, MessageCircle, BookOpen } from 'luc
 import { supabase } from '../lib/supabase.js'
 import { useSession } from '../hooks/useSession.js'
 import { useOnboarding } from '../hooks/useOnboarding.jsx'
+import NotificationsToggle from '../components/settings/NotificationsToggle.jsx'
 
 export default function Settings() {
   const { user } = useSession()
@@ -20,6 +21,8 @@ export default function Settings() {
         <p className="text-white/60">Sesión iniciada como</p>
         <p className="text-white">{user?.email ?? '—'}</p>
       </div>
+
+      <NotificationsToggle />
 
       <ul className="overflow-hidden rounded-xl bg-bg-elevated">
         <li>

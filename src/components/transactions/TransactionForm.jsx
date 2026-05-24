@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { format } from 'date-fns'
-import { Repeat } from 'lucide-react'
+import { Repeat, Calculator } from 'lucide-react'
 import Button from '../ui/Button.jsx'
+import CalculatorPad from '../ui/CalculatorPad.jsx'
 import { useCategories } from '../../hooks/useCategories.js'
 import {
   useCreateTransaction,
@@ -15,23 +16,23 @@ const schema = z
   .object({
     type: z.enum(['expense', 'income']),
     amount: z.coerce
-      .number({ invalid_type_error: 'Importe inválido' })
+      .number({ invalid_type_error: 'Importe invalido' })
       .positive('El importe debe ser mayor que 0'),
     description: z.string().max(120).optional().or(z.literal('')),
     category_id: z.string().uuid().optional().or(z.literal('')),
-    occurred_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha inválida'),
+    occurred_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha invalida'),
   })
   .refine(
     (v) => v.type === 'income' || (v.category_id && v.category_id.length > 0),
-    { path: ['category_id'], message: 'Categoría obligatoria en gastos' },
+    { path: ['category_id'], message: 'Categoria obligatoria en gastos' },
   )
 
 /**
- * Formulario para alta o edición de un movimiento.
+ * Formulario para alta o edicion de un movimiento.
  * - Si recibe `transaction`, prellena y llama a useUpdateTransaction.
  * - Si no, crea con los defaults habituales.
  * - Si recibe `defaultDate` (string YYYY-MM-DD) y NO hay transaction,
- *   usa esa fecha en vez del default normal (útil al añadir desde el calendario).
+ *   usa esa fecha en vez del default normal (util al anadir desde el calendario).
  */
 export default function TransactionForm({ transaction, defaultDate: defaultDateProp, onSuccess }) {
   const isEdit = !!transaction
@@ -40,9 +41,9 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
   const updateMutation = useUpdateTransaction()
   const { month, rangeStart, rangeEnd } = useMonth()
 
-  // Defaults: en edición usamos los valores actuales; en creación, hoy o
-  // el primer día del mes seleccionado si estás navegando otro mes.
-  // Si nos pasan defaultDate explícito (calendario), tiene prioridad.
+  // Defaults: en edicion usamos los valores actuales; en creacion, hoy o
+  // el primer dia del mes seleccionado si estas navegando otro mes.
+  // Si nos pasan defaultDate explicito (calendario), tiene prioridad.
   const today = format(new Date(), 'yyyy-MM-dd')
   const computedDefaultDate = today >= rangeStart && today < rangeEnd ? today : rangeStart
   const defaultDate = defaultDateProp || computedDefaultDate
@@ -72,8 +73,8 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
     formState: { errors, isSubmitting },
   } = useForm({ defaultValues: initial })
 
-  // Si cambia el mes seleccionado mientras está abierto el modal de creación,
-  // ajusta la fecha por defecto. En edición no tocamos.
+  // Si cambia el mes seleccionado mientras esta abierto el modal de creacion,
+  // ajusta la fecha por defecto. En edicion no tocamos.
   useEffect(() => {
     if (!isEdit) setValue('occurred_on', defaultDate)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -85,8 +86,23 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transaction?.id])
 
+  // Re-sincroniza la categoria cuando las categorias cargan tarde.
+  // `register` deja el <select> uncontrolled, asi que si las <option> no
+  // existen en el mount inicial el navegador deja el valor en "" y
+  // react-hook-form se queda desincronizado del DOM. Al llegar las
+  // categorias, forzamos el valor correcto.
+  useEffect(() => {
+    if (categories.length === 0) return
+    if (isEdit) {
+      setValue('category_id', transaction.category?.id ?? '')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories.length, transaction?.id])
+
   const type = watch('type')
+  const amount = watch('amount')
   const busy = createMutation.isPending || updateMutation.isPending
+  const [calcOpen, setCalcOpen] = useState(false)
 
   async function onSubmit(values) {
     const parsed = schema.safeParse(values)
@@ -98,7 +114,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
         onSuccess?.()
       } else {
         await createMutation.mutateAsync(parsed.data)
-        // Tras crear, dejamos el form listo para añadir otro: limpiamos campos
+        // Tras crear, dejamos el form listo para anadir otro: limpiamos campos
         // pero conservamos tipo y fecha para encadenar varios.
         reset({
           type: parsed.data.type,
@@ -122,7 +138,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
           <Repeat size={14} className="mt-0.5 shrink-0 text-accent" />
           <p>
             Este movimiento viene de un gasto fijo. Editarlo solo cambia este mes
-            concreto, no la configuración del gasto fijo en sí (eso se edita en
+            concreto, no la configuracion del gasto fijo en si (eso se edita en
             Presupuesto).
           </p>
         </div>
@@ -159,53 +175,75 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
       {/* Importe */}
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Importe (€)
+          Importe (EUR)
         </label>
-        <input
-          type="number"
-          inputMode="decimal"
-          step="0.01"
-          min="0.01"
-          autoFocus
-          placeholder="0,00"
-          {...register('amount', {
-            required: 'Importe obligatorio',
-            min: { value: 0.01, message: 'Mayor que 0' },
-          })}
-          className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-lg font-semibold text-white outline-none ring-1 ring-white/5 focus:ring-accent"
-        />
+        <div className="relative">
+          <input
+            type="number"
+            inputMode="decimal"
+            step="0.01"
+            min="0.01"
+            autoFocus
+            placeholder="0,00"
+            {...register('amount', {
+              required: 'Importe obligatorio',
+              min: { value: 0.01, message: 'Mayor que 0' },
+            })}
+            className="w-full rounded-lg bg-bg-card px-3 py-2.5 pr-12 text-lg font-semibold text-white outline-none ring-1 ring-white/5 focus:ring-accent"
+          />
+          <button
+            type="button"
+            onClick={() => setCalcOpen(true)}
+            aria-label="Abrir calculadora"
+            title="Calculadora"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md p-2 text-white/60 hover:bg-white/5 hover:text-accent"
+          >
+            <Calculator size={18} />
+          </button>
+        </div>
         {errors.amount && (
           <p className="mt-1 text-xs text-danger">{errors.amount.message}</p>
         )}
       </div>
 
-      {/* Descripción */}
+      <CalculatorPad
+        open={calcOpen}
+        initialValue={amount}
+        onClose={() => setCalcOpen(false)}
+        onAccept={(val) => {
+          // Guardamos como string con punto decimal porque el input es type=number
+          setValue('amount', String(val), { shouldValidate: true, shouldDirty: true })
+          setCalcOpen(false)
+        }}
+      />
+
+      {/* Descripcion */}
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Descripción
+          Descripcion
         </label>
         <input
           type="text"
           maxLength={120}
-          placeholder={type === 'expense' ? 'Mercadona, gasolina…' : 'Sueldo, regalo…'}
+          placeholder={type === 'expense' ? 'Mercadona, gasolina...' : 'Sueldo, regalo...'}
           {...register('description')}
           className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
         />
       </div>
 
-      {/* Categoría */}
+      {/* Categoria */}
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Categoría {type === 'expense' && <span className="text-danger">*</span>}
+          Categoria {type === 'expense' && <span className="text-danger">*</span>}
         </label>
         <select
           {...register('category_id', {
             validate: (v) =>
-              type === 'income' || (v && v.length > 0) || 'Categoría obligatoria',
+              type === 'income' || (v && v.length > 0) || 'Categoria obligatoria',
           })}
           className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
         >
-          <option value="">{type === 'income' ? 'Sin categoría' : 'Selecciona…'}</option>
+          <option value="">{type === 'income' ? 'Sin categoria' : 'Selecciona...'}</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -241,7 +279,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
           disabled={isSubmitting || busy}
           className="flex-1"
         >
-          {busy ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Guardar'}
+          {busy ? 'Guardando...' : isEdit ? 'Guardar cambios' : 'Guardar'}
         </Button>
       </div>
     </form>

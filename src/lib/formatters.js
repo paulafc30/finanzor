@@ -49,3 +49,26 @@ export function firstDayOfNextMonth(date) {
   d.setMonth(d.getMonth() + 1)
   return format(d, 'yyyy-MM-dd')
 }
+
+/**
+ * Devuelve el primer día del año (YYYY-01-01) como string YYYY-MM-DD
+ */
+export function firstDayOfYear(date) {
+  const d = new Date(date)
+  return format(new Date(d.getFullYear(), 0, 1), 'yyyy-MM-dd')
+}
+
+/**
+ * Devuelve el primer día del año siguiente como string YYYY-MM-DD
+ */
+export function firstDayOfNextYear(date) {
+  const d = new Date(date)
+  return format(new Date(d.getFullYear() + 1, 0, 1), 'yyyy-MM-dd')
+}
+
+/**
+ * Devuelve "2026" — etiqueta del selector en modo anual
+ */
+export function formatYearLabel(date) {
+  return String(new Date(date).getFullYear())
+}

@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { PieChart as PieIcon } from 'lucide-react'
 import { useTransactions } from '../../hooks/useTransactions.js'
+import { useMonth } from '../../hooks/useMonth.jsx'
 import { formatEuro } from '../../lib/formatters.js'
 
 /**
@@ -11,6 +12,7 @@ import { formatEuro } from '../../lib/formatters.js'
  */
 export default function CategoryDonut() {
   const { data: transactions = [] } = useTransactions()
+  const { isYearView } = useMonth()
 
   const data = useMemo(() => {
     const map = new Map()
@@ -31,7 +33,9 @@ export default function CategoryDonut() {
   if (data.length === 0) {
     return (
       <div className="flex h-48 items-center justify-center rounded-xl bg-bg-elevated ring-1 ring-white/5">
-        <p className="text-sm text-white/50">Sin gastos este mes</p>
+        <p className="text-sm text-white/50">
+          {isYearView ? 'Sin gastos este año' : 'Sin gastos este mes'}
+        </p>
       </div>
     )
   }

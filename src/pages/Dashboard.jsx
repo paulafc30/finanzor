@@ -11,14 +11,14 @@ import { useTransactions } from '../hooks/useTransactions.js'
 import { usePreviousMonthSummary } from '../hooks/usePreviousMonthSummary.js'
 import { useAccumulatedBalance } from '../hooks/useAccumulatedBalance.js'
 import { useMonth } from '../hooks/useMonth.jsx'
-import { formatEuro, formatMonthLabel } from '../lib/formatters.js'
+import { formatEuro, formatMonthLabel, formatYearLabel } from '../lib/formatters.js'
 
 export default function Dashboard() {
   const [open, setOpen] = useState(false)
   const { data: transactions = [], isLoading } = useTransactions()
   const { data: prev } = usePreviousMonthSummary()
   const { data: accumulatedBalance, isLoading: accLoading } = useAccumulatedBalance()
-  const { month } = useMonth()
+  const { month, isYearView } = useMonth()
 
   const summary = useMemo(() => {
     let income = 0
@@ -37,12 +37,16 @@ export default function Dashboard() {
 
   return (
     <section className="space-y-4">
-      {/* Header con título grande del mes */}
+      {/* Header con título grande del mes o año */}
       <div className="min-w-0">
         <h1 className="truncate text-2xl font-bold leading-tight">
-          {formatMonthLabel(month)}
+          {isYearView ? formatYearLabel(month) : formatMonthLabel(month)}
         </h1>
-        <p className="text-xs text-white/50">Resumen financiero del mes</p>
+        <p className="text-xs text-white/50">
+          {isYearView
+            ? 'Resumen financiero del año'
+            : 'Resumen financiero del mes'}
+        </p>
       </div>
 
       {/* KPIs en grid 2x2 (móvil) / 4x1 (desktop) */}
@@ -64,7 +68,8 @@ export default function Dashboard() {
           icon={TrendingDown}
           tone="danger"
           loading={isLoading}
-          delta={diffPct(summary.expense, prevExpense)}
+          // El delta vs mes anterior solo aplica en vista mensual.
+          delta={isYearView ? null : diffPct(summary.expense, prevExpense)}
           deltaPositiveIsGood={false}
         />
         <KpiCard
@@ -88,7 +93,9 @@ export default function Dashboard() {
         />
       </div>
 
-      <MonthBudgetBar />
+      {/* Barra de presupuesto solo en vista mensual: los presupuestos
+          se definen por mes y no tiene sentido agregarlos en anual. */}
+      {!isYearView && <MonthBudgetBar />}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <CategoryDonut />

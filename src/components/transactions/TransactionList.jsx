@@ -7,6 +7,7 @@ import {
   useTransactions,
   useDeleteTransaction,
 } from '../../hooks/useTransactions.js'
+import { useMonth } from '../../hooks/useMonth.jsx'
 
 /**
  * Lista de movimientos del mes seleccionado.
@@ -16,6 +17,7 @@ import {
 export default function TransactionList({ onEdit }) {
   const { data: transactions = [], isLoading, error } = useTransactions()
   const deleteMutation = useDeleteTransaction()
+  const { isYearView } = useMonth()
 
   // Agrupar por occurred_on (día)
   const grouped = useMemo(() => {
@@ -47,7 +49,11 @@ export default function TransactionList({ onEdit }) {
   if (transactions.length === 0) {
     return (
       <div className="rounded-xl bg-bg-elevated p-8 text-center">
-        <p className="text-white/60">No hay movimientos este mes.</p>
+        <p className="text-white/60">
+          {isYearView
+            ? 'No hay movimientos este año.'
+            : 'No hay movimientos este mes.'}
+        </p>
         <p className="mt-1 text-xs text-white/40">
           Pulsa el botón + para añadir el primero.
         </p>

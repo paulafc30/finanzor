@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Info, X, Plus } from 'lucide-react'
+import { Info, X, Plus, CalendarRange } from 'lucide-react'
 import Button from '../components/ui/Button.jsx'
 import Modal from '../components/ui/Modal.jsx'
 import BudgetRow from '../components/budget/BudgetRow.jsx'
@@ -21,7 +21,7 @@ export default function Budget() {
   const copyMutation = useCopyBudgetsFromPreviousMonth()
   const materialize = useMaterializeRecurring()
   const { data: recurrings = [] } = useRecurringExpenses()
-  const { rangeStart } = useMonth()
+  const { rangeStart, isYearView, setViewMode } = useMonth()
 
   const [justCopied, setJustCopied] = useState(false)
   const [recurringEdit, setRecurringEdit] = useState(null) // null | 'new' | object
@@ -47,6 +47,7 @@ export default function Budget() {
   // usuario si decide vaciarlos a propósito.
   const monthKey = `finanzor.budgetCopied:${rangeStart}`
   useEffect(() => {
+    if (isYearView) return // los presupuestos son mensuales: en año no aplica
     if (isLoading) return
     if (typeof window === 'undefined') return
 
@@ -60,7 +61,7 @@ export default function Budget() {
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, totals.totalBudget, monthKey])
+  }, [isLoading, totals.totalBudget, monthKey, isYearView])
 
   // Materializar gastos fijos del mes seleccionado.
   // Sin tracker en localStorage: la operación es idempotente, barata, y
@@ -68,11 +69,34 @@ export default function Budget() {
   // Se dispara al cambiar de mes O al cambiar la lista de recurrentes activos.
   const activeCount = recurrings.filter((r) => r.is_active).length
   useEffect(() => {
+    if (isYearView) return // los recurrentes se materializan a nivel de mes
     if (activeCount === 0) return
     if (materialize.isPending) return
     materialize.mutate()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rangeStart, activeCount])
+  }, [rangeStart, activeCount, isYearView])
+
+  if (isYearView) {
+    return (
+      <section className="space-y-4">
+        <h1 className="text-xl font-semibold">Presupuesto</h1>
+        <div className="rounded-xl bg-bg-elevated p-8 text-center ring-1 ring-white/5">
+          <CalendarRange size={32} className="mx-auto mb-3 text-white/40" />
+          <p className="text-white">Los presupuestos se definen por mes.</p>
+          <p className="mt-1 text-sm text-white/60">
+            Cambia la vista a "Mes" para gestionar los límites de un mes concreto.
+          </p>
+          <button
+            type="button"
+            onClick={() => setViewMode('month')}
+            className="mt-4 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90"
+          >
+            Cambiar a vista mensual
+          </button>
+        </div>
+      </section>
+    )
+  }
 
   if (isLoading) {
     return (
