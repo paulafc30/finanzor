@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { format } from 'date-fns'
-import { Repeat, Calculator } from 'lucide-react'
+import { Repeat, Calculator, Plus } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import Button from '../ui/Button.jsx'
 import CalculatorPad from '../ui/CalculatorPad.jsx'
 import { useCategories } from '../../hooks/useCategories.js'
@@ -233,9 +234,19 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
 
       {/* Categoria */}
       <div>
-        <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Categoria {type === 'expense' && <span className="text-danger">*</span>}
-        </label>
+        <div className="mb-1 flex items-center justify-between">
+          <label className="block text-xs uppercase tracking-wide text-white/50">
+            Categoria {type === 'expense' && <span className="text-danger">*</span>}
+          </label>
+          <Link
+            to="/categorias"
+            onClick={() => onSuccess?.()}
+            className="inline-flex items-center gap-0.5 text-[11px] font-medium text-accent hover:text-accent/80"
+          >
+            <Plus size={11} />
+            Nueva
+          </Link>
+        </div>
         <select
           {...register('category_id', {
             validate: (v) =>

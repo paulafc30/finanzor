@@ -8,27 +8,37 @@ import {
   useDeleteTransaction,
 } from '../../hooks/useTransactions.js'
 import { useMonth } from '../../hooks/useMonth.jsx'
+import { applyFilter, countActiveFilters } from './MovementsFilters.jsx'
 
 /**
  * Lista de movimientos del mes seleccionado.
  * Cada item es clickable: llama a onEdit(t) si se proporciona.
  * El botón de papelera tiene stopPropagation para no disparar el edit al borrar.
+ *
+ * Si se pasa `filter` (objeto con la forma definida en MovementsFilters.jsx),
+ * la lista se filtra localmente.
  */
-export default function TransactionList({ onEdit }) {
+export default function TransactionList({ onEdit, filter = null }) {
   const { data: transactions = [], isLoading, error } = useTransactions()
   const deleteMutation = useDeleteTransaction()
   const { isYearView } = useMonth()
 
+  // Aplicar filtro local si se proporciona
+  const filtered = useMemo(
+    () => (filter ? applyFilter(transactions, filter) : transactions),
+    [transactions, filter],
+  )
+
   // Agrupar por occurred_on (día)
   const grouped = useMemo(() => {
     const map = new Map()
-    for (const t of transactions) {
+    for (const t of filtered) {
       const key = t.occurred_on
       if (!map.has(key)) map.set(key, [])
       map.get(key).push(t)
     }
     return Array.from(map.entries())
-  }, [transactions])
+  }, [filtered])
 
   if (isLoading) {
     return (
@@ -56,6 +66,25 @@ export default function TransactionList({ onEdit }) {
         </p>
         <p className="mt-1 text-xs text-white/40">
           Pulsa el botón + para añadir el primero.
+        </p>
+      </div>
+    )
+  }
+
+  // Hay movimientos pero el filtro deja la lista vacía
+  if (filtered.length === 0) {
+    const filtersActive =
+      (filter?.text && filter.text.length > 0) ||
+      (filter && countActiveFilters(filter) > 0)
+    return (
+      <div className="rounded-xl bg-bg-elevated p-8 text-center">
+        <p className="text-white/60">
+          {filtersActive
+            ? 'Ningún movimiento coincide con los filtros.'
+            : 'No hay resultados.'}
+        </p>
+        <p className="mt-1 text-xs text-white/40">
+          Ajusta o limpia los filtros para ver más.
         </p>
       </div>
     )

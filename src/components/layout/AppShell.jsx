@@ -13,7 +13,7 @@ export default function AppShell() {
 
   return (
     <div className="flex min-h-screen flex-col bg-bg-base text-white">
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-white/5 bg-bg-base/80 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-white/5 bg-bg-base/80 px-2 py-2 backdrop-blur sm:px-4 sm:py-3">
         {showMonthSwitcher ? (
           <MonthSwitcher />
         ) : (
@@ -22,13 +22,13 @@ export default function AppShell() {
         <Link
           to="/ajustes"
           aria-label="Ajustes"
-          className="rounded-full p-2 hover:bg-white/5"
+          className="shrink-0 rounded-full p-1.5 hover:bg-white/5 sm:p-2"
         >
           <UserCircle2 size={22} />
         </Link>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-24 pt-4">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-3 pb-24 pt-4 sm:px-4">
         <Outlet />
       </main>
 

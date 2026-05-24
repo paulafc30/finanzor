@@ -3,7 +3,10 @@ import { ChevronRight, Tags, LogOut, Upload, MessageCircle, BookOpen } from 'luc
 import { supabase } from '../lib/supabase.js'
 import { useSession } from '../hooks/useSession.js'
 import { useOnboarding } from '../hooks/useOnboarding.jsx'
-import NotificationsToggle from '../components/settings/NotificationsToggle.jsx'
+// Recordatorio diario oculto temporalmente hasta configurar OneSignal.
+// El componente y los hooks asociados (useNotifications, lib/onesignal.js)
+// se conservan; solo está desactivado el render aquí.
+// import NotificationsToggle from '../components/settings/NotificationsToggle.jsx'
 
 export default function Settings() {
   const { user } = useSession()
@@ -22,7 +25,7 @@ export default function Settings() {
         <p className="text-white">{user?.email ?? '—'}</p>
       </div>
 
-      <NotificationsToggle />
+      {/* <NotificationsToggle />  Oculto hasta configurar OneSignal */}
 
       <ul className="overflow-hidden rounded-xl bg-bg-elevated">
         <li>

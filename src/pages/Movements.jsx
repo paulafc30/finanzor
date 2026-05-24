@@ -3,17 +3,25 @@ import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
 import TransactionForm from '../components/transactions/TransactionForm.jsx'
 import TransactionList from '../components/transactions/TransactionList.jsx'
+import MovementsFilters, {
+  emptyFilter,
+} from '../components/transactions/MovementsFilters.jsx'
 
 export default function Movements() {
   // null = cerrado, 'new' = creando, transaction object = editando
   const [editing, setEditing] = useState(null)
   const open = editing !== null
 
+  // Filtros locales (buscador + panel desplegable)
+  const [filter, setFilter] = useState(emptyFilter())
+
   return (
     <section className="space-y-4">
       <h1 className="text-xl font-semibold">Movimientos</h1>
 
-      <TransactionList onEdit={(t) => setEditing(t)} />
+      <MovementsFilters filter={filter} onChange={setFilter} />
+
+      <TransactionList filter={filter} onEdit={(t) => setEditing(t)} />
 
       <Fab onClick={() => setEditing('new')} ariaLabel="Añadir movimiento" />
 

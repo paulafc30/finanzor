@@ -1,4 +1,4 @@
-import { ArrowUp, ArrowDown, ArrowUpRight } from 'lucide-react'
+import { ArrowUp, ArrowDown } from 'lucide-react'
 import { formatEuro } from '../../lib/formatters.js'
 
 /**
@@ -96,8 +96,6 @@ export default function KpiCard({
         palette.cardRing,
       ].join(' ')}
     >
-      <ArrowUpRight size={14} className={`absolute right-3 top-3 ${palette.arrow}`} />
-
       <div
         className={`mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full ${palette.iconBg} shadow-sm`}
       >
