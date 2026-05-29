@@ -1,12 +1,51 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="22" fill="#ffffff"/>
-  <!-- Aleta con esquinas redondeadas arriba -->
-  <rect x="32" y="26" width="36" height="16" rx="3" fill="#ef4444"/>
-  <!-- Conexión trapezoidal entre aleta y cuerpo -->
-  <polygon points="32,38 68,38 76,44 24,44" fill="#ef4444"/>
-  <!-- Cuerpo principal -->
-  <rect x="20" y="42" width="60" height="36" rx="6" fill="#ef4444"/>
-  <!-- Cierre -->
-  <rect x="64" y="55" width="14" height="10" rx="5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5"/>
-  <circle cx="71" cy="60" r="1.6" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220" role="img" aria-label="Finanzor">
+  <!-- Fondo blanco redondeado -->
+  <rect width="240" height="220" rx="36" fill="#ffffff"/>
+
+  <!-- Trazos morados (mismo tono que el texto) -->
+  <g fill="none" stroke="#6d28d9" stroke-width="11" stroke-linejoin="round" stroke-linecap="round">
+
+    <!-- Billete trasero asomando: forma con esquina apuntada arriba a la derecha -->
+    <path d="M62 100
+             L62 70
+             Q62 60 72 60
+             L142 60
+             L172 90"/>
+
+    <!-- Billete delantero inclinado (la solapa de la cartera) -->
+    <path d="M82 100
+             L142 60"/>
+
+    <!-- Cuerpo principal -->
+    <rect x="30" y="100" width="180" height="100" rx="12"/>
+
+    <!-- Correa: sale por arriba del cuerpo, baja por la derecha y termina abajo -->
+    <path d="M178 100
+             L178 92
+             Q178 84 186 84
+             L198 84
+             Q206 84 206 92
+             L206 188
+             Q206 196 198 196
+             L186 196
+             Q178 196 178 188
+             L178 180"/>
+
+    <!-- Hebilla horizontal con esquinas redondeadas -->
+    <rect x="148" y="128" width="68" height="24" rx="12"/>
+
+    <!-- Botón del cierre -->
+    <circle cx="166" cy="140" r="5"/>
+  </g>
+
+  <!-- Texto vertical FINANZOR en el lado izquierdo -->
+  <text
+    x="60" y="186"
+    transform="rotate(-90 60 186)"
+    fill="#6d28d9"
+    font-family="Georgia, 'DejaVu Serif', 'Times New Roman', serif"
+    font-weight="900"
+    font-size="24"
+    letter-spacing="2"
+  >FINANZOR</text>
 </svg>

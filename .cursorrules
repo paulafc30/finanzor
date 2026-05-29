@@ -1,0 +1,135 @@
+# Finanzor — Reglas para asistentes IA (Cursor / Windsurf / Copilot Chat)
+
+Estas reglas describen cómo escribir código que encaje en este repo. Si
+estás generando o modificando código aquí, **respeta esto siempre**. En
+caso de duda, prioriza lo escrito en `docs/ARCHITECTURE.md` y `docs/adr/`.
+
+---
+
+## Producto
+
+Finanzor es una app **personal** de finanzas mes a mes, hecha por una sola
+desarrolladora (web), pensada para uso familiar y para empaquetarse a
+Play Store en el futuro como PWA/TWA. No es SaaS, no es multi-tenant
+corporativo. Optimiza para simplicidad y mantenibilidad por una sola
+persona.
+
+## Stack obligatorio
+
+- **React 18** funcional (hooks). Nada de clases.
+- **Vite 5** como bundler. No tocar `vite.config.js` salvo razón fuerte.
+- **JavaScript** (no TypeScript). No introducir `.ts/.tsx` ni JSDoc con
+  tipos exhaustivos: la decisión es deliberada (ADR-0002).
+- **Tailwind CSS 3** con tokens propios (`bg-bg-base`, `bg-bg-elevated`,
+  `bg-bg-card`, `text-accent`, `bg-danger`, `bg-success`, `bg-warning`,
+  `bg-info`). NO escribir CSS en archivos `.css` aparte salvo los ya
+  existentes en `src/styles/index.css`.
+- **Supabase JS v2** (`@supabase/supabase-js`) como único acceso a datos.
+- **TanStack React Query 5** como única capa de cache cliente.
+- **React Hook Form + Zod** para formularios.
+- **React Router 6** para rutas.
+- **date-fns 3** (con `es` de `date-fns/locale`) para fechas.
+- **lucide-react** para iconos.
+- **recharts** para gráficos.
+
+No añadir librerías nuevas sin justificación clara. Antes de proponer una,
+revisa si lo que ya hay basta.
+
+## Reglas de modelo de datos
+
+1. **Filtrar siempre por `transactions.occurred_on`**, nunca por
+   `created_at`. `created_at` solo como desempate de orden.
+   Ver `docs/adr/0003-filtrar-por-occurred-on.md`.
+2. **Categorías por defecto (`is_default = true`) no se pueden archivar ni
+   eliminar.** Solo renombrar y cambiar color/icono.
+3. **Categorías custom se archivan (`is_archived = true`), no se borran**
+   desde la UI. El histórico se conserva.
+4. **Presupuestos son por mes** — fila por `(user_id, category_id, month)`.
+   `amount = 0` significa "eliminar" la fila vía `useUpsertBudget`.
+
+## Arquitectura
+
+- **Componentes nunca llaman a Supabase directamente.** Toda query/mutation
+  vive en un hook de dominio en `src/hooks/`. Si un componente nuevo
+  necesita datos, crea o reutiliza un hook.
+- Cada hook que muta datos invalida los `queryKey` afectados en su
+  `onSuccess`. Convención: `['<recurso>', user?.id, ...filtros]`.
+- Estado UI compartido (mes seleccionado, onboarding) → Context dentro de
+  `src/hooks/use<Cosa>.jsx`.
+- Estado UI local → `useState`.
+- El **mes/año seleccionado** lo da `useMonth()`. Cualquier vista que
+  dependa del rango debe leer `rangeStart` / `rangeEnd` / `isYearView` de
+  ahí, no calcularlos por su cuenta.
+- Modales: usar `src/components/ui/Modal.jsx` o pickers existentes —
+  **bottom-sheet en móvil**, modal centrado en `sm+`. Si haces uno nuevo,
+  copia esa estructura.
+
+## Estilos
+
+- **Mobile-first.** Empieza por `< 380 px`, añade `sm:` para subir.
+- Tipos de toggle, listas, etc. usan tokens del config, no colores
+  hardcoded salvo dentro del logo o assets puntuales.
+- Cuidado con `dark mode`: el `<html>` tiene `class="dark"` fijo. No
+  pongas variantes `dark:` — pinta directamente para fondo oscuro.
+
+## Idioma y mensajes
+
+- Textos de UI: **español**, sin acentos rotos. Imperativos cortos en
+  botones ("Guardar", "Archivar", "Restaurar").
+- Errores hacia el usuario: traducir Supabase a español. Auth: ya hay
+  `src/lib/authErrors.js`. Para mutaciones nuevas, capturar en `catch` y
+  re-lanzar con mensaje claro.
+- Comentarios y JSDoc en español también.
+
+## Comentarios
+
+- El "porqué", no el "qué". Ver `docs/STYLE_GUIDE.md`.
+- Si tomas una decisión que parece un atajo o un workaround, **deja
+  comentario explicando**, especialmente si la siguiente persona que mire
+  podría revertirlo pensando que es un bug.
+
+## Estructura de carpetas
+
+- `src/lib/` — utilidades puras sin estado React.
+- `src/hooks/` — un archivo por dominio. Querys + mutations juntos.
+- `src/components/<dominio>/` — agrupados por dominio, no por tipo.
+- `src/pages/` — orquestación, no lógica pesada.
+- `supabase/migrations/` — SQL numerado en orden. **Nuevas migraciones se
+  añaden con número siguiente, nunca se editan las anteriores.**
+
+## Qué NO hacer
+
+- ❌ Crear archivos `.ts` o `.tsx`.
+- ❌ Llamar a `supabase.from(...)` desde un componente o página.
+- ❌ Filtrar transacciones por `created_at`.
+- ❌ Permitir borrar categorías por defecto.
+- ❌ Borrar categorías custom desde la UI (archívalas).
+- ❌ Añadir tema claro / toggle de tema.
+- ❌ Introducir Redux, Zustand, Recoil, Jotai u otro store. Hay React Query
+  + Context, basta.
+- ❌ Añadir traducciones / i18n (la app es solo en español).
+- ❌ Modificar el esquema de Supabase fuera de `supabase/migrations/<N+1>_...sql`.
+- ❌ Tocar el comportamiento de `useMonth` sin ver `docs/ARCHITECTURE.md`
+  sección 3.
+
+## Qué SÍ esperar de tu output
+
+- Cambios pequeños, comentados en español, alineados con los patrones del
+  repo.
+- Si añades un hook, **invalida** las cache keys correctas.
+- Si añades una vista que depende del mes/año, considera ambos modos
+  (`viewMode === 'year'`) o bloquéala con un mensaje claro como hacen
+  `Budget.jsx` y `Calendar.jsx`.
+- Si tocas un formulario, valida con Zod.
+- Si añades una nueva tabla SQL: incluye RLS por `auth.uid() = user_id` y
+  un trigger si hace falta seed por usuario.
+
+## Antes de proponer un cambio
+
+Lee:
+
+1. `README.md` (visión rápida y comandos)
+2. `docs/ARCHITECTURE.md` (flujos)
+3. `docs/STYLE_GUIDE.md` (cómo escribir)
+4. ADR relevante en `docs/adr/`
+5. El hook o componente que ya hace algo parecido en el repo

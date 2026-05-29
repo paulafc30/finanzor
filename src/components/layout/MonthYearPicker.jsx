@@ -90,19 +90,29 @@ export default function MonthYearPicker({ open, mode = 'month', value, onSelect,
       role="dialog"
       aria-modal="true"
       aria-label="Seleccionar mes y año"
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose?.()
       }}
     >
-      {/* Capa interna que centra el modal y permite scroll si excede viewport */}
+      {/*
+        Posicionamiento del modal:
+        - Movil: anclado al fondo de la pantalla (bottom-sheet). Usamos
+          posicion absoluta inset-x-0 bottom-0 para que siempre se vea
+          arrancando desde la parte inferior, sin depender de flex+min-h
+          que algunos navegadores moviles calculan mal.
+        - sm+: centrado tanto vertical como horizontalmente.
+        Damos al modal max-h-[85vh] y overflow-y-auto para que, si el
+        contenido excede la pantalla, scrollee dentro de si mismo sin
+        salirse del viewport.
+      */}
       <div
-        className="flex min-h-full items-end justify-center sm:items-center sm:p-4"
+        className="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center sm:p-4"
         onMouseDown={(e) => {
           if (e.target === e.currentTarget) onClose?.()
         }}
       >
-        <div className="w-full max-w-sm rounded-t-2xl bg-bg-elevated p-4 shadow-xl sm:rounded-2xl">
+        <div className="mx-auto w-full max-w-sm max-h-[85vh] overflow-y-auto rounded-t-2xl bg-bg-elevated p-4 shadow-xl sm:rounded-2xl">
         {/* Header: navegacion + cerrar */}
         <div className="mb-3 flex items-center gap-2">
           <button
