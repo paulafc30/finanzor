@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 
 const MONTHS_SHORT = [
@@ -85,7 +86,11 @@ export default function MonthYearPicker({ open, mode = 'month', value, onSelect,
       ? `${yearBlock[0]} – ${yearBlock[yearBlock.length - 1]}`
       : String(cursorYear)
 
-  return (
+  // IMPORTANTE: renderizamos el modal via React Portal en `document.body`
+  // porque el header del AppShell usa `backdrop-blur` (CSS backdrop-filter),
+  // que rompe `position: fixed` de los hijos. Sin portal, el modal queda
+  // atrapado dentro del header sticky en lugar de cubrir toda la pantalla.
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -198,7 +203,8 @@ export default function MonthYearPicker({ open, mode = 'month', value, onSelect,
         </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
