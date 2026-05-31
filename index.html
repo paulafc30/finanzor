@@ -1,23 +1,54 @@
 <!doctype html>
-<html lang="es" class="dark">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <script>
+      (function () {
+        var t = localStorage.getItem('finanzor-theme') || 'dark';
+        if (t === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+      })();
+    </script>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
     <title>Finanzor</title>
-    <meta name="description" content="Control mensual de ingresos, gastos y ahorro." />
+    <meta
+      name="description"
+      content="Control mensual de ingresos, gastos y ahorro." />
 
-    <!-- Iconos -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!--
+      Iconos del proyecto. El query string `?v=2` fuerza a navegadores y
+      Chrome Android a refrescar el icono sin tener que reinstalar la PWA.
+      Al cambiar el logo en el futuro, basta con subir v=3, v=4...
+    -->
+    <link rel="icon" type="image/x-icon" sizes="any" href="/favicon.ico?v=2" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
 
     <!-- PWA -->
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="theme-color" content="#6d28d9" />
+    <link rel="manifest" href="/manifest.webmanifest?v=2" />
+    <meta name="theme-color" content="#0c0d12" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Finanzor" />
+
+    <!--
+      Aplica el tema (clase .dark) antes de cargar React para evitar el
+      "flash" de tema incorrecto en el primer pintado. Lee la misma clave
+      de localStorage que usa src/context/ThemeContext.jsx.
+    -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('finanzor-theme') || 'dark';
+          if (t === 'dark') document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class="bg-bg-base text-white antialiased">
     <div id="root"></div>

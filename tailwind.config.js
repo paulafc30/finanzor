@@ -7,9 +7,9 @@ export default {
       colors: {
         // Paleta dark inspirada en banca digital — refinable
         bg: {
-          base: '#0b0d12',
-          elevated: '#151821',
-          card: '#1c2030',
+          base: 'rgb(var(--bg-base) / <alpha-value>)',
+          elevated: 'rgb(var(--bg-elevated) / <alpha-value>)',
+          card: 'rgb(var(--bg-card) / <alpha-value>)',
         },
         accent: {
           DEFAULT: '#7c5cff',

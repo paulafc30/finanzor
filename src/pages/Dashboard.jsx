@@ -7,6 +7,7 @@ import KpiCard from '../components/dashboard/KpiCard.jsx'
 import CategoryDonut from '../components/dashboard/CategoryDonut.jsx'
 import MonthBudgetBar from '../components/dashboard/MonthBudgetBar.jsx'
 import RecentTransactions from '../components/dashboard/RecentTransactions.jsx'
+import CategoryComparisonChart from '../components/dashboard/CategoryComparisonChart.jsx'
 import { useTransactions } from '../hooks/useTransactions.js'
 import { usePreviousMonthSummary } from '../hooks/usePreviousMonthSummary.js'
 import { useAccumulatedBalance } from '../hooks/useAccumulatedBalance.js'
@@ -96,6 +97,12 @@ export default function Dashboard() {
       {/* Barra de presupuesto solo en vista mensual: los presupuestos
           se definen por mes y no tiene sentido agregarlos en anual. */}
       {!isYearView && <MonthBudgetBar />}
+
+      {/* Comparativa por categoria — solo desktop (lg+). En vista mes
+          compara con la media de los 3 meses anteriores; en vista anio
+          compara con el anio anterior completo. El componente se
+          autogestiona el `hidden lg:block`. */}
+      <CategoryComparisonChart />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <CategoryDonut />

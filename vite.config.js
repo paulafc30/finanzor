@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
@@ -10,7 +10,7 @@ export default defineConfig({
       // Usamos nuestro propio manifest.webmanifest en /public
       manifest: false,
       includeAssets: [
-        'favicon.svg',
+        'favicon.ico',
         'apple-touch-icon.png',
         'icon-192.png',
         'icon-512.png',
@@ -39,4 +39,4 @@ export default defineConfig({
     port: 5173,
     open: false,
   },
-})
+});

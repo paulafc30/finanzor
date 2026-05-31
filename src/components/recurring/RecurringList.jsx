@@ -72,7 +72,7 @@ export default function RecurringList({ onEdit }) {
               {r.category && (
                 <span
                   className="text-xs"
-                  style={{ color: r.category.color ?? 'rgba(255,255,255,0.5)' }}
+                  style={{ color: r.category.color ?? 'rgba(148,163,184,0.8)' }}
                 >
                   · {r.category.name}
                 </span>

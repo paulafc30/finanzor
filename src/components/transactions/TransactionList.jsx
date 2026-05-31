@@ -151,7 +151,7 @@ export default function TransactionList({ onEdit, filter = null }) {
                     {t.category && (
                       <p
                         className="text-xs"
-                        style={{ color: t.category.color ?? 'rgba(255,255,255,0.5)' }}
+                        style={{ color: t.category.color ?? 'rgba(148,163,184,0.8)' }}
                       >
                         {t.category.name}
                       </p>

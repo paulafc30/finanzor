@@ -4,6 +4,7 @@ import { PieChart as PieIcon } from 'lucide-react'
 import { useTransactions } from '../../hooks/useTransactions.js'
 import { useMonth } from '../../hooks/useMonth.jsx'
 import { formatEuro } from '../../lib/formatters.js'
+import { useTheme } from '../../context/ThemeContext.jsx'
 
 /**
  * Donut de gastos del mes agrupados por categoría.
@@ -13,6 +14,8 @@ import { formatEuro } from '../../lib/formatters.js'
 export default function CategoryDonut() {
   const { data: transactions = [] } = useTransactions()
   const { isYearView } = useMonth()
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
 
   const data = useMemo(() => {
     const map = new Map()
@@ -64,17 +67,17 @@ export default function CategoryDonut() {
               ))}
             </Pie>
             <Tooltip
-              cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+              cursor={{ fill: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.04)' }}
               contentStyle={{
-                backgroundColor: '#1c2030',
-                border: '1px solid rgba(255,255,255,0.15)',
+                backgroundColor: isDark ? '#1c2030' : '#ffffff',
+                border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(15,23,42,0.1)',
                 borderRadius: 8,
-                color: 'white',
+                color: isDark ? 'white' : 'rgb(15,23,42)',
                 fontSize: 12,
                 padding: '6px 10px',
               }}
-              itemStyle={{ color: 'white' }}
-              labelStyle={{ color: 'rgba(255,255,255,0.6)' }}
+              itemStyle={{ color: isDark ? 'white' : 'rgb(15,23,42)' }}
+              labelStyle={{ color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(15,23,42,0.5)' }}
               formatter={(value, name) => [formatEuro(value), name]}
             />
           </PieChart>
