@@ -1,4 +1,4 @@
-import { Pencil, Trash2, Repeat } from 'lucide-react'
+import { Pencil, Trash2, Repeat, ArrowUpCircle, ArrowDownCircle } from 'lucide-react'
 import { formatEuro } from '../../lib/formatters.js'
 import {
   useRecurringExpenses,
@@ -7,11 +7,14 @@ import {
 } from '../../hooks/useRecurringExpenses.js'
 
 /**
- * Lista de gastos fijos recurrentes con toggle activar/desactivar,
- * editar y eliminar.
+ * Lista de recurrentes con toggle activar/desactivar, editar y eliminar.
+ *
+ * Props:
+ *  - type: 'expense' | 'income' — filtra los recurrentes por tipo.
+ *  - onEdit: callback al pulsar editar.
  */
-export default function RecurringList({ onEdit }) {
-  const { data: recurrings = [], isLoading } = useRecurringExpenses()
+export default function RecurringList({ type = 'expense', onEdit }) {
+  const { data: recurrings = [], isLoading } = useRecurringExpenses({ type })
   const toggle = useToggleRecurring()
   const remove = useDeleteRecurring()
 
@@ -26,8 +29,9 @@ export default function RecurringList({ onEdit }) {
   if (recurrings.length === 0) {
     return (
       <div className="rounded-xl bg-bg-elevated p-4 text-center text-sm text-white/60">
-        No tienes gastos fijos. Pulsa "Nuevo" para añadir el primero (alquiler,
-        suscripciones, gimnasio…).
+        {type === 'income'
+          ? 'No tienes ingresos fijos. Pulsa "Nuevo" para añadir el primero (nómina, alquiler cobrado…).'
+          : 'No tienes gastos fijos. Pulsa "Nuevo" para añadir el primero (alquiler, suscripciones, gimnasio…).'}
       </div>
     )
   }
@@ -41,8 +45,9 @@ export default function RecurringList({ onEdit }) {
   }
 
   async function handleDelete(r) {
+    const noun = r.type === 'income' ? 'ingreso fijo' : 'gasto fijo'
     const ok = window.confirm(
-      `¿Eliminar el gasto fijo "${r.name}"?\n\n• Los movimientos futuros (de meses que aún no han ocurrido) se eliminarán.\n• Los movimientos pasados se mantienen para no falsear el histórico.\n• A partir de ahora ya no se volverá a generar.`,
+      `¿Eliminar el ${noun} "${r.name}"?\n\n• Los movimientos futuros (de meses que aún no han ocurrido) se eliminarán.\n• Los movimientos pasados se mantienen para no falsear el histórico.\n• A partir de ahora ya no se volverá a generar.`,
     )
     if (!ok) return
     try {
@@ -54,71 +59,84 @@ export default function RecurringList({ onEdit }) {
 
   return (
     <ul className="space-y-2">
-      {recurrings.map((r) => (
-        <li
-          key={r.id}
-          className={[
-            'flex items-center gap-3 rounded-xl bg-bg-elevated p-3',
-            r.is_active ? '' : 'opacity-50',
-          ].join(' ')}
-        >
-          <Repeat size={16} className="shrink-0 text-accent" />
+      {recurrings.map((r) => {
+        const isIncome = r.type === 'income'
+        const Icon = isIncome ? ArrowUpCircle : ArrowDownCircle
+        const iconClass = isIncome ? 'text-success' : 'text-danger'
+        return (
+          <li
+            key={r.id}
+            className={[
+              'flex items-center gap-3 rounded-xl bg-bg-elevated p-3',
+              r.is_active ? '' : 'opacity-50',
+            ].join(' ')}
+          >
+            <Icon size={18} className={`shrink-0 ${iconClass}`} />
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="truncate text-sm font-medium text-white">
-                {r.name}
-              </span>
-              {r.category && (
-                <span
-                  className="text-xs"
-                  style={{ color: r.category.color ?? 'rgba(148,163,184,0.8)' }}
-                >
-                  · {r.category.name}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="truncate text-sm font-medium text-white">
+                  {r.name}
                 </span>
-              )}
+                {r.category && (
+                  <span
+                    className="text-xs"
+                    style={{ color: r.category.color ?? 'rgba(148,163,184,0.8)' }}
+                  >
+                    · {r.category.name}
+                  </span>
+                )}
+                <Repeat
+                  size={11}
+                  className="shrink-0 text-accent/70"
+                  aria-label="Recurrente"
+                />
+              </div>
+              <p className="text-xs text-white/50">
+                {formatEuro(r.amount)} · día {r.day_of_month} de cada mes
+              </p>
             </div>
-            <p className="text-xs text-white/50">
-              {formatEuro(r.amount)} · día {r.day_of_month} de cada mes
-            </p>
-          </div>
 
-          {/* Toggle activo */}
-          <label className="shrink-0 cursor-pointer" title={r.is_active ? 'Activo' : 'Inactivo'}>
-            <input
-              type="checkbox"
-              checked={r.is_active}
-              onChange={() => handleToggle(r)}
-              className="peer sr-only"
-            />
-            <span className="block h-5 w-9 rounded-full bg-white/10 transition peer-checked:bg-accent">
-              <span
-                className={[
-                  'block h-4 w-4 translate-x-0.5 translate-y-0.5 rounded-full bg-white transition',
-                  r.is_active ? 'translate-x-[18px]' : '',
-                ].join(' ')}
+            {/* Toggle activo */}
+            <label
+              className="shrink-0 cursor-pointer"
+              title={r.is_active ? 'Activo' : 'Inactivo'}
+            >
+              <input
+                type="checkbox"
+                checked={r.is_active}
+                onChange={() => handleToggle(r)}
+                className="peer sr-only"
               />
-            </span>
-          </label>
+              <span className="block h-5 w-9 rounded-full bg-white/10 transition peer-checked:bg-accent">
+                <span
+                  className={[
+                    'block h-4 w-4 translate-x-0.5 translate-y-0.5 rounded-full bg-white transition',
+                    r.is_active ? 'translate-x-[18px]' : '',
+                  ].join(' ')}
+                />
+              </span>
+            </label>
 
-          <button
-            type="button"
-            onClick={() => onEdit(r)}
-            aria-label="Editar"
-            className="shrink-0 rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-white"
-          >
-            <Pencil size={15} />
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDelete(r)}
-            aria-label="Eliminar"
-            className="shrink-0 rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-danger"
-          >
-            <Trash2 size={15} />
-          </button>
-        </li>
-      ))}
+            <button
+              type="button"
+              onClick={() => onEdit(r)}
+              aria-label="Editar"
+              className="shrink-0 rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-white"
+            >
+              <Pencil size={15} />
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDelete(r)}
+              aria-label="Eliminar"
+              className="shrink-0 rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-danger"
+            >
+              <Trash2 size={15} />
+            </button>
+          </li>
+        )
+      })}
     </ul>
   )
 }

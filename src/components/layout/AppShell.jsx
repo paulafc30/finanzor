@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { UserCircle2 } from 'lucide-react'
+import { Settings as SettingsIcon } from 'lucide-react'
 import MonthSwitcher from './MonthSwitcher.jsx'
 import BottomNav from './BottomNav.jsx'
 
@@ -24,7 +24,7 @@ export default function AppShell() {
           aria-label="Ajustes"
           className="shrink-0 rounded-full p-1.5 hover:bg-white/5 sm:p-2"
         >
-          <UserCircle2 size={22} />
+          <SettingsIcon size={22} />
         </Link>
       </header>
 

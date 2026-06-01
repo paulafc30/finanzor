@@ -7,17 +7,27 @@ import {
 } from '../../hooks/useRecurringExpenses.js'
 
 /**
- * Formulario de gasto fijo recurrente.
- * - Si recibe `recurring`, edita; si no, crea nuevo.
- * - Día limitado a 1-28 para evitar problemas con febrero.
+ * Formulario de recurrente (gasto fijo o ingreso fijo).
+ *
+ * Props:
+ *  - recurring: si se pasa, modo edición.
+ *  - defaultType: 'expense' | 'income'. Solo aplica si se está creando.
+ *    Permite que la página Presupuesto abra el modal "Nuevo ingreso fijo"
+ *    sin obligar al usuario a tocar el toggle.
+ *  - onSuccess: callback al guardar.
+ *
+ * Reglas:
+ *  - Día limitado a 1-28 para evitar problemas con febrero.
+ *  - En gastos la categoría es obligatoria. En ingresos, opcional.
  */
-export default function RecurringForm({ recurring, onSuccess }) {
+export default function RecurringForm({ recurring, defaultType = 'expense', onSuccess }) {
   const isEdit = !!recurring
   const { data: categories = [] } = useCategories()
   const createMutation = useCreateRecurring()
   const updateMutation = useUpdateRecurring()
   const busy = createMutation.isPending || updateMutation.isPending
 
+  const [type, setType] = useState(recurring?.type ?? defaultType)
   const [name, setName] = useState(recurring?.name ?? '')
   const [amount, setAmount] = useState(recurring?.amount ?? '')
   const [categoryId, setCategoryId] = useState(recurring?.category?.id ?? '')
@@ -26,19 +36,21 @@ export default function RecurringForm({ recurring, onSuccess }) {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    setType(recurring?.type ?? defaultType)
     setName(recurring?.name ?? '')
     setAmount(recurring?.amount ?? '')
     setCategoryId(recurring?.category?.id ?? '')
     setDay(recurring?.day_of_month ?? 1)
     setIsActive(recurring?.is_active ?? true)
     setError(null)
-  }, [recurring])
+  }, [recurring, defaultType])
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
     try {
       const payload = {
+        type,
         name,
         amount,
         category_id: categoryId || null,
@@ -58,6 +70,34 @@ export default function RecurringForm({ recurring, onSuccess }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Toggle Gasto / Ingreso */}
+      <div className="grid grid-cols-2 gap-2 rounded-lg bg-bg-card p-1">
+        <button
+          type="button"
+          onClick={() => setType('expense')}
+          className={[
+            'rounded-md py-2 text-sm font-medium transition',
+            type === 'expense'
+              ? 'bg-danger text-white'
+              : 'text-white/60 hover:text-white',
+          ].join(' ')}
+        >
+          Gasto fijo
+        </button>
+        <button
+          type="button"
+          onClick={() => setType('income')}
+          className={[
+            'rounded-md py-2 text-sm font-medium transition',
+            type === 'income'
+              ? 'bg-success text-white'
+              : 'text-white/60 hover:text-white',
+          ].join(' ')}
+        >
+          Ingreso fijo
+        </button>
+      </div>
+
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
           Nombre
@@ -66,7 +106,11 @@ export default function RecurringForm({ recurring, onSuccess }) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Alquiler, Netflix, Gimnasio…"
+          placeholder={
+            type === 'income'
+              ? 'Nómina, alquiler cobrado…'
+              : 'Alquiler, Netflix, Gimnasio…'
+          }
           autoFocus
           maxLength={60}
           required
@@ -93,14 +137,16 @@ export default function RecurringForm({ recurring, onSuccess }) {
 
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Categoría
+          Categoría {type === 'expense' && <span className="text-danger">*</span>}
         </label>
         <select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
           className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
         >
-          <option value="">Sin categoría</option>
+          <option value="">
+            {type === 'income' ? 'Sin categoría' : 'Selecciona…'}
+          </option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -141,7 +187,13 @@ export default function RecurringForm({ recurring, onSuccess }) {
 
       <div className="flex gap-2 pt-2">
         <Button type="submit" disabled={busy} className="flex-1">
-          {busy ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear gasto fijo'}
+          {busy
+            ? 'Guardando…'
+            : isEdit
+            ? 'Guardar cambios'
+            : type === 'income'
+            ? 'Crear ingreso fijo'
+            : 'Crear gasto fijo'}
         </Button>
       </div>
     </form>

@@ -5,7 +5,6 @@ import Fab from '../components/ui/Fab.jsx'
 import TransactionForm from '../components/transactions/TransactionForm.jsx'
 import KpiCard from '../components/dashboard/KpiCard.jsx'
 import CategoryDonut from '../components/dashboard/CategoryDonut.jsx'
-import MonthBudgetBar from '../components/dashboard/MonthBudgetBar.jsx'
 import RecentTransactions from '../components/dashboard/RecentTransactions.jsx'
 import CategoryComparisonChart from '../components/dashboard/CategoryComparisonChart.jsx'
 import { useTransactions } from '../hooks/useTransactions.js'
@@ -94,9 +93,8 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Barra de presupuesto solo en vista mensual: los presupuestos
-          se definen por mes y no tiene sentido agregarlos en anual. */}
-      {!isYearView && <MonthBudgetBar />}
+      {/* La barra resumen del presupuesto vive en la pagina Presupuesto,
+          no aqui. Asi el Dashboard se queda como vista financiera general. */}
 
       {/* Comparativa por categoria — solo desktop (lg+). En vista mes
           compara con la media de los 3 meses anteriores; en vista anio

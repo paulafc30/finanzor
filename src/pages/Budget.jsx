@@ -5,6 +5,7 @@ import Modal from '../components/ui/Modal.jsx'
 import BudgetRow from '../components/budget/BudgetRow.jsx'
 import RecurringList from '../components/recurring/RecurringList.jsx'
 import RecurringForm from '../components/recurring/RecurringForm.jsx'
+import MonthBudgetBar from '../components/dashboard/MonthBudgetBar.jsx'
 import {
   useBudgetSummary,
   useCopyBudgetsFromPreviousMonth,
@@ -24,8 +25,16 @@ export default function Budget() {
   const { rangeStart, isYearView, setViewMode } = useMonth()
 
   const [justCopied, setJustCopied] = useState(false)
-  const [recurringEdit, setRecurringEdit] = useState(null) // null | 'new' | object
+  // recurringEdit:
+  //   null                                  → modal cerrado
+  //   { __new: true, type: 'expense' }      → nuevo gasto fijo
+  //   { __new: true, type: 'income' }       → nuevo ingreso fijo
+  //   <recurring object>                    → editar uno existente
+  const [recurringEdit, setRecurringEdit] = useState(null)
   const recurringModalOpen = recurringEdit !== null
+  const isNewRecurring = !!recurringEdit?.__new
+  const recurringToEdit = isNewRecurring ? null : recurringEdit
+  const newRecurringType = isNewRecurring ? recurringEdit.type : 'expense'
 
   const totals = useMemo(() => {
     let totalBudget = 0
@@ -142,13 +151,16 @@ export default function Budget() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-white">Gastos fijos</h2>
-          <Button size="sm" onClick={() => setRecurringEdit('new')}>
+          <Button
+            size="sm"
+            onClick={() => setRecurringEdit({ __new: true, type: 'expense' })}
+          >
             <Plus size={16} />
             Nuevo
           </Button>
         </div>
 
-        <RecurringList onEdit={(r) => setRecurringEdit(r)} />
+        <RecurringList type="expense" onEdit={(r) => setRecurringEdit(r)} />
 
         <details className="rounded-xl bg-bg-elevated/50 p-3 text-xs text-white/60 [&>summary]:cursor-pointer [&[open]>summary]:mb-2">
           <summary className="flex items-center gap-1.5 text-white/70 hover:text-white">
@@ -182,23 +194,34 @@ export default function Budget() {
         </details>
       </div>
 
+      {/* === Sección: Ingresos fijos recurrentes === */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold text-white">Ingresos fijos</h2>
+          <Button
+            size="sm"
+            onClick={() => setRecurringEdit({ __new: true, type: 'income' })}
+          >
+            <Plus size={16} />
+            Nuevo
+          </Button>
+        </div>
+
+        <RecurringList type="income" onEdit={(r) => setRecurringEdit(r)} />
+
+        <p className="px-1 text-xs text-white/40">
+          Igual que los gastos fijos, pero positivos: nómina, alquiler que cobras,
+          una mensualidad… Se materializan automáticamente cada mes y se contabilizan
+          como ingreso en las estadísticas.
+        </p>
+      </div>
+
       {/* === Sección: Presupuestos por categoría === */}
       <div className="space-y-3">
         <h2 className="text-base font-semibold text-white">Presupuestos por categoría</h2>
 
-        {hasAnyBudget && (
-          <div className="rounded-xl bg-bg-elevated p-3">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-white/60">Total del mes</span>
-              <span className="font-semibold text-white">
-                {formatEuro(totals.totalSpent)}{' '}
-                <span className="text-white/40">
-                  / {formatEuro(totals.totalBudget)}
-                </span>
-              </span>
-            </div>
-          </div>
-        )}
+        {/* Barra resumen del presupuesto del mes (movida desde el Dashboard) */}
+        {hasAnyBudget && <MonthBudgetBar />}
 
         {!hasAnyBudget && !copyMutation.isPending && (
           <div className="rounded-xl bg-bg-elevated p-6 text-center">
@@ -215,19 +238,54 @@ export default function Budget() {
           ))}
         </div>
 
-        <p className="px-1 text-xs text-white/40">
-          Click en el importe del límite para editarlo. Pon 0 para quitar el
-          presupuesto de esa categoría.
-        </p>
+        <details className="rounded-xl bg-bg-elevated/50 p-3 text-xs text-white/60 [&>summary]:cursor-pointer [&[open]>summary]:mb-2">
+          <summary className="flex items-center gap-1.5 text-white/70 hover:text-white">
+            <Info size={13} />
+            Cómo funcionan los presupuestos
+          </summary>
+          <ul className="ml-1 list-disc space-y-1 pl-4">
+            <li>
+              Cada presupuesto vive <strong>en un mes concreto</strong>. Si en
+              marzo subes el de Alimentación a 500 €, abril sigue con su valor
+              propio, no se cambian todos los meses a la vez.
+            </li>
+            <li>
+              Al entrar a un mes nuevo sin presupuestos, copiamos los del mes
+              anterior <strong>una sola vez</strong> para que no empieces de
+              cero cada vez.
+            </li>
+            <li>
+              Click en el importe del límite para editarlo. Pon <strong>0</strong>
+              para quitar el presupuesto de esa categoría ese mes.
+            </li>
+            <li>
+              El gasto que cuenta se filtra por la fecha real del movimiento
+              (<em>occurred_on</em>), no por cuándo lo apuntaste.
+            </li>
+            <li>
+              Estados de la barra: hasta el 70 % verde, 70-90 % naranja, a partir
+              del 90 % rojo.
+            </li>
+          </ul>
+        </details>
       </div>
 
       <Modal
         open={recurringModalOpen}
         onClose={() => setRecurringEdit(null)}
-        title={recurringEdit === 'new' ? 'Nuevo gasto fijo' : 'Editar gasto fijo'}
+        title={
+          isNewRecurring
+            ? newRecurringType === 'income'
+              ? 'Nuevo ingreso fijo'
+              : 'Nuevo gasto fijo'
+            : recurringToEdit?.type === 'income'
+            ? 'Editar ingreso fijo'
+            : 'Editar gasto fijo'
+        }
       >
         <RecurringForm
-          recurring={recurringEdit && recurringEdit !== 'new' ? recurringEdit : null}
+          recurring={recurringToEdit}
+          defaultType={newRecurringType}
           onSuccess={() => setRecurringEdit(null)}
         />
       </Modal>

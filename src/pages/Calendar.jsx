@@ -1,15 +1,12 @@
 import { useState } from 'react'
-import { Calendar as CalendarIcon, CalendarRange, ChevronDown } from 'lucide-react'
+import { Calendar as CalendarIcon, CalendarRange } from 'lucide-react'
 import MonthCalendar from '../components/calendar/MonthCalendar.jsx'
 import DayDetailModal from '../components/calendar/DayDetailModal.jsx'
-import MonthYearPicker from '../components/layout/MonthYearPicker.jsx'
 import { useMonth } from '../hooks/useMonth.jsx'
-import { formatMonthLabel } from '../lib/formatters.js'
 
 export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState(null)
-  const [pickerOpen, setPickerOpen] = useState(false)
-  const { isYearView, setViewMode, month, goToMonth } = useMonth()
+  const { isYearView, setViewMode } = useMonth()
 
   if (isYearView) {
     return (
@@ -37,24 +34,13 @@ export default function CalendarPage() {
     )
   }
 
+  // En vista mes no repetimos selector aquí: el header global ya muestra
+  // el switcher con su MonthYearPicker propio (clic en "Mayo 2026").
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <CalendarIcon size={20} className="shrink-0 text-info" />
-          <h1 className="truncate text-xl font-semibold">Calendario</h1>
-        </div>
-
-        {/* Selector mes/año dentro de la página */}
-        <button
-          type="button"
-          onClick={() => setPickerOpen(true)}
-          className="inline-flex items-center gap-1 rounded-lg bg-bg-elevated px-3 py-1.5 text-sm font-medium text-white ring-1 ring-white/5 hover:bg-white/5"
-          aria-haspopup="dialog"
-        >
-          <span className="capitalize">{formatMonthLabel(month)}</span>
-          <ChevronDown size={14} className="text-white/50" />
-        </button>
+      <div className="flex items-center gap-2">
+        <CalendarIcon size={20} className="shrink-0 text-info" />
+        <h1 className="truncate text-xl font-semibold">Calendario</h1>
       </div>
 
       <p className="text-xs text-white/50">
@@ -67,17 +53,6 @@ export default function CalendarPage() {
         dayKey={selectedDay}
         open={!!selectedDay}
         onClose={() => setSelectedDay(null)}
-      />
-
-      <MonthYearPicker
-        open={pickerOpen}
-        mode="month"
-        value={month}
-        onSelect={(d) => {
-          goToMonth(d)
-          setPickerOpen(false)
-        }}
-        onClose={() => setPickerOpen(false)}
       />
     </section>
   )

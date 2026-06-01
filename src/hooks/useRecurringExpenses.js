@@ -5,24 +5,29 @@ import { useSession } from './useSession.js'
 import { useMonth } from './useMonth.jsx'
 
 /**
- * Lista todos los gastos fijos del usuario, activos e inactivos.
+ * Lista TODOS los recurrentes del usuario (gastos e ingresos fijos),
+ * activos e inactivos. Devuelve `type` para que la UI pueda separarlos.
+ *
+ * Si se pasa `{ type }` filtra en BBDD. Sin filtro vienen los dos tipos
+ * y se separan en cliente.
  */
-export function useRecurringExpenses() {
+export function useRecurringExpenses({ type = null } = {}) {
   const { user } = useSession()
 
   return useQuery({
-    queryKey: ['recurring', user?.id],
+    queryKey: ['recurring', user?.id, type ?? 'all'],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from('recurring_expenses')
         .select(`
-          id, name, amount, day_of_month, is_active, created_at,
+          id, name, amount, day_of_month, is_active, type, created_at,
           category:categories(id, name, color)
         `)
         .order('is_active', { ascending: false })
         .order('day_of_month', { ascending: true })
-
+      if (type) q = q.eq('type', type)
+      const { data, error } = await q
       if (error) throw error
       return data ?? []
     },
@@ -39,9 +44,13 @@ export function useCreateRecurring() {
         user_id: user.id,
         name: input.name?.trim(),
         amount: Number(input.amount),
+        // Para ingresos la categoria es opcional (igual que en movimientos
+        // sueltos: un ingreso puede ir "sin categoria"); para gastos es
+        // obligatoria por coherencia con la UI de Movimientos.
         category_id: input.category_id || null,
         day_of_month: Number(input.day_of_month),
         is_active: input.is_active ?? true,
+        type: input.type === 'income' ? 'income' : 'expense',
       }
       if (!payload.name) throw new Error('El nombre es obligatorio')
       if (!Number.isFinite(payload.amount) || payload.amount <= 0) {
@@ -49,6 +58,9 @@ export function useCreateRecurring() {
       }
       if (payload.day_of_month < 1 || payload.day_of_month > 28) {
         throw new Error('El día debe estar entre 1 y 28')
+      }
+      if (payload.type === 'expense' && !payload.category_id) {
+        throw new Error('Categoría obligatoria en gastos fijos')
       }
 
       const { data, error } = await supabase
@@ -78,6 +90,7 @@ export function useUpdateRecurring() {
       if (patch.category_id !== undefined) cleaned.category_id = patch.category_id || null
       if (patch.day_of_month !== undefined) cleaned.day_of_month = Number(patch.day_of_month)
       if (patch.is_active !== undefined) cleaned.is_active = !!patch.is_active
+      if (patch.type !== undefined) cleaned.type = patch.type === 'income' ? 'income' : 'expense'
 
       const { data, error } = await supabase
         .from('recurring_expenses')
@@ -119,13 +132,10 @@ export function useToggleRecurring() {
 }
 
 /**
- * Elimina un gasto fijo recurrente.
+ * Elimina un recurrente (gasto o ingreso fijo).
  * Antes de borrar el registro, elimina también los movimientos futuros
  * (occurred_on > hoy) generados por él. Los movimientos pasados se mantienen
  * para no falsear el histórico.
- *
- * Por la FK ON DELETE SET NULL en transactions.recurring_id, las tx pasadas
- * quedan con recurring_id = NULL pero conservan importe y fecha.
  */
 export function useDeleteRecurring() {
   const { user } = useSession()
@@ -143,8 +153,7 @@ export function useDeleteRecurring() {
         .gt('occurred_on', today)
       if (e1) throw e1
 
-      // 2. Borrar el recurrente. Las tx pasadas con recurring_id quedan
-      //    como NULL gracias a ON DELETE SET NULL.
+      // 2. Borrar el recurrente
       const { error: e2 } = await supabase
         .from('recurring_expenses')
         .delete()
@@ -163,16 +172,8 @@ export function useDeleteRecurring() {
 /**
  * Materializa los recurrentes activos para el mes seleccionado.
  *
- * Por cada recurrente activo cuyo movimiento aún no exista (no hay tx con
- * recurring_id=X y occurred_on dentro del mes), inserta uno con:
- *   - type = 'expense'
- *   - amount = recurring.amount
- *   - description = recurring.name
- *   - category_id = recurring.category_id
- *   - occurred_on = primer día del mes con day_of_month
- *   - recurring_id = recurring.id
- *
- * Es idempotente: llamarla varias veces no duplica movimientos.
+ * Por cada recurrente activo cuyo movimiento aún no exista, inserta uno
+ * con su `type` propio (expense o income). Idempotente.
  */
 export function useMaterializeRecurring() {
   const { user } = useSession()
@@ -181,10 +182,10 @@ export function useMaterializeRecurring() {
 
   return useMutation({
     mutationFn: async () => {
-      // 1. Recurrentes activos
+      // 1. Recurrentes activos (de ambos tipos)
       const { data: recurrings, error: e1 } = await supabase
         .from('recurring_expenses')
-        .select('id, name, amount, category_id, day_of_month')
+        .select('id, name, amount, category_id, day_of_month, type')
         .eq('is_active', true)
       if (e1) throw e1
       if (!recurrings?.length) return { inserted: 0 }
@@ -213,7 +214,7 @@ export function useMaterializeRecurring() {
           const occurred = format(new Date(year, monthIdx, day), 'yyyy-MM-dd')
           return {
             user_id: user.id,
-            type: 'expense',
+            type: r.type === 'income' ? 'income' : 'expense',
             amount: r.amount,
             description: r.name,
             category_id: r.category_id,
