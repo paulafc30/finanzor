@@ -9,7 +9,7 @@ import RecentTransactions from '../components/dashboard/RecentTransactions.jsx'
 import CategoryComparisonChart from '../components/dashboard/CategoryComparisonChart.jsx'
 import { useTransactions } from '../hooks/useTransactions.js'
 import { usePreviousMonthSummary } from '../hooks/usePreviousMonthSummary.js'
-import { useAccumulatedBalance } from '../hooks/useAccumulatedBalance.js'
+import { useCarryForward } from '../hooks/useCarryForward.js'
 import { useMonth } from '../hooks/useMonth.jsx'
 import { formatEuro, formatMonthLabel, formatYearLabel } from '../lib/formatters.js'
 
@@ -17,7 +17,7 @@ export default function Dashboard() {
   const [open, setOpen] = useState(false)
   const { data: transactions = [], isLoading } = useTransactions()
   const { data: prev } = usePreviousMonthSummary()
-  const { data: accumulatedBalance, isLoading: accLoading } = useAccumulatedBalance()
+  const { data: carryForward = 0, isLoading: cfLoading } = useCarryForward()
   const { month, isYearView } = useMonth()
 
   const summary = useMemo(() => {
@@ -34,6 +34,15 @@ export default function Dashboard() {
 
   const prevIncome = prev?.income ?? 0
   const prevExpense = prev?.expense ?? 0
+
+  // La card "Saldo del mes" suma el balance del periodo visible al
+  // carry-forward (lo que sobró al cierre del mes anterior). Resultado:
+  // refleja el dinero que tendrias acumulado a fin del mes visible,
+  // SOLO incluyendo lo que paso antes en la app. Si paula tiene un
+  // déficit histórico antiguo (importacion CSV vieja, gastos olvidados),
+  // sale aqui — y se ve donde mirando los meses anteriores.
+  const balanceLabel = isYearView ? 'Saldo del año' : 'Saldo del mes'
+  const balanceValue = summary.balance + Number(carryForward || 0)
 
   return (
     <section className="space-y-4">
@@ -73,16 +82,11 @@ export default function Dashboard() {
           deltaPositiveIsGood={false}
         />
         <KpiCard
-          label="Saldo Actual"
-          value={formatEuro(accumulatedBalance ?? 0)}
+          label={balanceLabel}
+          value={formatEuro(balanceValue)}
           icon={Wallet}
           tone="info"
-          loading={accLoading}
-          // Delta "este mes" desactivado temporalmente hasta revisar el cálculo.
-          // delta={summary.balance}
-          // deltaPositiveIsGood
-          // deltaIsAbsolute
-          // deltaLabel="este mes"
+          loading={isLoading || cfLoading}
         />
         <KpiCard
           label="Tasa de Ahorro"

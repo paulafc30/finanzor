@@ -17,7 +17,15 @@ export default function AppShell() {
         {showMonthSwitcher ? (
           <MonthSwitcher />
         ) : (
-          <span className="text-sm font-semibold text-white/80">Finanzor</span>
+          <span className="flex items-center gap-2 text-sm font-semibold text-white/90">
+            <img
+              src="/favicon.ico?v=2"
+              alt=""
+              aria-hidden="true"
+              className="h-6 w-6 rounded-md"
+            />
+            Finanzor
+          </span>
         )}
         <Link
           to="/ajustes"

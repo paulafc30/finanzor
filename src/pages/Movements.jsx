@@ -6,6 +6,7 @@ import TransactionList from '../components/transactions/TransactionList.jsx'
 import MovementsFilters, {
   emptyFilter,
 } from '../components/transactions/MovementsFilters.jsx'
+import MovementsSummary from '../components/transactions/MovementsSummary.jsx'
 
 export default function Movements() {
   // null = cerrado, 'new' = creando, transaction object = editando
@@ -20,6 +21,10 @@ export default function Movements() {
       <h1 className="text-xl font-semibold">Movimientos</h1>
 
       <MovementsFilters filter={filter} onChange={setFilter} />
+
+      {/* Banner de totales + diagnóstico por origen. Solo aparece si hay
+          al menos un movimiento; permite auditar a ojo las sumas. */}
+      <MovementsSummary filter={filter} />
 
       <TransactionList filter={filter} onEdit={(t) => setEditing(t)} />
 

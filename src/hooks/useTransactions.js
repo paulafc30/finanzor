@@ -73,6 +73,9 @@ export function useCreateTransaction() {
       qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
       qc.invalidateQueries({ queryKey: ['previous-month-summary', user?.id] })
       qc.invalidateQueries({ queryKey: ['savings-from-expenses', user?.id] })
+      qc.invalidateQueries({ queryKey: ['budgets', user?.id] })
+      qc.invalidateQueries({ queryKey: ['expense-comparison', user?.id] })
+      qc.invalidateQueries({ queryKey: ['carry-forward', user?.id] })
     },
   })
 }
@@ -115,6 +118,8 @@ export function useUpdateTransaction() {
       qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
       qc.invalidateQueries({ queryKey: ['previous-month-summary', user?.id] })
       qc.invalidateQueries({ queryKey: ['savings-from-expenses', user?.id] })
+      qc.invalidateQueries({ queryKey: ['expense-comparison', user?.id] })
+      qc.invalidateQueries({ queryKey: ['carry-forward', user?.id] })
     },
   })
 }
@@ -138,6 +143,9 @@ export function useDeleteTransaction() {
       qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
       qc.invalidateQueries({ queryKey: ['previous-month-summary', user?.id] })
       qc.invalidateQueries({ queryKey: ['savings-from-expenses', user?.id] })
+      qc.invalidateQueries({ queryKey: ['budgets', user?.id] })
+      qc.invalidateQueries({ queryKey: ['expense-comparison', user?.id] })
+      qc.invalidateQueries({ queryKey: ['carry-forward', user?.id] })
     },
   })
 }

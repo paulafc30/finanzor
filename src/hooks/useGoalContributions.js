@@ -114,6 +114,9 @@ export function useCreateContribution() {
       qc.invalidateQueries({ queryKey: ['savings-from-expenses', user?.id] })
       qc.invalidateQueries({ queryKey: ['monthly-summary', user?.id] })
       qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
+      qc.invalidateQueries({ queryKey: ['expense-comparison', user?.id] })
+      qc.invalidateQueries({ queryKey: ['budgets', user?.id] })
+      qc.invalidateQueries({ queryKey: ['carry-forward', user?.id] })
     },
   })
 }
@@ -161,6 +164,9 @@ export function useDeleteContribution() {
       qc.invalidateQueries({ queryKey: ['savings-from-expenses', user?.id] })
       qc.invalidateQueries({ queryKey: ['monthly-summary', user?.id] })
       qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
+      qc.invalidateQueries({ queryKey: ['expense-comparison', user?.id] })
+      qc.invalidateQueries({ queryKey: ['budgets', user?.id] })
+      qc.invalidateQueries({ queryKey: ['carry-forward', user?.id] })
     },
   })
 }

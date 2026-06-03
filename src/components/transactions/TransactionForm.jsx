@@ -43,11 +43,71 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
   const { month, rangeStart, rangeEnd } = useMonth()
 
   // Defaults: en edicion usamos los valores actuales; en creacion, hoy o
-  // el primer dia del mes seleccionado si estas navegando otro mes.
+  // el primer dia del mes seleccionado si estas navegando otro mes (pero
+  // nunca antes del mes actual real, ver `defaultDate` mas abajo).
   // Si nos pasan defaultDate explicito (calendario), tiene prioridad.
   const today = format(new Date(), 'yyyy-MM-dd')
   const computedDefaultDate = today >= rangeStart && today < rangeEnd ? today : rangeStart
-  const defaultDate = defaultDateProp || computedDefaultDate
+
+  // ── Limites de fecha permitidos ──
+  // Regla: no se pueden crear movimientos con fecha de meses pasados
+  // (el saldo de meses cerrados queda congelado y no debe alterarse).
+  // - Crear: min = primer dia del mes actual real.
+  // - Editar: si el movimiento es de un mes pasado, su fecha solo puede
+  //   moverse dentro del mismo mes original (para no descuadrar saldos
+  //   posteriores). En el mes actual o futuro, sin tope superior.
+  const now = new Date()
+  const firstOfCurrentMonth = format(
+    new Date(now.getFullYear(), now.getMonth(), 1),
+    'yyyy-MM-dd',
+  )
+  const txMonthStart = isEdit
+    ? format(
+        new Date(
+          new Date(transaction.occurred_on).getFullYear(),
+          new Date(transaction.occurred_on).getMonth(),
+          1,
+        ),
+        'yyyy-MM-dd',
+      )
+    : null
+  const txMonthEndExclusive = isEdit
+    ? format(
+        new Date(
+          new Date(transaction.occurred_on).getFullYear(),
+          new Date(transaction.occurred_on).getMonth() + 1,
+          1,
+        ),
+        'yyyy-MM-dd',
+      )
+    : null
+  // Para el input <type="date"> el max es inclusivo, así que restamos un día.
+  const txMonthEndInclusive = isEdit
+    ? format(
+        new Date(
+          new Date(transaction.occurred_on).getFullYear(),
+          new Date(transaction.occurred_on).getMonth() + 1,
+          0,
+        ),
+        'yyyy-MM-dd',
+      )
+    : null
+  // ¿El movimiento que estamos editando ya pertenece a un mes pasado?
+  const isEditingPastMonth = isEdit && transaction.occurred_on < firstOfCurrentMonth
+
+  // Valores definitivos del input date
+  const dateInputMin = isEdit
+    ? isEditingPastMonth
+      ? txMonthStart       // solo se puede mover dentro del mismo mes
+      : firstOfCurrentMonth
+    : firstOfCurrentMonth  // crear: nunca antes del mes actual
+  const dateInputMax = isEdit && isEditingPastMonth ? txMonthEndInclusive : undefined
+
+  // En creacion garantizamos que la fecha por defecto nunca sea anterior al
+  // mes actual (aunque el usuario este navegando un mes pasado).
+  const safeDefault =
+    computedDefaultDate < firstOfCurrentMonth ? today : computedDefaultDate
+  const defaultDate = defaultDateProp || safeDefault
 
   const initial = isEdit
     ? {
@@ -108,6 +168,22 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
   async function onSubmit(values) {
     const parsed = schema.safeParse(values)
     if (!parsed.success) return
+
+    // Validacion adicional: respetar los limites de fecha (algunos
+    // navegadores no aplican min/max al type="date").
+    const d = parsed.data.occurred_on
+    if (d < dateInputMin) {
+      alert(
+        isEdit && isEditingPastMonth
+          ? 'Solo puedes mover la fecha dentro del mismo mes original.'
+          : 'No se pueden crear movimientos con fecha de meses pasados.',
+      )
+      return
+    }
+    if (dateInputMax && d > dateInputMax) {
+      alert('Solo puedes mover la fecha dentro del mismo mes original.')
+      return
+    }
 
     try {
       if (isEdit) {
@@ -273,15 +349,24 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
         </label>
         <input
           type="date"
+          min={dateInputMin}
+          max={dateInputMax}
           {...register('occurred_on', { required: 'Fecha obligatoria' })}
           className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
         />
         {errors.occurred_on && (
           <p className="mt-1 text-xs text-danger">{errors.occurred_on.message}</p>
         )}
-        <p className="mt-1 text-xs text-white/40">
-          Cuenta para el mes de la fecha que pongas, no para hoy.
-        </p>
+        {isEdit && isEditingPastMonth ? (
+          <p className="mt-1 text-xs text-warning">
+            Este movimiento es de un mes pasado. Solo puedes moverlo dentro
+            de su mes original para no descuadrar el saldo de meses posteriores.
+          </p>
+        ) : (
+          <p className="mt-1 text-xs text-white/40">
+            No se permiten fechas anteriores al mes actual ({firstOfCurrentMonth.slice(0, 7)}).
+          </p>
+        )}
       </div>
 
       <div className="flex gap-2 pt-2">

@@ -182,10 +182,13 @@ export function useMaterializeRecurring() {
 
   return useMutation({
     mutationFn: async () => {
-      // 1. Recurrentes activos (de ambos tipos)
+      // 1. Recurrentes activos (de ambos tipos). Incluimos created_at
+      //    para no materializar el recurrente en meses anteriores a su
+      //    creacion: un gasto fijo creado el 15 de junio no debe aparecer
+      //    en mayo ni antes.
       const { data: recurrings, error: e1 } = await supabase
         .from('recurring_expenses')
-        .select('id, name, amount, category_id, day_of_month, type')
+        .select('id, name, amount, category_id, day_of_month, type, created_at')
         .eq('is_active', true)
       if (e1) throw e1
       if (!recurrings?.length) return { inserted: 0 }
@@ -206,9 +209,22 @@ export function useMaterializeRecurring() {
       // 3. Construir las filas que faltan
       const year = month.getFullYear()
       const monthIdx = month.getMonth() // 0-11
+      const monthStart = format(new Date(year, monthIdx, 1), 'yyyy-MM-dd')
 
       const toInsert = recurrings
         .filter((r) => !alreadyMaterialized.has(r.id))
+        .filter((r) => {
+          // Saltar los recurrentes creados despues del primer dia del mes
+          // visible. Asi un fijo creado el 15 de junio no aparece en
+          // mayo aunque el usuario navegue alli.
+          if (!r.created_at) return true
+          const created = new Date(r.created_at)
+          const createdMonthStart = format(
+            new Date(created.getFullYear(), created.getMonth(), 1),
+            'yyyy-MM-dd',
+          )
+          return monthStart >= createdMonthStart
+        })
         .map((r) => {
           const day = Math.max(1, Math.min(28, r.day_of_month))
           const occurred = format(new Date(year, monthIdx, day), 'yyyy-MM-dd')
@@ -232,7 +248,15 @@ export function useMaterializeRecurring() {
     },
     onSuccess: (res) => {
       if (res?.inserted > 0) {
+        // Refrescamos todo lo que depende de transacciones: lista, KPIs del
+        // mes, saldo acumulado, comparativa, presupuestos y ahorro.
         qc.invalidateQueries({ queryKey: ['transactions', user?.id] })
+        qc.invalidateQueries({ queryKey: ['monthly-summary', user?.id] })
+        qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
+        qc.invalidateQueries({ queryKey: ['previous-month-summary', user?.id] })
+        qc.invalidateQueries({ queryKey: ['savings-from-expenses', user?.id] })
+        qc.invalidateQueries({ queryKey: ['budgets', user?.id] })
+        qc.invalidateQueries({ queryKey: ['expense-comparison', user?.id] })
       }
     },
   })

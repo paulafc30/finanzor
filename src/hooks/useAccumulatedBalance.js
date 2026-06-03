@@ -4,25 +4,32 @@ import { useSession } from './useSession.js'
 import { useMonth } from './useMonth.jsx'
 
 /**
- * Calcula el saldo acumulado del usuario hasta el último día del mes
- * seleccionado. Esto incluye TODAS las transacciones (ingresos − gastos)
- * desde el comienzo del histórico hasta justo antes del primer día del
- * mes siguiente.
+ * Calcula el saldo acumulado hasta el último día del periodo seleccionado
+ * (mes o año, según `viewMode` del MonthSwitcher).
  *
- * Es lo que en banca se llama "saldo a fin de mes" — refleja cuánto
- * dinero queda acumulado cuando termina el mes en curso.
+ * Definición: suma de todos los `income` − todos los `expense` con
+ * `occurred_on < rangeEnd`, sin filtrar por categoría ni tipo de origen.
  *
- * Devuelve { balance, isLoading, error }.
+ * Esto hace que el "Saldo" sea **un punto temporal congelado**:
+ *  - Si navegas a un mes pasado, ves cuánto tenías al cerrar ese mes.
+ *    No se actualiza al pasar el tiempo, solo si añades/borras/editas un
+ *    movimiento cuya fecha caiga en ese mes o anteriores.
+ *  - Si el mes seleccionado contiene hoy, es efectivamente el saldo de
+ *    hoy + lo que ya esté materializado de futuros (recurrentes).
+ *  - Si el mes seleccionado es futuro, es el saldo proyectado a fin de
+ *    ese mes contando los recurrentes ya generados.
+ *
+ * Cualquier vista que dependa de "saldo a día de hoy" debe calcularlo
+ * por su cuenta filtrando por la fecha actual, no por este hook.
  */
 export function useAccumulatedBalance() {
   const { user } = useSession()
-  const { rangeEnd } = useMonth() // primer día del mes siguiente al seleccionado
+  const { rangeEnd } = useMonth() // primer día del mes/año siguiente al visible
 
   return useQuery({
     queryKey: ['accumulated-balance', user?.id, rangeEnd],
     enabled: !!user,
     queryFn: async () => {
-      // Traemos solo type y amount (no necesitamos el resto)
       const { data, error } = await supabase
         .from('transactions')
         .select('type, amount')

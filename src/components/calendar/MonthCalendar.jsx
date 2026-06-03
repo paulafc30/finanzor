@@ -97,20 +97,26 @@ export default function MonthCalendar({ onDayClick }) {
                 {format(day, 'd')}
               </span>
 
-              {/* Indicadores de actividad */}
+              {/* Importes del día — formato compacto para no romper la celda
+                  en móvil. Rojo si hay gastos, verde si hay ingresos. Si hay
+                  ambos, se muestran ambas líneas. */}
               {data ? (
-                <div className="flex items-center gap-1.5">
-                  {data.income > 0 && (
-                    <span
-                      className="h-2.5 w-2.5 rounded-full bg-success"
-                      title="Ingresos"
-                    />
-                  )}
+                <div className="flex flex-col items-end leading-none">
                   {data.expense > 0 && (
                     <span
-                      className="h-2.5 w-2.5 rounded-full bg-danger"
-                      title="Gastos"
-                    />
+                      className="text-[10px] font-semibold tabular-nums text-danger sm:text-xs"
+                      title={`Gastos: ${data.expense.toFixed(2)} €`}
+                    >
+                      −{formatShortEuro(data.expense)}
+                    </span>
+                  )}
+                  {data.income > 0 && (
+                    <span
+                      className="mt-0.5 text-[10px] font-semibold tabular-nums text-success sm:text-xs"
+                      title={`Ingresos: ${data.income.toFixed(2)} €`}
+                    >
+                      +{formatShortEuro(data.income)}
+                    </span>
                   )}
                 </div>
               ) : (
@@ -122,13 +128,13 @@ export default function MonthCalendar({ onDayClick }) {
       </div>
 
       {/* Leyenda */}
-      <div className="mt-5 flex items-center justify-center gap-5 text-xs text-white/60">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-success" />
+      <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-white/60">
+        <span className="inline-flex items-center gap-1">
+          <span className="font-semibold text-success">+€</span>
           Ingresos
         </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-danger" />
+        <span className="inline-flex items-center gap-1">
+          <span className="font-semibold text-danger">−€</span>
           Gastos
         </span>
         <span className="inline-flex items-center gap-1.5">
@@ -138,4 +144,24 @@ export default function MonthCalendar({ onDayClick }) {
       </div>
     </div>
   )
+}
+
+/**
+ * Formatea un importe para la celda del calendario, donde el espacio es
+ * mínimo. Ejemplos:
+ *   12        → "12€"
+ *   12.5      → "12,50€"
+ *   1234      → "1,2k€"
+ *   1500      → "1,5k€"
+ *   12345     → "12k€"
+ *
+ * Bajo 1000 mostramos los céntimos solo si no son 0 (para no llenar la
+ * celda); a partir de 1000 abreviamos con "k€".
+ */
+function formatShortEuro(n) {
+  const v = Math.abs(Number(n) || 0)
+  if (v >= 10000) return `${Math.round(v / 1000)}k€`
+  if (v >= 1000) return `${(v / 1000).toFixed(1).replace('.', ',')}k€`
+  if (Number.isInteger(v)) return `${v}€`
+  return `${v.toFixed(2).replace('.', ',')}€`
 }
