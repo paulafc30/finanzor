@@ -9,11 +9,7 @@ import { useMonth } from '../hooks/useMonth.jsx'
 export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState(null)
   const { isYearView, setViewMode } = useMonth()
-
-  // Vista local: 'month' | 'week'
   const [calView, setCalView] = useState('month')
-
-  // Ancla de la semana visible (lunes de la semana actual por defecto)
   const [weekAnchor, setWeekAnchor] = useState(() =>
     format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
   )
@@ -25,8 +21,7 @@ export default function CalendarPage() {
           <CalendarIcon size={20} className="text-info" />
           <h1 className="text-xl font-semibold">Calendario</h1>
         </div>
-
-        <div className="rounded-xl bg-bg-elevated p-6 text-center ring-1 ring-white/5 sm:p-8">
+        <div className="rounded-xl bg-bg-elevated p-6 text-center ring-1 ring-white/5">
           <CalendarRange size={32} className="mx-auto mb-3 text-white/40" />
           <p className="text-white">El calendario es mensual.</p>
           <p className="mt-1 text-sm text-white/60">
@@ -45,15 +40,18 @@ export default function CalendarPage() {
   }
 
   return (
-    <section className="space-y-3">
-      {/* Header con toggle mes / semana */}
-      <div className="flex items-center justify-between">
+    // height = 100dvh - header(~42px) - bottomNav(~56px) - main pt-4(16px) - 4px margen
+    <section
+      className="flex flex-col gap-2"
+      style={{ height: 'calc(100dvh - 118px)' }}
+    >
+      {/* Header con toggle Mes / Semana */}
+      <div className="flex shrink-0 items-center justify-between">
         <div className="flex items-center gap-2">
-          <CalendarIcon size={20} className="shrink-0 text-info" />
-          <h1 className="truncate text-xl font-semibold">Calendario</h1>
+          <CalendarIcon size={18} className="shrink-0 text-info" />
+          <h1 className="text-lg font-semibold">Calendario</h1>
         </div>
 
-        {/* Toggle Mes / Semana */}
         <div className="flex rounded-lg bg-bg-elevated p-0.5">
           {[
             { id: 'month', label: 'Mes' },
@@ -76,12 +74,12 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      <p className="text-xs text-white/50">
-        Toca un día para ver sus movimientos o añadir uno nuevo.
-      </p>
-
+      {/* Calendario — ocupa todo el espacio restante */}
       {calView === 'month' ? (
-        <MonthCalendar onDayClick={(key) => setSelectedDay(key)} />
+        <MonthCalendar
+          className="min-h-0 flex-1"
+          onDayClick={(key) => setSelectedDay(key)}
+        />
       ) : (
         <WeekCalendar
           weekAnchor={weekAnchor}

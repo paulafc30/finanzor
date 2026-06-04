@@ -13,9 +13,9 @@ import { es } from 'date-fns/locale'
 import { useTransactions } from '../../hooks/useTransactions.js'
 import { useMonth } from '../../hooks/useMonth.jsx'
 
-const WEEKDAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
+const WEEKDAYS_ES = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom']
 
-export default function MonthCalendar({ onDayClick }) {
+export default function MonthCalendar({ onDayClick, className = '' }) {
   const { data: transactions = [] } = useTransactions()
   const { month } = useMonth()
 
@@ -26,6 +26,8 @@ export default function MonthCalendar({ onDayClick }) {
     const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 })
     return eachDayOfInterval({ start: gridStart, end: gridEnd })
   }, [month])
+
+  const numWeeks = days.length / 7
 
   const byDay = useMemo(() => {
     const map = new Map()
@@ -42,21 +44,24 @@ export default function MonthCalendar({ onDayClick }) {
   const today = new Date()
 
   return (
-    <div className="select-none">
-      {/* Cabecera días de la semana */}
-      <div className="grid grid-cols-7 border-b border-white/8 pb-2">
-        {WEEKDAYS.map((d) => (
+    <div className={`flex flex-col ${className}`}>
+      {/* Cabecera con nombres de día */}
+      <div className="grid shrink-0 grid-cols-7 border-b border-white/10 pb-1.5">
+        {WEEKDAYS_ES.map((d) => (
           <div
             key={d}
-            className="text-center text-[10px] font-semibold uppercase tracking-wider text-white/35"
+            className="text-center text-[10px] font-medium tracking-wide text-white/35"
           >
             {d}
           </div>
         ))}
       </div>
 
-      {/* Grid de días */}
-      <div className="grid grid-cols-7 border-l border-t border-white/8">
+      {/* Grid estirado — cada fila ocupa 1fr del espacio disponible */}
+      <div
+        className="grid min-h-0 flex-1 grid-cols-7 border-l border-t border-white/10"
+        style={{ gridTemplateRows: `repeat(${numWeeks}, 1fr)` }}
+      >
         {days.map((day) => {
           const key = format(day, 'yyyy-MM-dd')
           const inMonth = isSameMonth(day, month)
@@ -69,28 +74,27 @@ export default function MonthCalendar({ onDayClick }) {
               type="button"
               onClick={() => onDayClick?.(key, day)}
               aria-label={format(day, "EEEE d 'de' LLLL", { locale: es })}
-              className="group flex min-h-[56px] flex-col items-center border-b border-r border-white/8 px-0.5 pt-1.5 pb-1 transition hover:bg-white/3 sm:min-h-[80px] sm:p-2"
+              className={[
+                'flex h-full flex-col items-start border-b border-r border-white/10 p-1 text-left transition hover:bg-white/[0.03]',
+                !inMonth ? 'opacity-30' : '',
+              ].join(' ')}
             >
-              {/* Número del día */}
+              {/* Número del día — círculo si es hoy */}
               <span
                 className={[
-                  'flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold leading-none sm:h-7 sm:w-7 sm:text-sm',
-                  isToday
-                    ? 'bg-accent text-white'
-                    : inMonth
-                    ? 'text-white group-hover:bg-white/10'
-                    : 'text-white/20',
+                  'mb-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold leading-none',
+                  isToday ? 'bg-accent text-white' : 'text-white',
                 ].join(' ')}
               >
                 {format(day, 'd')}
               </span>
 
-              {/* Chips de importe */}
+              {/* Chips de transacciones */}
               {data && (
-                <div className="mt-1 flex w-full flex-col gap-px">
+                <div className="flex w-full flex-col gap-px">
                   {data.expense > 0 && (
                     <div
-                      className="w-full truncate rounded-[3px] bg-danger/20 px-0.5 text-center text-[8px] font-semibold tabular-nums text-danger sm:text-[9px]"
+                      className="w-full truncate rounded-[3px] bg-danger/25 px-1 py-px text-[9px] font-semibold leading-tight text-danger"
                       title={`Gastos: ${data.expense.toFixed(2)} €`}
                     >
                       −{formatShortEuro(data.expense)}
@@ -98,7 +102,7 @@ export default function MonthCalendar({ onDayClick }) {
                   )}
                   {data.income > 0 && (
                     <div
-                      className="w-full truncate rounded-[3px] bg-success/20 px-0.5 text-center text-[8px] font-semibold tabular-nums text-success sm:text-[9px]"
+                      className="w-full truncate rounded-[3px] bg-success/25 px-1 py-px text-[9px] font-semibold leading-tight text-success"
                       title={`Ingresos: ${data.income.toFixed(2)} €`}
                     >
                       +{formatShortEuro(data.income)}
@@ -109,24 +113,6 @@ export default function MonthCalendar({ onDayClick }) {
             </button>
           )
         })}
-      </div>
-
-      {/* Leyenda */}
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-white/50">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-4 rounded-[3px] bg-success/30" />
-          Ingresos
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-4 rounded-[3px] bg-danger/30" />
-          Gastos
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[8px] font-bold text-white">
-            {today.getDate()}
-          </span>
-          Hoy
-        </span>
       </div>
     </div>
   )

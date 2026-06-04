@@ -4,14 +4,8 @@ import { es } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTransactionsByRange } from '../../hooks/useTransactions.js'
 
-const DAY_SHORT = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
+const DAY_SHORT = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom']
 
-/**
- * Vista semanal tipo Google Calendar: 7 columnas (L-D).
- * - weekAnchor: 'YYYY-MM-DD' del lunes de la semana
- * - onWeekChange(anchor): callback para cambiar semana
- * - onDayClick(dateKey, date): abre el modal del día
- */
 export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
   const weekStart = parseISO(weekAnchor)
   const weekEnd = addDays(weekStart, 6)
@@ -40,9 +34,9 @@ export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
     : `${format(weekStart, 'd MMM', { locale: es })} – ${format(weekEnd, 'd MMM yyyy', { locale: es })}`
 
   return (
-    <div className="select-none">
-      {/* Navegación */}
-      <div className="mb-3 flex items-center justify-between">
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
+      {/* Navegación de semana */}
+      <div className="flex shrink-0 items-center justify-between">
         <button
           type="button"
           onClick={() => onWeekChange(format(addDays(weekStart, -7), 'yyyy-MM-dd'))}
@@ -62,29 +56,28 @@ export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
         </button>
       </div>
 
-      {/* Grid de 7 columnas */}
-      <div className="grid grid-cols-7 border-l border-t border-white/8">
-        {/* Cabeceras de día */}
+      {/* Grid de 7 columnas estirado */}
+      <div className="grid min-h-0 flex-1 grid-cols-7 border-l border-t border-white/10">
+        {/* Cabeceras */}
         {days.map((day) => {
           const isToday = isSameDay(day, today)
-          const dayIndex = day.getDay() === 0 ? 6 : day.getDay() - 1
-
+          const idx = day.getDay() === 0 ? 6 : day.getDay() - 1
           return (
             <div
               key={`h-${format(day, 'yyyy-MM-dd')}`}
-              className="flex flex-col items-center border-b border-r border-white/8 py-2"
+              className="flex flex-col items-center border-b border-r border-white/10 py-1.5"
             >
               <span
                 className={[
-                  'text-[10px] font-semibold uppercase tracking-wider',
+                  'text-[9px] font-medium uppercase tracking-wide',
                   isToday ? 'text-accent' : 'text-white/35',
                 ].join(' ')}
               >
-                {DAY_SHORT[dayIndex]}
+                {DAY_SHORT[idx]}
               </span>
               <span
                 className={[
-                  'mt-0.5 flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold',
+                  'mt-0.5 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold',
                   isToday ? 'bg-accent text-white' : 'text-white',
                 ].join(' ')}
               >
@@ -105,25 +98,20 @@ export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
               key={`col-${key}`}
               type="button"
               onClick={() => onDayClick?.(key, day)}
-              className={[
-                'flex min-h-[140px] w-full flex-col gap-0.5 border-b border-r border-white/8 p-0.5 text-left transition hover:bg-white/3 sm:min-h-[200px] sm:p-1',
-                isToday ? 'bg-accent/3' : '',
-              ].join(' ')}
               aria-label={format(day, "EEEE d 'de' LLLL", { locale: es })}
+              className={[
+                'flex h-full w-full flex-col gap-px overflow-hidden border-b border-r border-white/10 p-0.5 text-left transition hover:bg-white/[0.03]',
+                isToday ? 'bg-accent/[0.04]' : '',
+              ].join(' ')}
             >
               {dayTxs.map((t) => {
-                const bg = t.category?.color
-                  ? t.category.color + '30'
-                  : t.type === 'income'
-                  ? '#22c55e20'
-                  : '#ef444420'
-                const fg = t.category?.color ?? (t.type === 'income' ? '#22c55e' : '#ef4444')
-
+                const color = t.category?.color ?? (t.type === 'income' ? '#22c55e' : '#ef4444')
+                const bg = color + '28'
                 return (
                   <div
                     key={t.id}
-                    className="w-full truncate rounded-[3px] px-0.5 py-px text-[8px] font-semibold tabular-nums leading-tight sm:text-[9px]"
-                    style={{ backgroundColor: bg, color: fg }}
+                    className="w-full truncate rounded-[3px] px-0.5 py-px text-[8px] font-semibold leading-tight tabular-nums sm:text-[9px]"
+                    style={{ backgroundColor: bg, color }}
                     title={`${t.description || t.category?.name || ''} ${t.type === 'income' ? '+' : '−'}${Number(t.amount).toFixed(2)}€`}
                   >
                     {t.type === 'income' ? '+' : '−'}
@@ -134,13 +122,6 @@ export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
             </button>
           )
         })}
-      </div>
-
-      {/* Leyenda compacta */}
-      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-white/50">
-        <span className="inline-flex items-center gap-1">
-          Toca un día para ver detalle o añadir movimiento
-        </span>
       </div>
     </div>
   )
