@@ -50,15 +50,18 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
   const computedDefaultDate = today >= rangeStart && today < rangeEnd ? today : rangeStart
 
   // ── Limites de fecha permitidos ──
-  // Regla: no se pueden crear movimientos con fecha de meses pasados
-  // (el saldo de meses cerrados queda congelado y no debe alterarse).
-  // - Crear: min = primer dia del mes actual real.
-  // - Editar: si el movimiento es de un mes pasado, su fecha solo puede
-  //   moverse dentro del mismo mes original (para no descuadrar saldos
-  //   posteriores). En el mes actual o futuro, sin tope superior.
+  // Regla: se puede crear o editar libremente desde el primer dia del
+  // mes ANTERIOR al actual en adelante. Asi paula puede meter algun
+  // gasto del mes pasado que se olvido, pero no remontarse a febrero.
+  //
+  // Para movimientos que ya estan en un mes MUY antiguo (anterior al
+  // mes pasado, ej. abril cuando estamos en junio), el formulario sigue
+  // dejandote editar descripcion/categoria/importe pero la fecha solo
+  // se puede mover dentro del mismo mes original (para no descuadrar
+  // otros meses por accidente).
   const now = new Date()
-  const firstOfCurrentMonth = format(
-    new Date(now.getFullYear(), now.getMonth(), 1),
+  const firstOfPrevMonth = format(
+    new Date(now.getFullYear(), now.getMonth() - 1, 1),
     'yyyy-MM-dd',
   )
   const txMonthStart = isEdit
@@ -66,16 +69,6 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
         new Date(
           new Date(transaction.occurred_on).getFullYear(),
           new Date(transaction.occurred_on).getMonth(),
-          1,
-        ),
-        'yyyy-MM-dd',
-      )
-    : null
-  const txMonthEndExclusive = isEdit
-    ? format(
-        new Date(
-          new Date(transaction.occurred_on).getFullYear(),
-          new Date(transaction.occurred_on).getMonth() + 1,
           1,
         ),
         'yyyy-MM-dd',
@@ -92,21 +85,21 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
         'yyyy-MM-dd',
       )
     : null
-  // ¿El movimiento que estamos editando ya pertenece a un mes pasado?
-  const isEditingPastMonth = isEdit && transaction.occurred_on < firstOfCurrentMonth
+  // ¿El movimiento que estamos editando es de un mes MUY antiguo
+  // (anterior al mes pasado)?
+  const isEditingOldMonth = isEdit && transaction.occurred_on < firstOfPrevMonth
 
   // Valores definitivos del input date
-  const dateInputMin = isEdit
-    ? isEditingPastMonth
-      ? txMonthStart       // solo se puede mover dentro del mismo mes
-      : firstOfCurrentMonth
-    : firstOfCurrentMonth  // crear: nunca antes del mes actual
-  const dateInputMax = isEdit && isEditingPastMonth ? txMonthEndInclusive : undefined
+  const dateInputMin = isEditingOldMonth
+    ? txMonthStart       // solo se mueve dentro de su mes original
+    : firstOfPrevMonth   // crear o editar: desde el mes pasado en adelante
+  const dateInputMax = isEditingOldMonth ? txMonthEndInclusive : undefined
 
-  // En creacion garantizamos que la fecha por defecto nunca sea anterior al
-  // mes actual (aunque el usuario este navegando un mes pasado).
+  // En creacion garantizamos que la fecha por defecto nunca sea anterior
+  // al mes pasado (aunque el usuario este navegando un mes mucho mas
+  // antiguo).
   const safeDefault =
-    computedDefaultDate < firstOfCurrentMonth ? today : computedDefaultDate
+    computedDefaultDate < firstOfPrevMonth ? today : computedDefaultDate
   const defaultDate = defaultDateProp || safeDefault
 
   const initial = isEdit
@@ -174,9 +167,9 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
     const d = parsed.data.occurred_on
     if (d < dateInputMin) {
       alert(
-        isEdit && isEditingPastMonth
+        isEditingOldMonth
           ? 'Solo puedes mover la fecha dentro del mismo mes original.'
-          : 'No se pueden crear movimientos con fecha de meses pasados.',
+          : 'La fecha no puede ser anterior al mes pasado.',
       )
       return
     }
@@ -357,14 +350,14 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
         {errors.occurred_on && (
           <p className="mt-1 text-xs text-danger">{errors.occurred_on.message}</p>
         )}
-        {isEdit && isEditingPastMonth ? (
+        {isEditingOldMonth ? (
           <p className="mt-1 text-xs text-warning">
-            Este movimiento es de un mes pasado. Solo puedes moverlo dentro
-            de su mes original para no descuadrar el saldo de meses posteriores.
+            Este movimiento es de hace más de un mes. Solo puedes moverlo
+            dentro de su mes original para no descuadrar saldos posteriores.
           </p>
         ) : (
           <p className="mt-1 text-xs text-white/40">
-            No se permiten fechas anteriores al mes actual ({firstOfCurrentMonth.slice(0, 7)}).
+            Puedes poner fechas desde el mes pasado ({firstOfPrevMonth.slice(0, 7)}) en adelante.
           </p>
         )}
       </div>

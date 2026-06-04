@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from './useSession.js'
-import { useMonth } from './useMonth.jsx'
 
 /**
  * Lista TODOS los recurrentes del usuario (gastos e ingresos fijos),
@@ -170,22 +169,38 @@ export function useDeleteRecurring() {
 }
 
 /**
- * Materializa los recurrentes activos para el mes seleccionado.
+ * Materializa los recurrentes activos en el MES CALENDARIO ACTUAL.
  *
- * Por cada recurrente activo cuyo movimiento aún no exista, inserta uno
- * con su `type` propio (expense o income). Idempotente.
+ * REGLAS:
+ *  - Solo se generan movimientos en el mes en curso (mes real de hoy).
+ *    Da igual que el usuario navegue a mayo, abril o agosto: nunca se
+ *    crearán recurrentes en esos meses al pasar por ellos.
+ *  - Solo materializa los que están `is_active = true`. Si lo desactivas,
+ *    deja de generarse en futuros meses; los pasados se mantienen.
+ *  - Solo materializa recurrentes cuyo `created_at` esté en este mes o
+ *    en uno anterior (un fijo creado el 15 de junio no produce nada
+ *    en mayo, pero sí en junio aunque el día 15 ya hubiera pasado).
+ *  - Idempotente: si el movimiento de este mes ya existe (mismo
+ *    `recurring_id`), no se duplica.
  */
 export function useMaterializeRecurring() {
   const { user } = useSession()
-  const { month, rangeStart, rangeEnd } = useMonth()
   const qc = useQueryClient()
 
   return useMutation({
     mutationFn: async () => {
+      // Mes actual real (no el del switcher). Esto es clave: el usuario
+      // puede estar viendo mayo, pero solo se materializa en junio (o el
+      // mes en el que esté).
+      const now = new Date()
+      const year = now.getFullYear()
+      const monthIdx = now.getMonth() // 0-11
+      const todayDay = now.getDate() // 1-31
+      const monthStart = format(new Date(year, monthIdx, 1), 'yyyy-MM-dd')
+      const monthEnd = format(new Date(year, monthIdx + 1, 1), 'yyyy-MM-dd')
+
       // 1. Recurrentes activos (de ambos tipos). Incluimos created_at
-      //    para no materializar el recurrente en meses anteriores a su
-      //    creacion: un gasto fijo creado el 15 de junio no debe aparecer
-      //    en mayo ni antes.
+      //    para saltar los creados despues del mes en curso.
       const { data: recurrings, error: e1 } = await supabase
         .from('recurring_expenses')
         .select('id, name, amount, category_id, day_of_month, type, created_at')
@@ -193,12 +208,12 @@ export function useMaterializeRecurring() {
       if (e1) throw e1
       if (!recurrings?.length) return { inserted: 0 }
 
-      // 2. Movimientos del mes que ya provienen de recurrentes
+      // 2. Movimientos del mes actual que ya provienen de recurrentes
       const { data: existing, error: e2 } = await supabase
         .from('transactions')
         .select('recurring_id')
-        .gte('occurred_on', rangeStart)
-        .lt('occurred_on', rangeEnd)
+        .gte('occurred_on', monthStart)
+        .lt('occurred_on', monthEnd)
         .not('recurring_id', 'is', null)
       if (e2) throw e2
 
@@ -207,16 +222,11 @@ export function useMaterializeRecurring() {
       )
 
       // 3. Construir las filas que faltan
-      const year = month.getFullYear()
-      const monthIdx = month.getMonth() // 0-11
-      const monthStart = format(new Date(year, monthIdx, 1), 'yyyy-MM-dd')
-
       const toInsert = recurrings
         .filter((r) => !alreadyMaterialized.has(r.id))
         .filter((r) => {
-          // Saltar los recurrentes creados despues del primer dia del mes
-          // visible. Asi un fijo creado el 15 de junio no aparece en
-          // mayo aunque el usuario navegue alli.
+          // Saltar recurrentes creados despues del primer dia del mes
+          // en curso: solo cuentan desde el mes de su creacion.
           if (!r.created_at) return true
           const created = new Date(r.created_at)
           const createdMonthStart = format(
@@ -224,6 +234,14 @@ export function useMaterializeRecurring() {
             'yyyy-MM-dd',
           )
           return monthStart >= createdMonthStart
+        })
+        .filter((r) => {
+          // Solo materializar cuando ya ha llegado (o pasado) el dia del
+          // mes que el recurrente tiene fijado. Asi una nomina con dia 28
+          // no aparece en movimientos el dia 4. Cuando el usuario entre
+          // a la app el dia 28 o despues, ese mismo dia se materializa.
+          const day = Math.max(1, Math.min(28, r.day_of_month))
+          return day <= todayDay
         })
         .map((r) => {
           const day = Math.max(1, Math.min(28, r.day_of_month))

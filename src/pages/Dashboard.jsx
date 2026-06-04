@@ -66,10 +66,11 @@ export default function Dashboard() {
           icon={TrendingUp}
           tone="success"
           loading={isLoading}
-          // Delta vs mes anterior desactivado temporalmente: la comparativa
-          // sale rara cuando el mes anterior tiene importes muy distintos.
-          // delta={diffPct(summary.income, prevIncome)}
-          // deltaPositiveIsGood
+          // Delta vs mes anterior solo en vista mensual. En ingresos
+          // "positivo = bueno" (default), o sea subir 12% sale en verde
+          // y bajar 12% en rojo.
+          delta={isYearView ? null : diffPct(summary.income, prevIncome)}
+          deltaLabel="vs. mes pasado"
         />
         <KpiCard
           label="Gastos"
@@ -80,6 +81,7 @@ export default function Dashboard() {
           // El delta vs mes anterior solo aplica en vista mensual.
           delta={isYearView ? null : diffPct(summary.expense, prevExpense)}
           deltaPositiveIsGood={false}
+          deltaLabel="vs. mes pasado"
         />
         <KpiCard
           label={balanceLabel}

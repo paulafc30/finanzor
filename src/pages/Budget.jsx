@@ -72,18 +72,19 @@ export default function Budget() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, totals.totalBudget, monthKey, isYearView])
 
-  // Materializar gastos fijos del mes seleccionado.
-  // Sin tracker en localStorage: la operación es idempotente, barata, y
-  // así se ejecuta también cuando el usuario añade/edita un recurrente.
-  // Se dispara al cambiar de mes O al cambiar la lista de recurrentes activos.
+  // Materializar gastos/ingresos fijos. El hook materializa SOLO en el
+  // mes calendario actual, ignorando el mes navegado en el switcher. Asi
+  // navegar a mayo no genera nada en mayo. La operacion es idempotente,
+  // se puede llamar tantas veces como haga falta sin duplicar.
+  // Se dispara cuando cambia la lista de recurrentes activos (nuevo,
+  // toggle on/off) o al entrar a la pagina.
   const activeCount = recurrings.filter((r) => r.is_active).length
   useEffect(() => {
-    if (isYearView) return // los recurrentes se materializan a nivel de mes
     if (activeCount === 0) return
     if (materialize.isPending) return
     materialize.mutate()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rangeStart, activeCount, isYearView])
+  }, [activeCount])
 
   if (isYearView) {
     return (
