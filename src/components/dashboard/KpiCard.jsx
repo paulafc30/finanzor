@@ -58,6 +58,7 @@ export default function KpiCard({
   deltaPositiveIsGood = true,
   deltaIsAbsolute = false,
   deltaLabel = null,
+  onClick = null,
 }) {
   const palette = tonePalette[tone] ?? tonePalette.accent
 
@@ -88,12 +89,17 @@ export default function KpiCard({
     )
   }
 
+  const Wrapper = onClick ? 'button' : 'div'
+
   return (
-    <div
+    <Wrapper
+      type={onClick ? 'button' : undefined}
+      onClick={onClick ?? undefined}
       className={[
-        'relative overflow-hidden rounded-2xl p-4 ring-1',
+        'relative overflow-hidden rounded-2xl p-4 ring-1 text-left',
         palette.cardBg,
         palette.cardRing,
+        onClick ? 'cursor-pointer transition-opacity hover:opacity-80 active:opacity-60' : '',
       ].join(' ')}
     >
       <div
@@ -114,6 +120,6 @@ export default function KpiCard({
       </p>
 
       {deltaNode && <div className="mt-1.5">{deltaNode}</div>}
-    </div>
+    </Wrapper>
   )
 }

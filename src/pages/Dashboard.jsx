@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { TrendingUp, TrendingDown, Wallet, Percent } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
@@ -15,6 +16,7 @@ import { formatEuro, formatMonthLabel, formatYearLabel } from '../lib/formatters
 
 export default function Dashboard() {
   const [open, setOpen] = useState(false)
+  const navigate = useNavigate()
   const { data: transactions = [], isLoading } = useTransactions()
   const { data: prev } = usePreviousMonthSummary()
   const { data: carryForward = 0, isLoading: cfLoading } = useCarryForward()
@@ -66,11 +68,9 @@ export default function Dashboard() {
           icon={TrendingUp}
           tone="success"
           loading={isLoading}
-          // Delta vs mes anterior solo en vista mensual. En ingresos
-          // "positivo = bueno" (default), o sea subir 12% sale en verde
-          // y bajar 12% en rojo.
           delta={isYearView ? null : diffPct(summary.income, prevIncome)}
           deltaLabel="vs. mes pasado"
+          onClick={() => navigate('/movimientos', { state: { filterType: 'income' } })}
         />
         <KpiCard
           label="Gastos"
@@ -78,10 +78,10 @@ export default function Dashboard() {
           icon={TrendingDown}
           tone="danger"
           loading={isLoading}
-          // El delta vs mes anterior solo aplica en vista mensual.
           delta={isYearView ? null : diffPct(summary.expense, prevExpense)}
           deltaPositiveIsGood={false}
           deltaLabel="vs. mes pasado"
+          onClick={() => navigate('/movimientos', { state: { filterType: 'expense' } })}
         />
         <KpiCard
           label={balanceLabel}

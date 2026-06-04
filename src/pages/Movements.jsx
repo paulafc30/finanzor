@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
 import TransactionForm from '../components/transactions/TransactionForm.jsx'
@@ -13,8 +14,13 @@ export default function Movements() {
   const [editing, setEditing] = useState(null)
   const open = editing !== null
 
-  // Filtros locales (buscador + panel desplegable)
-  const [filter, setFilter] = useState(emptyFilter())
+  // Si venimos del Dashboard con filtro preactivado (ingresos/gastos)
+  const { state: navState } = useLocation()
+  const [filter, setFilter] = useState(() => {
+    const base = emptyFilter()
+    if (navState?.filterType) return { ...base, type: navState.filterType }
+    return base
+  })
 
   return (
     <section className="space-y-4">
