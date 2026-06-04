@@ -5,6 +5,7 @@ import { useSession } from '../hooks/useSession.js'
 import { useOnboarding } from '../hooks/useOnboarding.jsx'
 import ThemeToggle from '../components/settings/ThemeToggle.jsx'
 import DeleteAccountCard from '../components/settings/DeleteAccountCard.jsx'
+import ExportDataCard from '../components/settings/ExportDataCard.jsx'
 // Recordatorio diario oculto temporalmente hasta configurar OneSignal.
 // El componente y los hooks asociados (useNotifications, lib/onesignal.js)
 // se conservan; solo está desactivado el render aquí.
@@ -84,10 +85,12 @@ export default function Settings() {
         Cerrar sesión
       </button>
 
+      <ExportDataCard />
+
       <DeleteAccountCard />
 
       <p className="px-1 text-xs text-white/40">
-        Próximamente: umbral de alertas, exportar datos.
+        Próximamente: umbral de alertas.
       </p>
     </section>
   )
