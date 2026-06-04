@@ -1,12 +1,22 @@
 import { useState } from 'react'
+import { format, startOfWeek } from 'date-fns'
 import { Calendar as CalendarIcon, CalendarRange } from 'lucide-react'
 import MonthCalendar from '../components/calendar/MonthCalendar.jsx'
+import WeekCalendar from '../components/calendar/WeekCalendar.jsx'
 import DayDetailModal from '../components/calendar/DayDetailModal.jsx'
 import { useMonth } from '../hooks/useMonth.jsx'
 
 export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState(null)
   const { isYearView, setViewMode } = useMonth()
+
+  // Vista local: 'month' | 'week'
+  const [calView, setCalView] = useState('month')
+
+  // Ancla de la semana visible (lunes de la semana actual por defecto)
+  const [weekAnchor, setWeekAnchor] = useState(() =>
+    format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+  )
 
   if (isYearView) {
     return (
@@ -34,20 +44,51 @@ export default function CalendarPage() {
     )
   }
 
-  // En vista mes no repetimos selector aquí: el header global ya muestra
-  // el switcher con su MonthYearPicker propio (clic en "Mayo 2026").
   return (
-    <section className="space-y-4">
-      <div className="flex items-center gap-2">
-        <CalendarIcon size={20} className="shrink-0 text-info" />
-        <h1 className="truncate text-xl font-semibold">Calendario</h1>
+    <section className="space-y-3">
+      {/* Header con toggle mes / semana */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <CalendarIcon size={20} className="shrink-0 text-info" />
+          <h1 className="truncate text-xl font-semibold">Calendario</h1>
+        </div>
+
+        {/* Toggle Mes / Semana */}
+        <div className="flex rounded-lg bg-bg-elevated p-0.5">
+          {[
+            { id: 'month', label: 'Mes' },
+            { id: 'week', label: 'Semana' },
+          ].map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setCalView(id)}
+              className={[
+                'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+                calView === id
+                  ? 'bg-white/15 text-white'
+                  : 'text-white/50 hover:text-white/70',
+              ].join(' ')}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <p className="text-xs text-white/50">
-        Toca cualquier día para ver sus movimientos o añadir uno nuevo con esa fecha.
+        Toca un día para ver sus movimientos o añadir uno nuevo.
       </p>
 
-      <MonthCalendar onDayClick={(key) => setSelectedDay(key)} />
+      {calView === 'month' ? (
+        <MonthCalendar onDayClick={(key) => setSelectedDay(key)} />
+      ) : (
+        <WeekCalendar
+          weekAnchor={weekAnchor}
+          onWeekChange={setWeekAnchor}
+          onDayClick={(key) => setSelectedDay(key)}
+        />
+      )}
 
       <DayDetailModal
         dayKey={selectedDay}

@@ -4,6 +4,40 @@ import { useSession } from './useSession.js'
 import { useMonth } from './useMonth.jsx'
 
 /**
+ * Lista las transacciones de un rango de fechas arbitrario.
+ * Útil para la vista semanal del calendario, donde la semana puede
+ * cruzar el límite de dos meses.
+ * from / to: 'YYYY-MM-DD', inclusive en ambos extremos.
+ */
+export function useTransactionsByRange(from, to) {
+  const { user } = useSession()
+
+  return useQuery({
+    queryKey: ['transactions', user?.id, from, to],
+    enabled: !!user && !!from && !!to,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+          id,
+          type,
+          amount,
+          description,
+          occurred_on,
+          category:categories(id, name, icon, color)
+        `)
+        .gte('occurred_on', from)
+        .lte('occurred_on', to)
+        .order('occurred_on', { ascending: true })
+        .order('created_at', { ascending: true })
+
+      if (error) throw error
+      return data ?? []
+    },
+  })
+}
+
+/**
  * Lista las transacciones del mes seleccionado.
  *
  * IMPORTANTE: filtra por occurred_on (fecha real del movimiento), nunca por
