@@ -91,10 +91,10 @@ export default function MonthCalendar({ onDayClick, className = '' }) {
 
               {/* Chips de transacciones */}
               {data && (
-                <div className="flex w-full flex-col gap-px">
+                <div className="flex w-full flex-col gap-0.5">
                   {data.expense > 0 && (
                     <div
-                      className="w-full truncate rounded-[3px] bg-danger/25 px-1 py-px text-[9px] font-semibold leading-tight text-danger"
+                      className="w-full truncate rounded bg-danger/25 px-1 py-0.5 text-[11px] font-semibold leading-tight text-danger"
                       title={`Gastos: ${data.expense.toFixed(2)} €`}
                     >
                       −{formatShortEuro(data.expense)}
@@ -102,7 +102,7 @@ export default function MonthCalendar({ onDayClick, className = '' }) {
                   )}
                   {data.income > 0 && (
                     <div
-                      className="w-full truncate rounded-[3px] bg-success/25 px-1 py-px text-[9px] font-semibold leading-tight text-success"
+                      className="w-full truncate rounded bg-success/25 px-1 py-0.5 text-[11px] font-semibold leading-tight text-success"
                       title={`Ingresos: ${data.income.toFixed(2)} €`}
                     >
                       +{formatShortEuro(data.income)}

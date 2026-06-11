@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Eye, EyeOff, PiggyBank, TrendingUp } from 'lucide-react'
+import { Eye, EyeOff, TrendingUp } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
 import GoalCard from '../components/savings/GoalCard.jsx'
 import GoalForm from '../components/savings/GoalForm.jsx'
 import GoalDetailModal from '../components/savings/GoalDetailModal.jsx'
+import PiggyIcon from '../components/savings/PiggyIcon.jsx'
 import { useGoals } from '../hooks/useGoals.js'
 import { useSavingsFromExpenses } from '../hooks/useSavingsFromExpenses.js'
 import { formatEuro } from '../lib/formatters.js'
@@ -15,10 +16,9 @@ export default function Savings() {
   const { data: savingsExp } = useSavingsFromExpenses()
 
   const [creating, setCreating] = useState(false)
-  const [openGoal, setOpenGoal] = useState(null) // goal seleccionada para detalle
+  const [openGoal, setOpenGoal] = useState(null)
 
-  // Mantener referenciada la versión más reciente de la goal abierta para que al
-  // recargar la lista (después de aportar / editar) el modal se actualice.
+  // Mantener referenciada la versión más reciente de la goal abierta
   const liveOpenGoal = useMemo(() => {
     if (!openGoal) return null
     return goals.find((g) => g.id === openGoal.id) ?? openGoal
@@ -68,37 +68,25 @@ export default function Savings() {
         </button>
       </div>
 
-      {/* Aportaciones de la categoría "Ahorro" (gastos clasificados como Ahorro) */}
+      {/* Categoría Ahorro: cerdito grande con el total dentro */}
       <div className="rounded-xl bg-success/10 p-4 ring-1 ring-success/20">
-        <div className="mb-3 flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-success">
-            <PiggyBank size={16} className="text-white" />
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold text-white">Categoría Ahorro</h2>
-            <p className="text-[11px] text-white/50">
-              Suma de tus gastos categorizados como "Ahorro"
-            </p>
-          </div>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-white">Categoría Ahorro</h2>
+          <p className="text-[11px] text-white/50">
+            gastos como "Ahorro"
+          </p>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-white/50">
-              Este mes
-            </p>
-            <p className="mt-0.5 text-lg font-bold text-success tabular-nums">
-              {formatEuro(savingsExp?.monthTotal ?? 0)}
-            </p>
-          </div>
-          <div>
-            <p className="text-[11px] uppercase tracking-wide text-white/50">
-              Total acumulado
-            </p>
-            <p className="mt-0.5 text-lg font-bold text-success tabular-nums">
-              {formatEuro(savingsExp?.allTotal ?? 0)}
-            </p>
-          </div>
+
+        {/* Cerdito grande con la cifra total renderizada dentro */}
+        <div className="flex justify-center py-2">
+          <PiggyIcon
+            size={180}
+            amount={piggyFormat(savingsExp?.allTotal ?? 0)}
+            label="ahorrado"
+            className="text-success"
+          />
         </div>
+
       </div>
 
       {/* Resumen total de metas activas */}
@@ -133,7 +121,7 @@ export default function Savings() {
         </div>
       )}
 
-      {/* Archivadas (solo si está activado el toggle) */}
+      {/* Archivadas */}
       {showArchived && archivedGoals.length > 0 && (
         <div className="space-y-2 pt-4">
           <h2 className="text-xs uppercase tracking-wide text-white/40">
@@ -147,16 +135,10 @@ export default function Savings() {
 
       <Fab onClick={() => setCreating(true)} ariaLabel="Nueva meta" />
 
-      {/* Modal: nueva meta */}
-      <Modal
-        open={creating}
-        onClose={() => setCreating(false)}
-        title="Nueva meta"
-      >
+      <Modal open={creating} onClose={() => setCreating(false)} title="Nueva meta">
         <GoalForm onSuccess={() => setCreating(false)} />
       </Modal>
 
-      {/* Modal: detalle de meta */}
       <GoalDetailModal
         goal={liveOpenGoal}
         open={!!openGoal}
@@ -164,4 +146,21 @@ export default function Savings() {
       />
     </section>
   )
+}
+
+/**
+ * Formato compacto pensado para encajar dentro del SVG del cerdito,
+ * donde el espacio es pequeño. Ejemplos:
+ *   0       → "0 €"
+ *   12      → "12 €"
+ *   1234    → "1.234 €"
+ *   12345   → "12.345 €"
+ *   123456  → "123 k€"   (a partir de 100.000 abreviamos)
+ */
+function piggyFormat(n) {
+  const v = Math.abs(Number(n) || 0)
+  if (v >= 100000) return `${Math.round(v / 1000)} k€`
+  // Separador de miles con punto, sin decimales (lo que cabe).
+  const intPart = Math.round(v).toLocaleString('es-ES')
+  return `${intPart} €`
 }
