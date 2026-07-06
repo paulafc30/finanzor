@@ -194,6 +194,10 @@ export default function Login() {
             ? '¿No tienes cuenta? Crear una'
             : '¿Ya tienes cuenta? Iniciar sesión'}
         </button>
+
+        <p className="mt-6 text-center text-[11px] text-white/25">
+          Hecho con ♥ por <span className="font-semibold tracking-wide">Ferava</span>
+        </p>
       </div>
     </div>
   )

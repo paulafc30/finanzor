@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { TrendingUp, TrendingDown, Wallet, Percent } from 'lucide-react'
+import { TrendingUp, TrendingDown, Wallet, Percent, CalendarClock } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
 import TransactionForm from '../components/transactions/TransactionForm.jsx'
@@ -22,29 +22,45 @@ export default function Dashboard() {
   const { data: carryForward = 0, isLoading: cfLoading } = useCarryForward()
   const { month, isYearView } = useMonth()
 
+  // Fecha de hoy en formato 'YYYY-MM-DD' para comparar con occurred_on
+  const todayStr = useMemo(() => {
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  }, [])
+
   const summary = useMemo(() => {
-    let income = 0
-    let expense = 0
+    let income = 0, expense = 0           // solo transacciones hasta hoy
+    let incomeAll = 0, expenseAll = 0     // todas (incluidas las futuras del mes)
+
     for (const t of transactions) {
-      if (t.type === 'income') income += Number(t.amount)
-      else expense += Number(t.amount)
+      const amount = Number(t.amount)
+      if (t.type === 'income') incomeAll += amount
+      else expenseAll += amount
+
+      // Solo cuenta para el saldo actual si la fecha ya llegó
+      if (t.occurred_on <= todayStr) {
+        if (t.type === 'income') income += amount
+        else expense += amount
+      }
     }
+
     const balance = income - expense
+    const balanceAll = incomeAll - expenseAll
     const savingsRate = income > 0 ? (balance / income) * 100 : 0
-    return { income, expense, balance, savingsRate }
-  }, [transactions])
+    // ¿Hay movimientos con fecha futura en el mes visible?
+    const hasFuture = incomeAll !== income || expenseAll !== expense
+
+    return { income: incomeAll, expense: expenseAll, balance, balanceAll, savingsRate, hasFuture }
+  }, [transactions, todayStr])
 
   const prevIncome = prev?.income ?? 0
   const prevExpense = prev?.expense ?? 0
 
-  // La card "Saldo del mes" suma el balance del periodo visible al
-  // carry-forward (lo que sobró al cierre del mes anterior). Resultado:
-  // refleja el dinero que tendrias acumulado a fin del mes visible,
-  // SOLO incluyendo lo que paso antes en la app. Si paula tiene un
-  // déficit histórico antiguo (importacion CSV vieja, gastos olvidados),
-  // sale aqui — y se ve donde mirando los meses anteriores.
-  const balanceLabel = isYearView ? 'Saldo del año' : 'Saldo del mes'
+  // Saldo actual = solo lo ocurrido hasta hoy + carry-forward
+  const balanceLabel = isYearView ? 'Saldo del año' : 'Saldo a hoy'
   const balanceValue = summary.balance + Number(carryForward || 0)
+  // Saldo estimado = todos los movimientos del mes + carry-forward
+  const estimatedValue = summary.balanceAll + Number(carryForward || 0)
 
   return (
     <section className="space-y-4">
@@ -98,6 +114,27 @@ export default function Dashboard() {
           loading={isLoading}
         />
       </div>
+
+      {/* Saldo estimado — solo aparece cuando hay movimientos con fecha
+          futura en el mes visible. Muestra cómo quedará el saldo si todos
+          los movimientos planificados se ejecutan. */}
+      {!isYearView && summary.hasFuture && !isLoading && (
+        <div className="flex items-center gap-2.5 rounded-xl bg-info/10 px-3 py-2.5 ring-1 ring-info/20">
+          <CalendarClock size={16} className="shrink-0 text-info" />
+          <div className="min-w-0 flex-1 text-sm">
+            <span className="text-white/60">Saldo estimado a fin de mes: </span>
+            <span
+              className={[
+                'font-semibold tabular-nums',
+                estimatedValue >= 0 ? 'text-success' : 'text-danger',
+              ].join(' ')}
+            >
+              {formatEuro(estimatedValue)}
+            </span>
+          </div>
+          <span className="shrink-0 text-[10px] text-white/35">con mov. futuros</span>
+        </div>
+      )}
 
       {/* La barra resumen del presupuesto vive en la pagina Presupuesto,
           no aqui. Asi el Dashboard se queda como vista financiera general. */}

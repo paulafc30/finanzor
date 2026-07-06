@@ -85,17 +85,18 @@ export default function CategoryComparisonChart() {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
-            margin={{ top: 4, right: 8, bottom: 4, left: 8 }}
+            margin={{ top: 4, right: 8, bottom: 48, left: 8 }}
             barCategoryGap="22%"
             barGap={4}
           >
             <CartesianGrid stroke={gridColor} vertical={false} />
             <XAxis
               dataKey="name"
-              tick={{ fill: axisColor, fontSize: 11 }}
+              tick={{ fill: axisColor, fontSize: 10, angle: -40, textAnchor: 'end', dy: 4 }}
               tickLine={false}
               axisLine={{ stroke: gridColor }}
               interval={0}
+              height={60}
             />
             <YAxis
               tick={{ fill: axisColor, fontSize: 11 }}

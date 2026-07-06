@@ -92,6 +92,10 @@ export default function Settings() {
       <p className="px-1 text-xs text-white/40">
         Próximamente: umbral de alertas.
       </p>
+
+      <p className="pb-2 text-center text-xs text-white/25">
+        Hecho con ♥ por <span className="font-semibold tracking-wide">Ferava</span>
+      </p>
     </section>
   )
 }
