@@ -22,6 +22,7 @@ export function useBudgets() {
       const { data, error } = await supabase
         .from('budgets')
         .select('id, category_id, month, amount')
+        .eq('user_id', user.id)
         .eq('month', rangeStart)
 
       if (error) throw error
@@ -154,6 +155,7 @@ export function useCopyBudgetsFromPreviousMonth() {
       const { data: prevBudgets, error: e1 } = await supabase
         .from('budgets')
         .select('category_id, amount')
+        .eq('user_id', user.id)
         .eq('month', prevMonth)
       if (e1) throw e1
 

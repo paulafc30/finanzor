@@ -31,6 +31,7 @@ export function useCarryForward() {
       const { data, error } = await supabase
         .from('transactions')
         .select('type, amount')
+        .eq('user_id', user.id)
         .lt('occurred_on', rangeStart)
 
       if (error) throw error

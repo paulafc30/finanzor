@@ -30,6 +30,7 @@ export function usePreviousMonthSummary() {
       const { data, error } = await supabase
         .from('transactions')
         .select('type, amount')
+        .eq('user_id', user.id)
         .gte('occurred_on', prevStart)
         .lt('occurred_on', prevEnd)
 

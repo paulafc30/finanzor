@@ -12,8 +12,9 @@ import { useDeleteAccount } from '../../hooks/useDeleteAccount.js'
  *  2. Dentro del modal hay que escribir literalmente "BORRAR" para
  *     habilitar el boton final.
  *
- * El registro de auth.users no se borra: el usuario podria volver a
- * iniciar sesion con el mismo email, pero veria la app vacia.
+ * Borra tambien el registro de auth.users (via Edge Function con
+ * service_role): el usuario no puede volver a iniciar sesion con el mismo
+ * email/Google despues de esto.
  */
 export default function DeleteAccountCard() {
   const [open, setOpen] = useState(false)
@@ -81,11 +82,9 @@ export default function DeleteAccountCard() {
             <p>
               Se eliminarán <strong>todos</strong> tus datos: movimientos,
               categorías, presupuestos, metas, aportaciones, gastos fijos e
-              ingresos fijos. Esta acción no se puede deshacer.
-              <br />
-              <br />
-              Tu cuenta de inicio de sesión se mantiene; si quieres también
-              borrar el acceso, hazlo desde el panel de Supabase.
+              ingresos fijos, y también tu cuenta de acceso (email/Google).
+              No podrás volver a iniciar sesión con esta cuenta. Esta acción
+              no se puede deshacer.
             </p>
           </div>
 

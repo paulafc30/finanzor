@@ -2,14 +2,19 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase.js'
 
 /**
- * Borra todos los datos del usuario actual (movimientos, categorias,
- * presupuestos, gastos/ingresos fijos, metas, aportaciones, feedback)
- * llamando a la funcion RPC `delete_my_account` definida en
- * `supabase/migrations/0007_delete_my_account.sql`.
+ * Borra la cuenta del usuario actual de verdad: llama a la Edge Function
+ * `delete-account` (supabase/functions/delete-account/index.ts), que borra
+ * su fila de `auth.users` usando la service_role key (solo puede vivir en
+ * el servidor, nunca en el frontend).
  *
- * El registro de `auth.users` no se borra: el usuario podria volver a
- * iniciar sesion con el mismo email, pero veria la app vacia (como una
- * cuenta recien creada).
+ * Todas las tablas de dominio (movimientos, categorias, presupuestos,
+ * gastos/ingresos fijos, metas, aportaciones) tienen
+ * `references auth.users(id) on delete cascade`, asi que se borran solas
+ * en cuanto se borra el usuario — no hace falta la RPC `delete_my_account`
+ * como paso previo.
+ *
+ * El usuario NO puede volver a iniciar sesion con el mismo email/Google
+ * despues de esto: la cuenta ha desaparecido de verdad.
  *
  * Despues de borrar:
  *   - Limpia la cache de React Query.
@@ -23,7 +28,9 @@ export function useDeleteAccount() {
 
   return useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.rpc('delete_my_account')
+      const { error } = await supabase.functions.invoke('delete-account', {
+        method: 'POST',
+      })
       if (error) throw error
     },
     onSuccess: async () => {

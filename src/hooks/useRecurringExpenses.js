@@ -23,6 +23,7 @@ export function useRecurringExpenses({ type = null } = {}) {
           id, name, amount, day_of_month, is_active, type, created_at,
           category:categories(id, name, color)
         `)
+        .eq('user_id', user.id)
         .order('is_active', { ascending: false })
         .order('day_of_month', { ascending: true })
       if (type) q = q.eq('type', type)
@@ -95,6 +96,7 @@ export function useUpdateRecurring() {
         .from('recurring_expenses')
         .update(cleaned)
         .eq('id', id)
+        .eq('user_id', user.id)
         .select()
         .single()
 
@@ -121,6 +123,7 @@ export function useToggleRecurring() {
         .from('recurring_expenses')
         .update({ is_active })
         .eq('id', id)
+        .eq('user_id', user.id)
       if (error) throw error
       return { id, is_active }
     },
@@ -149,6 +152,7 @@ export function useDeleteRecurring() {
         .from('transactions')
         .delete()
         .eq('recurring_id', id)
+        .eq('user_id', user.id)
         .gt('occurred_on', today)
       if (e1) throw e1
 
@@ -157,6 +161,7 @@ export function useDeleteRecurring() {
         .from('recurring_expenses')
         .delete()
         .eq('id', id)
+        .eq('user_id', user.id)
       if (e2) throw e2
 
       return id
@@ -204,6 +209,7 @@ export function useMaterializeRecurring() {
       const { data: recurrings, error: e1 } = await supabase
         .from('recurring_expenses')
         .select('id, name, amount, category_id, day_of_month, type, created_at')
+        .eq('user_id', user.id)
         .eq('is_active', true)
       if (e1) throw e1
       if (!recurrings?.length) return { inserted: 0 }
@@ -212,6 +218,7 @@ export function useMaterializeRecurring() {
       const { data: existing, error: e2 } = await supabase
         .from('transactions')
         .select('recurring_id')
+        .eq('user_id', user.id)
         .gte('occurred_on', monthStart)
         .lt('occurred_on', monthEnd)
         .not('recurring_id', 'is', null)

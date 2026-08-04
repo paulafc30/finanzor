@@ -15,6 +15,7 @@ export function useGoalContributions(goalId) {
       const { data, error } = await supabase
         .from('goal_contributions')
         .select('id, amount, contributed_on, created_at, transaction_id')
+        .eq('user_id', user.id)
         .eq('goal_id', goalId)
         .order('contributed_on', { ascending: false })
         .order('created_at', { ascending: false })
@@ -53,7 +54,12 @@ export function useCreateContribution() {
 
       // 1) Leer en paralelo: nombre de la meta + id de la categoría "Ahorro"
       const [{ data: goal }, { data: cat }] = await Promise.all([
-        supabase.from('goals').select('id, name').eq('id', goal_id).single(),
+        supabase
+          .from('goals')
+          .select('id, name')
+          .eq('id', goal_id)
+          .eq('user_id', user.id)
+          .single(),
         supabase
           .from('categories')
           .select('id')
@@ -137,6 +143,7 @@ export function useDeleteContribution() {
         .from('goal_contributions')
         .select('transaction_id')
         .eq('id', id)
+        .eq('user_id', user.id)
         .single()
       if (readErr) throw readErr
 
@@ -146,6 +153,7 @@ export function useDeleteContribution() {
           .from('transactions')
           .delete()
           .eq('id', contrib.transaction_id)
+          .eq('user_id', user.id)
         if (txErr) throw txErr
       }
 
@@ -154,6 +162,7 @@ export function useDeleteContribution() {
         .from('goal_contributions')
         .delete()
         .eq('id', id)
+        .eq('user_id', user.id)
       if (error) throw error
       return id
     },

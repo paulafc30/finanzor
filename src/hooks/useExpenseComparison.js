@@ -51,12 +51,14 @@ export function useExpenseComparison() {
       const { data: cats, error: catsErr } = await supabase
         .from('categories')
         .select('id, name, color, is_archived')
+        .eq('user_id', user.id)
       if (catsErr) throw catsErr
 
       // 2) Movimientos del rango actual.
       const { data: rowsNow, error: e1 } = await supabase
         .from('transactions')
         .select('amount, category_id, occurred_on, type')
+        .eq('user_id', user.id)
         .eq('type', 'expense')
         .gte('occurred_on', rangeStart)
         .lt('occurred_on', rangeEnd)
@@ -66,6 +68,7 @@ export function useExpenseComparison() {
       const { data: rowsPrev, error: e2 } = await supabase
         .from('transactions')
         .select('amount, category_id, occurred_on, type')
+        .eq('user_id', user.id)
         .eq('type', 'expense')
         .gte('occurred_on', previous.from)
         .lt('occurred_on', previous.to)
