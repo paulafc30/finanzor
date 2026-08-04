@@ -13,9 +13,11 @@ export default defineConfig({
         'favicon.ico',
         'apple-touch-icon.png',
         'icon-192.png',
+        'icon-192-maskable.png',
         'icon-512.png',
         'icon-512-maskable.png',
         'manifest.webmanifest',
+        '.well-known/assetlinks.json',
       ],
       workbox: {
         // Cachear los assets generados por Vite + nuestros estáticos

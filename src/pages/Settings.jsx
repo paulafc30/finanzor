@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ChevronRight, Tags, LogOut, Upload, MessageCircle, BookOpen } from 'lucide-react'
+import { ChevronRight, Tags, LogOut, Upload, MessageCircle, BookOpen, Shield } from 'lucide-react'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from '../hooks/useSession.js'
 import { useOnboarding } from '../hooks/useOnboarding.jsx'
@@ -62,6 +62,18 @@ export default function Settings() {
             <span className="flex-1 text-sm text-white">Sugerencias y fallos</span>
             <ChevronRight size={16} className="text-white/40" />
           </Link>
+        </li>
+        <li className="border-t border-white/5">
+          <a
+            href="/privacidad.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-4 py-3 hover:bg-white/5"
+          >
+            <Shield size={18} className="text-white/60" />
+            <span className="flex-1 text-sm text-white">Política de privacidad</span>
+            <ChevronRight size={16} className="text-white/40" />
+          </a>
         </li>
         <li className="border-t border-white/5">
           <button
