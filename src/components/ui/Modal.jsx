@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 
 /**
@@ -8,6 +9,7 @@ import { X } from 'lucide-react'
  * - children es el contenido del modal
  */
 export default function Modal({ open, onClose, title, children }) {
+  const { t } = useTranslation('ui')
   useEffect(() => {
     if (!open) return
     const onKey = (e) => {
@@ -39,7 +41,7 @@ export default function Modal({ open, onClose, title, children }) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label={t('modal.close')}
             className="rounded-full p-1.5 text-white/60 hover:bg-white/5 hover:text-white"
           >
             <X size={18} />

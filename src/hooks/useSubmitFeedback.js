@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from './useSession.js'
 
@@ -21,12 +22,13 @@ const TYPE_LABELS = {
  */
 export function useSubmitFeedback() {
   const { user } = useSession()
+  const { t } = useTranslation('feedback')
 
   return useMutation({
     mutationFn: async ({ type, message, email }) => {
-      if (!message || !message.trim()) throw new Error('El mensaje es obligatorio')
+      if (!message || !message.trim()) throw new Error(t('errors.messageRequired'))
       if (!['suggestion', 'bug', 'other'].includes(type)) {
-        throw new Error('Tipo inválido')
+        throw new Error(t('errors.invalidType'))
       }
 
       const trimmed = message.trim()
@@ -55,7 +57,7 @@ export function useSubmitFeedback() {
       let emailError = null
 
       if (!WEB3FORMS_KEY) {
-        emailError = 'No hay VITE_WEB3FORMS_KEY configurada'
+        emailError = t('errors.web3formsNotConfigured')
       } else {
         try {
           const typeLabel = TYPE_LABELS[type]
@@ -99,7 +101,7 @@ export function useSubmitFeedback() {
             emailError = json.message ?? `HTTP ${res.status}`
           }
         } catch (err) {
-          emailError = err?.message ?? 'Error de red'
+          emailError = err?.message ?? t('errors.networkError')
         }
       }
 

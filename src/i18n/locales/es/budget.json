@@ -1,0 +1,54 @@
+{
+  "title": "Presupuesto",
+  "yearView": {
+    "notice": "Los presupuestos se definen por mes.",
+    "hint": "Cambia la vista a \"Mes\" para gestionar los límites de un mes concreto.",
+    "switchButton": "Cambiar a vista mensual"
+  },
+  "errorPrefix": "Error: ",
+  "copiedNotice": "Se ha copiado el presupuesto del mes anterior. Ajusta los importes que necesites tocando cada límite.",
+  "dismissNotice": "Descartar aviso",
+  "fixedExpenses": {
+    "title": "Gastos fijos",
+    "new": "Nuevo",
+    "howItWorks": "Cómo funcionan los gastos fijos",
+    "item1": "Al entrar a un mes, los activos se crean como movimientos automáticamente con el día y categoría que les hayas puesto.",
+    "item2": "<strong>Si añades uno hoy</strong>, se genera al instante también en el mes que estés viendo, aunque el día ya hubiera pasado.",
+    "item3": "<strong>Desactivar</strong> pausa sin borrar: deja de generarse en meses futuros, pero los movimientos pasados se mantienen.",
+    "item4": "<strong>Editar</strong> (importe, día…) solo afecta a meses futuros aún no generados. Para ajustar el de un mes concreto, edita el movimiento directamente.",
+    "item5": "<strong>Eliminar</strong> el gasto fijo borra los movimientos futuros que aún no han ocurrido. Los pasados se mantienen para no falsear el histórico."
+  },
+  "fixedIncome": {
+    "title": "Ingresos fijos",
+    "new": "Nuevo",
+    "hint": "Igual que los gastos fijos, pero positivos: nómina, alquiler que cobras, una mensualidad… Se materializan automáticamente cada mes y se contabilizan como ingreso en las estadísticas."
+  },
+  "byCategory": {
+    "title": "Presupuestos por categoría",
+    "emptyTitle": "Aún no has definido presupuestos.",
+    "emptyHint": "Pulsa \"Sin límite\" en cualquier categoría para fijar uno.",
+    "howItWorks": "Cómo funcionan los presupuestos",
+    "item1": "Cada presupuesto vive <strong>en un mes concreto</strong>. Si en marzo subes el de Alimentación a 500 €, abril sigue con su valor propio, no se cambian todos los meses a la vez.",
+    "item2": "Al entrar a un mes nuevo sin presupuestos, copiamos los del mes anterior <strong>una sola vez</strong> para que no empieces de cero cada vez.",
+    "item3": "Click en el importe del límite para editarlo. Pon <strong>0</strong> para quitar el presupuesto de esa categoría ese mes.",
+    "item4": "El gasto que cuenta se filtra por la fecha real del movimiento (<em>occurred_on</em>), no por cuándo lo apuntaste.",
+    "item5": "Estados de la barra: hasta el 70 % verde, 70-90 % naranja, a partir del 90 % rojo."
+  },
+  "recurringModal": {
+    "newIncome": "Nuevo ingreso fijo",
+    "newExpense": "Nuevo gasto fijo",
+    "editIncome": "Editar ingreso fijo",
+    "editExpense": "Editar gasto fijo"
+  },
+  "row": {
+    "noLimit": "Sin límite",
+    "editTooltip": "Click para editar el límite",
+    "percentUsed": "{{percent}}% usado",
+    "remaining": "Restan {{amount}}",
+    "exceeded": "Excedido en {{amount}}",
+    "saveError": "No se pudo guardar: {{error}}"
+  },
+  "errors": {
+    "invalidAmount": "Importe inválido"
+  }
+}

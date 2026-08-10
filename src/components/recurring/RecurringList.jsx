@@ -1,4 +1,5 @@
 import { Pencil, Trash2, Repeat, ArrowUpCircle, ArrowDownCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { formatEuro } from '../../lib/formatters.js'
 import {
   useRecurringExpenses,
@@ -14,6 +15,7 @@ import {
  *  - onEdit: callback al pulsar editar.
  */
 export default function RecurringList({ type = 'expense', onEdit }) {
+  const { t } = useTranslation('recurring')
   const { data: recurrings = [], isLoading } = useRecurringExpenses({ type })
   const toggle = useToggleRecurring()
   const remove = useDeleteRecurring()
@@ -30,8 +32,8 @@ export default function RecurringList({ type = 'expense', onEdit }) {
     return (
       <div className="rounded-xl bg-bg-elevated p-4 text-center text-sm text-white/60">
         {type === 'income'
-          ? 'No tienes ingresos fijos. Pulsa "Nuevo" para añadir el primero (nómina, alquiler cobrado…).'
-          : 'No tienes gastos fijos. Pulsa "Nuevo" para añadir el primero (alquiler, suscripciones, gimnasio…).'}
+          ? t('emptyIncome')
+          : t('emptyExpense')}
       </div>
     )
   }
@@ -40,20 +42,20 @@ export default function RecurringList({ type = 'expense', onEdit }) {
     try {
       await toggle.mutateAsync({ id: r.id, is_active: !r.is_active })
     } catch (err) {
-      alert('No se pudo cambiar: ' + (err.message ?? 'error'))
+      alert(t('errors.toggleFailed', { message: err.message ?? 'error' }))
     }
   }
 
   async function handleDelete(r) {
-    const noun = r.type === 'income' ? 'ingreso fijo' : 'gasto fijo'
+    const noun = r.type === 'income' ? t('incomeNoun') : t('expenseNoun')
     const ok = window.confirm(
-      `¿Eliminar el ${noun} "${r.name}"?\n\n• Los movimientos futuros (de meses que aún no han ocurrido) se eliminarán.\n• Los movimientos pasados se mantienen para no falsear el histórico.\n• A partir de ahora ya no se volverá a generar.`,
+      t('confirmDelete', { noun, name: r.name }),
     )
     if (!ok) return
     try {
       await remove.mutateAsync(r.id)
     } catch (err) {
-      alert('No se pudo eliminar: ' + (err.message ?? 'error'))
+      alert(t('errors.deleteFailed', { message: err.message ?? 'error' }))
     }
   }
 
@@ -89,18 +91,18 @@ export default function RecurringList({ type = 'expense', onEdit }) {
                 <Repeat
                   size={11}
                   className="shrink-0 text-accent/70"
-                  aria-label="Recurrente"
+                  aria-label={t('recurringAria')}
                 />
               </div>
               <p className="text-xs text-white/50">
-                {formatEuro(r.amount)} · día {r.day_of_month} de cada mes
+                {t('amountDayLine', { amount: formatEuro(r.amount), day: r.day_of_month })}
               </p>
             </div>
 
             {/* Toggle activo */}
             <label
               className="shrink-0 cursor-pointer"
-              title={r.is_active ? 'Activo' : 'Inactivo'}
+              title={r.is_active ? t('statusActive') : t('statusInactive')}
             >
               <input
                 type="checkbox"
@@ -121,7 +123,7 @@ export default function RecurringList({ type = 'expense', onEdit }) {
             <button
               type="button"
               onClick={() => onEdit(r)}
-              aria-label="Editar"
+              aria-label={t('editAria')}
               className="shrink-0 rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-white"
             >
               <Pencil size={15} />
@@ -129,7 +131,7 @@ export default function RecurringList({ type = 'expense', onEdit }) {
             <button
               type="button"
               onClick={() => handleDelete(r)}
-              aria-label="Eliminar"
+              aria-label={t('deleteAria')}
               className="shrink-0 rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-danger"
             >
               <Trash2 size={15} />

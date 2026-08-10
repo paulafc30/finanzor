@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff, TrendingUp } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
@@ -11,6 +12,7 @@ import { useSavingsFromExpenses } from '../hooks/useSavingsFromExpenses.js'
 import { formatEuro } from '../lib/formatters.js'
 
 export default function Savings() {
+  const { t } = useTranslation('savings')
   const [showArchived, setShowArchived] = useState(false)
   const { goals, isLoading, error } = useGoals({ includeArchived: showArchived })
   const { data: savingsExp } = useSavingsFromExpenses()
@@ -46,7 +48,7 @@ export default function Savings() {
   if (error) {
     return (
       <p className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
-        Error: {error.message}
+        {t('error', { message: error.message })}
       </p>
     )
   }
@@ -57,23 +59,23 @@ export default function Savings() {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Ahorro</h1>
+        <h1 className="text-xl font-semibold">{t('title')}</h1>
         <button
           type="button"
           onClick={() => setShowArchived((v) => !v)}
           className="inline-flex items-center gap-1 rounded-md bg-bg-elevated px-2.5 py-1.5 text-xs text-white/70 hover:text-white"
         >
           {showArchived ? <EyeOff size={13} /> : <Eye size={13} />}
-          {showArchived ? 'Ocultar archivadas' : 'Ver archivadas'}
+          {showArchived ? t('hideArchived') : t('viewArchived')}
         </button>
       </div>
 
       {/* Categoría Ahorro: cerdito grande con el total dentro */}
       <div className="rounded-xl bg-success/10 p-4 ring-1 ring-success/20">
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-white">Categoría Ahorro</h2>
+          <h2 className="text-sm font-semibold text-white">{t('savingsCategory')}</h2>
           <p className="text-[11px] text-white/50">
-            gastos como "Ahorro"
+            {t('savingsCategoryHint')}
           </p>
         </div>
 
@@ -82,7 +84,7 @@ export default function Savings() {
           <PiggyIcon
             size={180}
             amount={piggyFormat(savingsExp?.allTotal ?? 0)}
-            label="ahorrado"
+            label={t('piggyLabelSaved')}
             className="text-success"
           />
         </div>
@@ -95,7 +97,7 @@ export default function Savings() {
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-1.5 text-white/60">
               <TrendingUp size={14} />
-              Progreso total de metas
+              {t('totalProgress')}
             </span>
             <span className="font-semibold text-white tabular-nums">
               {formatEuro(totals.contributed)}{' '}
@@ -108,9 +110,9 @@ export default function Savings() {
       {/* Activas */}
       {activeGoals.length === 0 ? (
         <div className="rounded-xl bg-bg-elevated p-8 text-center">
-          <p className="text-white">No tienes metas activas.</p>
+          <p className="text-white">{t('noActiveGoals')}</p>
           <p className="mt-1 text-sm text-white/60">
-            Pulsa el + para crear la primera (un viaje, fondo de emergencia, una compra…).
+            {t('noActiveGoalsHint')}
           </p>
         </div>
       ) : (
@@ -125,7 +127,7 @@ export default function Savings() {
       {showArchived && archivedGoals.length > 0 && (
         <div className="space-y-2 pt-4">
           <h2 className="text-xs uppercase tracking-wide text-white/40">
-            Archivadas
+            {t('archivedTitle')}
           </h2>
           {archivedGoals.map((g) => (
             <GoalCard key={g.id} goal={g} onClick={() => setOpenGoal(g)} />
@@ -133,9 +135,9 @@ export default function Savings() {
         </div>
       )}
 
-      <Fab onClick={() => setCreating(true)} ariaLabel="Nueva meta" />
+      <Fab onClick={() => setCreating(true)} ariaLabel={t('newGoal')} />
 
-      <Modal open={creating} onClose={() => setCreating(false)} title="Nueva meta">
+      <Modal open={creating} onClose={() => setCreating(false)} title={t('newGoal')}>
         <GoalForm onSuccess={() => setCreating(false)} />
       </Modal>
 

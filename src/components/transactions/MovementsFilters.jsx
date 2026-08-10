@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Search, SlidersHorizontal, X, Plus, Archive } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useCategories } from '../../hooks/useCategories.js'
 
 /**
@@ -47,6 +48,7 @@ export function countActiveFilters(f) {
 }
 
 export default function MovementsFilters({ filter, onChange }) {
+  const { t } = useTranslation('transactions')
   const [open, setOpen] = useState(false)
   // Incluimos las archivadas para poder filtrar por categorias antiguas
   // (ej. un viaje que ya termino) sobre el historial de movimientos.
@@ -81,7 +83,7 @@ export default function MovementsFilters({ filter, onChange }) {
             inputMode="search"
             value={filter.text ?? ''}
             onChange={(e) => patch({ text: e.target.value })}
-            placeholder="Buscar descripción o categoría…"
+            placeholder={t('filters.searchPlaceholder')}
             // type="text" en vez de type="search" para evitar la X nativa
             // del navegador (tendríamos dos botones de borrar).
             className="w-full rounded-lg bg-bg-elevated px-3 py-2 pl-9 pr-9 text-sm text-white placeholder:text-white/40 outline-none ring-1 ring-white/5 focus:ring-accent"
@@ -90,7 +92,7 @@ export default function MovementsFilters({ filter, onChange }) {
             <button
               type="button"
               onClick={() => patch({ text: '' })}
-              aria-label="Limpiar búsqueda"
+              aria-label={t('filters.clearSearchAria')}
               className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-white/50 hover:bg-white/5 hover:text-white"
             >
               <X size={14} />
@@ -111,7 +113,7 @@ export default function MovementsFilters({ filter, onChange }) {
           ].join(' ')}
         >
           <SlidersHorizontal size={14} />
-          Filtros
+          {t('filters.filters')}
           {activeCount > 0 && (
             <span className="ml-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
               {activeCount}
@@ -129,7 +131,7 @@ export default function MovementsFilters({ filter, onChange }) {
             className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-white/70 hover:bg-white/10 hover:text-white"
           >
             <X size={11} />
-            Limpiar todo
+            {t('filters.clearAll')}
           </button>
         </div>
       )}
@@ -140,13 +142,13 @@ export default function MovementsFilters({ filter, onChange }) {
           {/* Tipo */}
           <div>
             <p className="mb-1 text-[11px] uppercase tracking-wide text-white/50">
-              Tipo
+              {t('filters.type')}
             </p>
             <div className="grid grid-cols-3 gap-1 rounded-lg bg-bg-card p-1">
               {[
-                { v: 'all', label: 'Todos' },
-                { v: 'expense', label: 'Gastos' },
-                { v: 'income', label: 'Ingresos' },
+                { v: 'all', label: t('filters.typeAll') },
+                { v: 'expense', label: t('filters.typeExpense') },
+                { v: 'income', label: t('filters.typeIncome') },
               ].map((opt) => (
                 <button
                   key={opt.v}
@@ -168,11 +170,11 @@ export default function MovementsFilters({ filter, onChange }) {
           {/* Fechas */}
           <div>
             <p className="mb-1 text-[11px] uppercase tracking-wide text-white/50">
-              Fechas
+              {t('filters.dates')}
             </p>
             <div className="grid grid-cols-2 gap-2">
               <label className="block">
-                <span className="mb-0.5 block text-[10px] text-white/40">Desde</span>
+                <span className="mb-0.5 block text-[10px] text-white/40">{t('filters.dateFrom')}</span>
                 <input
                   type="date"
                   value={filter.dateFrom ?? ''}
@@ -181,7 +183,7 @@ export default function MovementsFilters({ filter, onChange }) {
                 />
               </label>
               <label className="block">
-                <span className="mb-0.5 block text-[10px] text-white/40">Hasta</span>
+                <span className="mb-0.5 block text-[10px] text-white/40">{t('filters.dateTo')}</span>
                 <input
                   type="date"
                   value={filter.dateTo ?? ''}
@@ -195,11 +197,11 @@ export default function MovementsFilters({ filter, onChange }) {
           {/* Importe */}
           <div>
             <p className="mb-1 text-[11px] uppercase tracking-wide text-white/50">
-              Importe (€)
+              {t('filters.amount')}
             </p>
             <div className="grid grid-cols-2 gap-2">
               <label className="block">
-                <span className="mb-0.5 block text-[10px] text-white/40">Mínimo</span>
+                <span className="mb-0.5 block text-[10px] text-white/40">{t('filters.amountMin')}</span>
                 <input
                   type="number"
                   inputMode="decimal"
@@ -212,7 +214,7 @@ export default function MovementsFilters({ filter, onChange }) {
                 />
               </label>
               <label className="block">
-                <span className="mb-0.5 block text-[10px] text-white/40">Máximo</span>
+                <span className="mb-0.5 block text-[10px] text-white/40">{t('filters.amountMax')}</span>
                 <input
                   type="number"
                   inputMode="decimal"
@@ -231,7 +233,7 @@ export default function MovementsFilters({ filter, onChange }) {
           <div>
             <div className="mb-1 flex items-center justify-between">
               <p className="text-[11px] uppercase tracking-wide text-white/50">
-                Categorías
+                {t('filters.categories')}
               </p>
               <div className="flex items-center gap-2">
                 {filter.categoryIds?.length > 0 && (
@@ -240,7 +242,7 @@ export default function MovementsFilters({ filter, onChange }) {
                     onClick={() => patch({ categoryIds: [] })}
                     className="text-[10px] text-white/40 hover:text-white"
                   >
-                    Quitar todas
+                    {t('filters.removeAll')}
                   </button>
                 )}
                 <Link
@@ -248,13 +250,13 @@ export default function MovementsFilters({ filter, onChange }) {
                   className="inline-flex items-center gap-0.5 text-[11px] font-medium text-accent hover:text-accent/80"
                 >
                   <Plus size={11} />
-                  Nueva
+                  {t('filters.new')}
                 </Link>
               </div>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {categories.length === 0 && (
-                <span className="text-xs text-white/40">Cargando…</span>
+                <span className="text-xs text-white/40">{t('filters.loading')}</span>
               )}
               {categories.map((c) => {
                 const active = filter.categoryIds?.includes(c.id)
@@ -263,7 +265,7 @@ export default function MovementsFilters({ filter, onChange }) {
                     key={c.id}
                     type="button"
                     onClick={() => toggleCategory(c.id)}
-                    title={c.is_archived ? `${c.name} (archivada)` : c.name}
+                    title={c.is_archived ? t('filters.archivedTitle', { name: c.name }) : c.name}
                     className={[
                       'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium transition',
                       active
@@ -278,7 +280,7 @@ export default function MovementsFilters({ filter, onChange }) {
                     />
                     {c.name}
                     {c.is_archived && (
-                      <Archive size={10} className="opacity-70" aria-label="Archivada" />
+                      <Archive size={10} className="opacity-70" aria-label={t('filters.archivedAria')} />
                     )}
                   </button>
                 )

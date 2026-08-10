@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { PieChart as PieIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useTransactions } from '../../hooks/useTransactions.js'
 import { useMonth } from '../../hooks/useMonth.jsx'
 import { formatEuro } from '../../lib/formatters.js'
@@ -12,6 +13,7 @@ import { useTheme } from '../../context/ThemeContext.jsx'
  * Usa el color asignado a cada categoría.
  */
 export default function CategoryDonut() {
+  const { t } = useTranslation('dashboard')
   const { data: transactions = [] } = useTransactions()
   const { isYearView } = useMonth()
   const { theme } = useTheme()
@@ -19,17 +21,17 @@ export default function CategoryDonut() {
 
   const data = useMemo(() => {
     const map = new Map()
-    for (const t of transactions) {
-      if (t.type !== 'expense') continue
-      const key = t.category?.id ?? '__none__'
-      const name = t.category?.name ?? 'Sin categoría'
-      const color = t.category?.color ?? '#94a3b8'
+    for (const tx of transactions) {
+      if (tx.type !== 'expense') continue
+      const key = tx.category?.id ?? '__none__'
+      const name = tx.category?.name ?? t('donut.noCategory')
+      const color = tx.category?.color ?? '#94a3b8'
       const cur = map.get(key) ?? { name, color, value: 0 }
-      cur.value += Number(t.amount)
+      cur.value += Number(tx.amount)
       map.set(key, cur)
     }
     return Array.from(map.values()).sort((a, b) => b.value - a.value)
-  }, [transactions])
+  }, [transactions, t])
 
   const total = data.reduce((acc, d) => acc + d.value, 0)
 
@@ -37,7 +39,7 @@ export default function CategoryDonut() {
     return (
       <div className="flex h-48 items-center justify-center rounded-xl bg-bg-elevated ring-1 ring-white/5">
         <p className="text-sm text-white/50">
-          {isYearView ? 'Sin gastos este año' : 'Sin gastos este mes'}
+          {isYearView ? t('donut.noExpensesYear') : t('donut.noExpensesMonth')}
         </p>
       </div>
     )
@@ -47,7 +49,7 @@ export default function CategoryDonut() {
     <div className="rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5">
       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
         <PieIcon size={16} className="text-info" />
-        Gastos por categoría
+        {t('donut.title')}
       </h3>
 
       <div className="relative h-48">
@@ -86,7 +88,7 @@ export default function CategoryDonut() {
         {/* Total centrado */}
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-[10px] uppercase tracking-wide text-white/40">
-            Total
+            {t('donut.total')}
           </span>
           <span className="text-base font-semibold text-white">
             {formatEuro(total)}

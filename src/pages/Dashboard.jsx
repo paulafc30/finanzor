@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { TrendingUp, TrendingDown, Wallet, Percent, CalendarClock } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
@@ -15,6 +16,7 @@ import { useMonth } from '../hooks/useMonth.jsx'
 import { formatEuro, formatMonthLabel, formatYearLabel } from '../lib/formatters.js'
 
 export default function Dashboard() {
+  const { t } = useTranslation('dashboard')
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const { data: transactions = [], isLoading } = useTransactions()
@@ -57,7 +59,7 @@ export default function Dashboard() {
   const prevExpense = prev?.expense ?? 0
 
   // Saldo actual = solo lo ocurrido hasta hoy + carry-forward
-  const balanceLabel = isYearView ? 'Saldo del año' : 'Saldo a hoy'
+  const balanceLabel = isYearView ? t('kpi.balanceYear') : t('kpi.balanceToday')
   const balanceValue = summary.balance + Number(carryForward || 0)
   // Saldo estimado = todos los movimientos del mes + carry-forward
   const estimatedValue = summary.balanceAll + Number(carryForward || 0)
@@ -71,32 +73,32 @@ export default function Dashboard() {
         </h1>
         <p className="text-xs text-white/50">
           {isYearView
-            ? 'Resumen financiero del año'
-            : 'Resumen financiero del mes'}
+            ? t('subtitle.year')
+            : t('subtitle.month')}
         </p>
       </div>
 
       {/* KPIs en grid 2x2 (móvil) / 4x1 (desktop) */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <KpiCard
-          label="Ingresos"
+          label={t('kpi.income')}
           value={formatEuro(summary.income)}
           icon={TrendingUp}
           tone="success"
           loading={isLoading}
           delta={isYearView ? null : diffPct(summary.income, prevIncome)}
-          deltaLabel="vs. mes pasado"
+          deltaLabel={t('kpi.vsLastMonth')}
           onClick={() => navigate('/movimientos', { state: { filterType: 'income' } })}
         />
         <KpiCard
-          label="Gastos"
+          label={t('kpi.expense')}
           value={formatEuro(summary.expense)}
           icon={TrendingDown}
           tone="danger"
           loading={isLoading}
           delta={isYearView ? null : diffPct(summary.expense, prevExpense)}
           deltaPositiveIsGood={false}
-          deltaLabel="vs. mes pasado"
+          deltaLabel={t('kpi.vsLastMonth')}
           onClick={() => navigate('/movimientos', { state: { filterType: 'expense' } })}
         />
         <KpiCard
@@ -107,7 +109,7 @@ export default function Dashboard() {
           loading={isLoading || cfLoading}
         />
         <KpiCard
-          label="Tasa de Ahorro"
+          label={t('kpi.savingsRate')}
           value={summary.income > 0 ? `${summary.savingsRate.toFixed(1)}%` : '—'}
           icon={Percent}
           tone="accent"
@@ -122,7 +124,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-2.5 rounded-xl bg-info/10 px-3 py-2.5 ring-1 ring-info/20">
           <CalendarClock size={16} className="shrink-0 text-info" />
           <div className="min-w-0 flex-1 text-sm">
-            <span className="text-white/60">Saldo estimado a fin de mes: </span>
+            <span className="text-white/60">{t('estimatedBalance')}</span>
             <span
               className={[
                 'font-semibold tabular-nums',
@@ -132,7 +134,7 @@ export default function Dashboard() {
               {formatEuro(estimatedValue)}
             </span>
           </div>
-          <span className="shrink-0 text-[10px] text-white/35">con mov. futuros</span>
+          <span className="shrink-0 text-[10px] text-white/35">{t('withFutureMovements')}</span>
         </div>
       )}
 
@@ -150,8 +152,8 @@ export default function Dashboard() {
         <RecentTransactions limit={6} />
       </div>
 
-      <Fab onClick={() => setOpen(true)} ariaLabel="Añadir movimiento" />
-      <Modal open={open} onClose={() => setOpen(false)} title="Nuevo movimiento">
+      <Fab onClick={() => setOpen(true)} ariaLabel={t('addTransaction')} />
+      <Modal open={open} onClose={() => setOpen(false)} title={t('newTransaction')}>
         <TransactionForm onSuccess={() => setOpen(false)} />
       </Modal>
     </section>

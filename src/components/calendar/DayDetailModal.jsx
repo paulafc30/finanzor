@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Trash2,
   ArrowDownCircle,
@@ -8,7 +9,6 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
 import Modal from '../ui/Modal.jsx'
 import Button from '../ui/Button.jsx'
 import TransactionForm from '../transactions/TransactionForm.jsx'
@@ -16,7 +16,7 @@ import {
   useTransactions,
   useDeleteTransaction,
 } from '../../hooks/useTransactions.js'
-import { formatEuro } from '../../lib/formatters.js'
+import { formatEuro, dateFnsLocale } from '../../lib/formatters.js'
 
 /**
  * Modal con el detalle de un día concreto del calendario.
@@ -27,6 +27,7 @@ import { formatEuro } from '../../lib/formatters.js'
  * - edit: TransactionForm con la transaction seleccionada
  */
 export default function DayDetailModal({ dayKey, open, onClose }) {
+  const { t } = useTranslation('calendar')
   const [view, setView] = useState('list')
   const [editing, setEditing] = useState(null)
   const { data: allTx = [] } = useTransactions()
@@ -54,35 +55,38 @@ export default function DayDetailModal({ dayKey, open, onClose }) {
     onClose?.()
   }
 
-  function handleEdit(t) {
-    setEditing(t)
+  function handleEdit(tx) {
+    setEditing(tx)
     setView('edit')
   }
 
-  async function handleDelete(t) {
+  async function handleDelete(tx) {
     const ok = window.confirm(
-      `¿Eliminar este ${t.type === 'expense' ? 'gasto' : 'ingreso'} de ${formatEuro(t.amount)}?`,
+      t('dayModal.deleteConfirm', {
+        type: tx.type === 'expense' ? t('dayModal.typeExpense') : t('dayModal.typeIncome'),
+        amount: formatEuro(tx.amount),
+      }),
     )
     if (!ok) return
     try {
-      await removeMutation.mutateAsync(t.id)
+      await removeMutation.mutateAsync(tx.id)
     } catch (err) {
-      alert('No se pudo eliminar: ' + (err.message ?? 'error'))
+      alert(t('dayModal.deleteFailed', { error: err.message ?? t('dayModal.unknownError') }))
     }
   }
 
   if (!dayKey) return null
 
   const dayLabel = format(new Date(dayKey + 'T00:00:00'), "EEEE d 'de' LLLL", {
-    locale: es,
+    locale: dateFnsLocale(),
   })
   const dayLabelCap = dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1)
 
   // Cabeceras según vista
   const titles = {
     list: dayLabelCap,
-    new: 'Nuevo movimiento',
-    edit: 'Editar movimiento',
+    new: t('dayModal.newTransaction'),
+    edit: t('dayModal.editTransaction'),
   }
 
   return (
@@ -95,7 +99,7 @@ export default function DayDetailModal({ dayKey, open, onClose }) {
             className="inline-flex items-center gap-1 text-xs text-white/60 hover:text-white"
           >
             <ArrowLeft size={13} />
-            Volver al día
+            {t('dayModal.backToDay')}
           </button>
           <TransactionForm
             defaultDate={dayKey}
@@ -115,7 +119,7 @@ export default function DayDetailModal({ dayKey, open, onClose }) {
             className="inline-flex items-center gap-1 text-xs text-white/60 hover:text-white"
           >
             <ArrowLeft size={13} />
-            Volver al día
+            {t('dayModal.backToDay')}
           </button>
           <TransactionForm
             transaction={editing}
@@ -133,19 +137,19 @@ export default function DayDetailModal({ dayKey, open, onClose }) {
           {items.length > 0 ? (
             <div className="grid grid-cols-3 gap-2 rounded-xl bg-bg-card p-3 text-center text-xs">
               <div>
-                <p className="text-white/50">Ingresos</p>
+                <p className="text-white/50">{t('dayModal.income')}</p>
                 <p className="mt-0.5 font-semibold text-success">
                   {formatEuro(totals.income)}
                 </p>
               </div>
               <div>
-                <p className="text-white/50">Gastos</p>
+                <p className="text-white/50">{t('dayModal.expense')}</p>
                 <p className="mt-0.5 font-semibold text-danger">
                   {formatEuro(totals.expense)}
                 </p>
               </div>
               <div>
-                <p className="text-white/50">Balance</p>
+                <p className="text-white/50">{t('dayModal.balance')}</p>
                 <p
                   className={[
                     'mt-0.5 font-semibold',
@@ -158,37 +162,37 @@ export default function DayDetailModal({ dayKey, open, onClose }) {
             </div>
           ) : (
             <div className="rounded-xl bg-bg-card p-4 text-center text-sm text-white/50">
-              No hay movimientos este día.
+              {t('dayModal.noTransactions')}
             </div>
           )}
 
           {/* Botón añadir */}
           <Button onClick={() => setView('new')} className="w-full">
             <Plus size={16} />
-            Añadir movimiento
+            {t('dayModal.addTransaction')}
           </Button>
 
           {/* Lista */}
           {items.length > 0 && (
             <ul className="overflow-hidden rounded-xl bg-bg-card">
-              {items.map((t) => (
+              {items.map((tx) => (
                 <li
-                  key={t.id}
+                  key={tx.id}
                   className="border-b border-white/5 last:border-b-0"
                 >
                   <div
                     role="button"
                     tabIndex={0}
-                    onClick={() => handleEdit(t)}
+                    onClick={() => handleEdit(tx)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault()
-                        handleEdit(t)
+                        handleEdit(tx)
                       }
                     }}
                     className="flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left transition hover:bg-white/5"
                   >
-                    {t.type === 'expense' ? (
+                    {tx.type === 'expense' ? (
                       <ArrowDownCircle size={18} className="shrink-0 text-danger" />
                     ) : (
                       <ArrowUpCircle size={18} className="shrink-0 text-success" />
@@ -197,18 +201,18 @@ export default function DayDetailModal({ dayKey, open, onClose }) {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
                         <p className="truncate text-sm text-white">
-                          {t.description || (t.category?.name ?? 'Sin descripción')}
+                          {tx.description || (tx.category?.name ?? t('dayModal.noDescription'))}
                         </p>
-                        {t.recurring_id && (
+                        {tx.recurring_id && (
                           <Repeat size={11} className="shrink-0 text-accent" />
                         )}
                       </div>
-                      {t.category && (
+                      {tx.category && (
                         <p
                           className="text-xs"
-                          style={{ color: t.category.color ?? 'rgba(148,163,184,0.8)' }}
+                          style={{ color: tx.category.color ?? 'rgba(148,163,184,0.8)' }}
                         >
-                          {t.category.name}
+                          {tx.category.name}
                         </p>
                       )}
                     </div>
@@ -216,20 +220,20 @@ export default function DayDetailModal({ dayKey, open, onClose }) {
                     <p
                       className={[
                         'shrink-0 text-sm font-semibold',
-                        t.type === 'expense' ? 'text-danger' : 'text-success',
+                        tx.type === 'expense' ? 'text-danger' : 'text-success',
                       ].join(' ')}
                     >
-                      {t.type === 'expense' ? '−' : '+'}
-                      {formatEuro(t.amount)}
+                      {tx.type === 'expense' ? '−' : '+'}
+                      {formatEuro(tx.amount)}
                     </p>
 
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation()
-                        handleDelete(t)
+                        handleDelete(tx)
                       }}
-                      aria-label="Eliminar"
+                      aria-label={t('dayModal.deleteAriaLabel')}
                       className="shrink-0 rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-danger"
                     >
                       <Trash2 size={15} />

@@ -1,0 +1,47 @@
+{
+  "subtitle": {
+    "month": "Resumen financiero del mes",
+    "year": "Resumen financiero del año"
+  },
+  "kpi": {
+    "income": "Ingresos",
+    "expense": "Gastos",
+    "balanceToday": "Saldo a hoy",
+    "balanceYear": "Saldo del año",
+    "savingsRate": "Tasa de Ahorro",
+    "vsLastMonth": "vs. mes pasado"
+  },
+  "estimatedBalance": "Saldo estimado a fin de mes: ",
+  "withFutureMovements": "con mov. futuros",
+  "addTransaction": "Añadir movimiento",
+  "newTransaction": "Nuevo movimiento",
+  "comparisonChart": {
+    "title": "Comparativa por categoría",
+    "vsLabel": "vs. {{label}}",
+    "noData": "Aún no hay datos suficientes para comparar.",
+    "yearLabel": "Año {{year}}",
+    "avgLastMonths": "Media últimos {{count}} meses",
+    "currentMonth": "Mes actual"
+  },
+  "donut": {
+    "title": "Gastos por categoría",
+    "total": "Total",
+    "noExpensesMonth": "Sin gastos este mes",
+    "noExpensesYear": "Sin gastos este año",
+    "noCategory": "Sin categoría"
+  },
+  "budgetBar": {
+    "title": "Presupuesto del mes",
+    "spent": "Gastado: ",
+    "available": "Disponible",
+    "exceeded": "Excedido"
+  },
+  "recent": {
+    "title": "Últimos movimientos",
+    "viewAll": "Ver todos",
+    "noneMonth": "Sin movimientos este mes.",
+    "noneYear": "Sin movimientos este año.",
+    "noDescription": "Sin descripción",
+    "dateFormat": "d 'de' LLLL"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "backToSettingsAria": "Volver a ajustes",
+  "title": "Importar movimientos",
+  "upload": {
+    "intro": "Sube un CSV con tus movimientos bancarios. Detectamos automáticamente las columnas y categorizamos los gastos según el comercio (Mercadona → Comida, Repsol → Transporte, etc.). Antes de importar nada, revisas y editas todo lo que quieras."
+  },
+  "uploader": {
+    "dropText": "Arrastra tu CSV aquí o pulsa para elegir",
+    "hint": "Tu banco lo exporta normalmente desde \"Movimientos → Exportar\"",
+    "selectFile": "Seleccionar archivo"
+  },
+  "errors": {
+    "noColumnsDetected": "No se han detectado columnas. ¿El archivo tiene cabeceras?",
+    "noDataRows": "El archivo no contiene filas de datos.",
+    "readError": "Error al leer el archivo",
+    "importFailed": "No se pudo importar"
+  },
+  "mapping": {
+    "rows": "Filas",
+    "income": "Ingresos",
+    "expense": "Gastos",
+    "title": "Mapeo de columnas",
+    "description": "Asigna qué columna del CSV corresponde a cada campo. Si tu banco usa dos columnas separadas para ingresos y gastos (Haber / Debe), rellena esas en lugar de \"Importe\".",
+    "date": "Fecha",
+    "amount": "Importe (positivo = ingreso, negativo = gasto)",
+    "haber": "Haber (ingreso)",
+    "debe": "Debe (gasto)",
+    "desc": "Descripción / Concepto",
+    "noUse": "— No usar —",
+    "validationWarningPrefix": "Necesitas asignar la columna de",
+    "validationWarningField": "Fecha",
+    "validationWarningSuffix": "y al menos una columna de importe (Importe, o Haber/Debe) para continuar.",
+    "reviewTitle": "Revisa y edita antes de importar",
+    "cancel": "Cancelar",
+    "importing": "Importando…",
+    "importCount": "Importar {{count}} movimientos"
+  },
+  "preview": {
+    "empty": "No quedan movimientos. Sube otro CSV o ajusta el mapeo de columnas.",
+    "toggleTypeTitle": "Click para cambiar gasto/ingreso",
+    "expense": "Gasto",
+    "income": "Ingreso",
+    "descriptionPlaceholder": "Descripción",
+    "noCategory": "Sin categoría",
+    "removeRowAria": "Eliminar fila",
+    "hint": "Click en \"Gasto\" / \"Ingreso\" para cambiar el tipo. Edita cualquier campo directamente. Pulsa la papelera para descartar una fila."
+  },
+  "done": {
+    "title": "¡Importación completada!",
+    "messagePrefix": "Se han añadido",
+    "messageSuffix": "movimientos a tu cuenta. Repártense por sus fechas reales en el calendario.",
+    "importAnother": "Importar otro CSV",
+    "viewHome": "Ver Inicio"
+  },
+  "parser": {
+    "sessionInvalid": "Sesión inválida",
+    "invalidType": "Tipo inválido en alguna fila",
+    "invalidAmount": "Importe inválido en alguna fila",
+    "invalidDate": "Fecha inválida en alguna fila"
+  }
+}

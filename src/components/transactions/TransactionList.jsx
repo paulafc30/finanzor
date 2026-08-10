@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Trash2, ArrowDownCircle, ArrowUpCircle, Repeat } from 'lucide-react'
 import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
-import { formatEuro } from '../../lib/formatters.js'
+import { formatEuro, dateFnsLocale } from '../../lib/formatters.js'
 import {
   useTransactions,
   useDeleteTransaction,
@@ -12,13 +12,14 @@ import { applyFilter, countActiveFilters } from './MovementsFilters.jsx'
 
 /**
  * Lista de movimientos del mes seleccionado.
- * Cada item es clickable: llama a onEdit(t) si se proporciona.
+ * Cada item es clickable: llama a onEdit(tx) si se proporciona.
  * El botón de papelera tiene stopPropagation para no disparar el edit al borrar.
  *
  * Si se pasa `filter` (objeto con la forma definida en MovementsFilters.jsx),
  * la lista se filtra localmente.
  */
 export default function TransactionList({ onEdit, filter = null }) {
+  const { t } = useTranslation('transactions')
   const { data: transactions = [], isLoading, error } = useTransactions()
   const deleteMutation = useDeleteTransaction()
   const { isYearView } = useMonth()
@@ -32,10 +33,10 @@ export default function TransactionList({ onEdit, filter = null }) {
   // Agrupar por occurred_on (día)
   const grouped = useMemo(() => {
     const map = new Map()
-    for (const t of filtered) {
-      const key = t.occurred_on
+    for (const tx of filtered) {
+      const key = tx.occurred_on
       if (!map.has(key)) map.set(key, [])
-      map.get(key).push(t)
+      map.get(key).push(tx)
     }
     return Array.from(map.entries())
   }, [filtered])
@@ -51,7 +52,7 @@ export default function TransactionList({ onEdit, filter = null }) {
   if (error) {
     return (
       <p className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
-        Error cargando movimientos: {error.message}
+        {t('list.errorLoading', { message: error.message })}
       </p>
     )
   }
@@ -60,12 +61,10 @@ export default function TransactionList({ onEdit, filter = null }) {
     return (
       <div className="rounded-xl bg-bg-elevated p-8 text-center">
         <p className="text-white/60">
-          {isYearView
-            ? 'No hay movimientos este año.'
-            : 'No hay movimientos este mes.'}
+          {isYearView ? t('list.emptyYear') : t('list.emptyMonth')}
         </p>
         <p className="mt-1 text-xs text-white/40">
-          Pulsa el botón + para añadir el primero.
+          {t('list.emptyHint')}
         </p>
       </div>
     )
@@ -79,27 +78,27 @@ export default function TransactionList({ onEdit, filter = null }) {
     return (
       <div className="rounded-xl bg-bg-elevated p-8 text-center">
         <p className="text-white/60">
-          {filtersActive
-            ? 'Ningún movimiento coincide con los filtros.'
-            : 'No hay resultados.'}
+          {filtersActive ? t('list.noMatches') : t('list.noResults')}
         </p>
         <p className="mt-1 text-xs text-white/40">
-          Ajusta o limpia los filtros para ver más.
+          {t('list.adjustFiltersHint')}
         </p>
       </div>
     )
   }
 
-  async function handleDelete(e, t) {
+  async function handleDelete(e, tx) {
     e.stopPropagation()
     const ok = window.confirm(
-      `¿Eliminar este ${t.type === 'expense' ? 'gasto' : 'ingreso'} de ${formatEuro(t.amount)}?`,
+      tx.type === 'expense'
+        ? t('list.confirmDeleteExpense', { amount: formatEuro(tx.amount) })
+        : t('list.confirmDeleteIncome', { amount: formatEuro(tx.amount) }),
     )
     if (!ok) return
     try {
-      await deleteMutation.mutateAsync(t.id)
+      await deleteMutation.mutateAsync(tx.id)
     } catch (err) {
-      alert('No se pudo eliminar: ' + (err.message ?? 'error desconocido'))
+      alert(t('list.deleteFailed', { message: err.message ?? t('list.unknownError') }))
     }
   }
 
@@ -108,28 +107,28 @@ export default function TransactionList({ onEdit, filter = null }) {
       {grouped.map(([day, items]) => (
         <div key={day}>
           <h3 className="mb-1.5 px-1 text-xs uppercase tracking-wide text-white/40">
-            {format(new Date(day), "EEEE d 'de' LLLL", { locale: es })}
+            {format(new Date(day), "EEEE d 'de' LLLL", { locale: dateFnsLocale() })}
           </h3>
           <ul className="overflow-hidden rounded-xl bg-bg-elevated">
-            {items.map((t) => (
+            {items.map((tx) => (
               <li
-                key={t.id}
+                key={tx.id}
                 className="border-b border-white/5 last:border-b-0"
               >
                 <div
                   role="button"
                   tabIndex={0}
-                  onClick={() => onEdit?.(t)}
+                  onClick={() => onEdit?.(tx)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
-                      onEdit?.(t)
+                      onEdit?.(tx)
                     }
                   }}
                   className="flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left transition hover:bg-white/5"
-                  aria-label="Editar movimiento"
+                  aria-label={t('list.editMovementAria')}
                 >
-                  {t.type === 'expense' ? (
+                  {tx.type === 'expense' ? (
                     <ArrowDownCircle size={20} className="shrink-0 text-danger" />
                   ) : (
                     <ArrowUpCircle size={20} className="shrink-0 text-success" />
@@ -138,22 +137,22 @@ export default function TransactionList({ onEdit, filter = null }) {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <p className="truncate text-sm text-white">
-                        {t.description || (t.category?.name ?? 'Sin descripción')}
+                        {tx.description || (tx.category?.name ?? t('list.noDescription'))}
                       </p>
-                      {t.recurring_id && (
+                      {tx.recurring_id && (
                         <Repeat
                           size={12}
                           className="shrink-0 text-accent"
-                          aria-label="Movimiento recurrente"
+                          aria-label={t('list.recurringMovementAria')}
                         />
                       )}
                     </div>
-                    {t.category && (
+                    {tx.category && (
                       <p
                         className="text-xs"
-                        style={{ color: t.category.color ?? 'rgba(148,163,184,0.8)' }}
+                        style={{ color: tx.category.color ?? 'rgba(148,163,184,0.8)' }}
                       >
-                        {t.category.name}
+                        {tx.category.name}
                       </p>
                     )}
                   </div>
@@ -162,18 +161,18 @@ export default function TransactionList({ onEdit, filter = null }) {
                     <p
                       className={[
                         'text-sm font-semibold tabular-nums',
-                        t.type === 'expense' ? 'text-danger' : 'text-success',
+                        tx.type === 'expense' ? 'text-danger' : 'text-success',
                       ].join(' ')}
                     >
-                      {t.type === 'expense' ? '−' : '+'}
-                      {formatEuro(t.amount)}
+                      {tx.type === 'expense' ? '−' : '+'}
+                      {formatEuro(tx.amount)}
                     </p>
                   </div>
 
                   <button
                     type="button"
-                    onClick={(e) => handleDelete(e, t)}
-                    aria-label="Eliminar"
+                    onClick={(e) => handleDelete(e, tx)}
+                    aria-label={t('list.deleteAria')}
                     className="shrink-0 rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-danger"
                   >
                     <Trash2 size={16} />

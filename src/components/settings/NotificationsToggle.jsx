@@ -1,4 +1,5 @@
 import { Bell, BellOff, AlertTriangle, Clock } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useNotifications } from '../../hooks/useNotifications.js'
 
 /**
@@ -10,6 +11,7 @@ import { useNotifications } from '../../hooks/useNotifications.js'
  *  - Activar / desactivar
  */
 export default function NotificationsToggle() {
+  const { t } = useTranslation('settings')
   const { supported, configured, subscribed, loading, error, subscribe, unsubscribe } =
     useNotifications()
 
@@ -20,8 +22,7 @@ export default function NotificationsToggle() {
       <Wrapper>
         <Header subscribed={false} />
         <p className="mt-2 text-xs text-white/50">
-          Este navegador no soporta notificaciones push. Prueba con Chrome o
-          Firefox actualizados, o instala la app en tu pantalla de inicio.
+          {t('notifications.unsupported')}
         </p>
       </Wrapper>
     )
@@ -34,7 +35,7 @@ export default function NotificationsToggle() {
         <div className="mt-2 flex items-start gap-2 rounded-lg bg-warning/10 p-2 text-xs text-white ring-1 ring-warning/20">
           <AlertTriangle size={12} className="mt-0.5 shrink-0 text-warning" />
           <p>
-            Falta configurar OneSignal (VITE_ONESIGNAL_APP_ID en .env y Vercel).
+            {t('notifications.notConfigured')}
           </p>
         </div>
       </Wrapper>
@@ -46,8 +47,9 @@ export default function NotificationsToggle() {
       <Header subscribed={subscribed} />
 
       <p className="mt-1.5 text-xs text-white/60">
-        Te avisamos cada día a las <strong className="text-white">22:00</strong>{' '}
-        para que apuntes los gastos del día.
+        {t('notifications.descriptionBefore')}{' '}
+        <strong className="text-white">{t('notifications.descriptionTime')}</strong>{' '}
+        {t('notifications.descriptionAfter')}
       </p>
 
       {error && (
@@ -74,12 +76,12 @@ export default function NotificationsToggle() {
         ) : subscribed ? (
           <>
             <BellOff size={15} />
-            Desactivar
+            {t('notifications.disable')}
           </>
         ) : (
           <>
             <Bell size={15} />
-            Activar recordatorio diario
+            {t('notifications.enable')}
           </>
         )}
       </button>
@@ -96,6 +98,7 @@ function Wrapper({ children }) {
 }
 
 function Header({ subscribed }) {
+  const { t } = useTranslation('settings')
   return (
     <div className="flex items-center gap-2">
       <div
@@ -112,10 +115,10 @@ function Header({ subscribed }) {
       </div>
       <div className="min-w-0 flex-1">
         <h3 className="text-sm font-semibold text-white">
-          Recordatorio diario
+          {t('notifications.title')}
         </h3>
         <p className="text-[11px] text-white/50">
-          {subscribed ? 'Notificaciones activas' : 'Notificaciones desactivadas'}
+          {subscribed ? t('notifications.active') : t('notifications.inactive')}
         </p>
       </div>
     </div>

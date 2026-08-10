@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Button from '../ui/Button.jsx'
 import { useCategories } from '../../hooks/useCategories.js'
 import {
@@ -21,6 +22,7 @@ import {
  *  - En gastos la categoría es obligatoria. En ingresos, opcional.
  */
 export default function RecurringForm({ recurring, defaultType = 'expense', onSuccess }) {
+  const { t } = useTranslation('recurring')
   const isEdit = !!recurring
   const { data: categories = [] } = useCategories()
   const createMutation = useCreateRecurring()
@@ -64,7 +66,7 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
       }
       onSuccess?.()
     } catch (err) {
-      setError(err.message ?? 'No se pudo guardar')
+      setError(err.message ?? t('errors.saveFailed'))
     }
   }
 
@@ -82,7 +84,7 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
               : 'text-white/60 hover:text-white',
           ].join(' ')}
         >
-          Gasto fijo
+          {t('expenseType')}
         </button>
         <button
           type="button"
@@ -94,13 +96,13 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
               : 'text-white/60 hover:text-white',
           ].join(' ')}
         >
-          Ingreso fijo
+          {t('incomeType')}
         </button>
       </div>
 
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Nombre
+          {t('nameLabel')}
         </label>
         <input
           type="text"
@@ -108,8 +110,8 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
           onChange={(e) => setName(e.target.value)}
           placeholder={
             type === 'income'
-              ? 'Nómina, alquiler cobrado…'
-              : 'Alquiler, Netflix, Gimnasio…'
+              ? t('namePlaceholderIncome')
+              : t('namePlaceholderExpense')
           }
           autoFocus
           maxLength={60}
@@ -120,7 +122,7 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
 
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Importe (€)
+          {t('amountLabel')}
         </label>
         <input
           type="number"
@@ -137,7 +139,7 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
 
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Categoría {type === 'expense' && <span className="text-danger">*</span>}
+          {t('categoryLabel')} {type === 'expense' && <span className="text-danger">*</span>}
         </label>
         <select
           value={categoryId}
@@ -145,7 +147,7 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
           className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
         >
           <option value="">
-            {type === 'income' ? 'Sin categoría' : 'Selecciona…'}
+            {type === 'income' ? t('noCategory') : t('selectPlaceholder')}
           </option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
@@ -157,7 +159,7 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
 
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Día del mes
+          {t('dayLabel')}
         </label>
         <input
           type="number"
@@ -169,7 +171,7 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
           className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
         />
         <p className="mt-1 text-xs text-white/40">
-          Limitado a 1–28 para que funcione siempre, incluso en febrero.
+          {t('dayHint')}
         </p>
       </div>
 
@@ -180,7 +182,7 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
           onChange={(e) => setIsActive(e.target.checked)}
           className="h-4 w-4 accent-accent"
         />
-        Activo (se generará cada mes automáticamente)
+        {t('activeLabel')}
       </label>
 
       {error && <p className="text-sm text-danger">{error}</p>}
@@ -188,12 +190,12 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
       <div className="flex gap-2 pt-2">
         <Button type="submit" disabled={busy} className="flex-1">
           {busy
-            ? 'Guardando…'
+            ? t('saving')
             : isEdit
-            ? 'Guardar cambios'
+            ? t('saveChanges')
             : type === 'income'
-            ? 'Crear ingreso fijo'
-            : 'Crear gasto fijo'}
+            ? t('createIncome')
+            : t('createExpense')}
         </Button>
       </div>
     </form>

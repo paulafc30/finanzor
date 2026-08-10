@@ -1,0 +1,43 @@
+{
+  "dialogLabel": "Finanzor tutorial",
+  "skip": "Skip",
+  "skipAria": "Skip tutorial",
+  "back": "Back",
+  "next": "Next",
+  "start": "Get started",
+  "stepAria": "Go to step {{step}}",
+  "slides": [
+    {
+      "title": "Welcome to Finanzor",
+      "body": "Your personal app to track your income, expenses, and savings month by month. Simple, visual, and designed for daily use."
+    },
+    {
+      "title": "Log your transactions",
+      "body": "Tap the + button on Home or Transactions to add income or an expense. Category, amount, date — done in seconds."
+    },
+    {
+      "title": "See where your money goes",
+      "body": "The Dashboard shows your income, expenses, and current balance for the month, plus a pie chart of spending by category."
+    },
+    {
+      "title": "Set your budget",
+      "body": "Set a limit per category. The bar turns yellow at 70% and red at 90% to warn you that you're close to the limit."
+    },
+    {
+      "title": "Automate recurring expenses",
+      "body": "Rent, gym, Netflix... Set them up once with the day of the month and they'll be created automatically every month. Pause or delete them anytime."
+    },
+    {
+      "title": "Save toward your goals",
+      "body": "Create goals (vacation, emergency fund, a purchase) and contribute little by little. The bar shows how much is left."
+    },
+    {
+      "title": "Navigate between months",
+      "body": "Use the header arrows to go to past or future months. Data is always sorted by the transaction's actual date."
+    },
+    {
+      "title": "All set!",
+      "body": "Start by adding your first transaction from the + button on Home. If you ever want to see this tutorial again, it's in Settings."
+    }
+  ]
+}

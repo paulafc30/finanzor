@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { UserPlus, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from '../hooks/useSession.js'
@@ -15,6 +16,7 @@ import { translateAuthError } from '../lib/authErrors.js'
  * registered" y mostraremos el mensaje correspondiente.
  */
 export default function Login() {
+  const { t } = useTranslation('auth')
   const { user, loading } = useSession()
   const location = useLocation()
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
@@ -59,9 +61,7 @@ export default function Login() {
         if (error) throw error
         // Si el email requiere confirmación, data.user existe pero session es null
         if (data?.user && !data.session) {
-          setInfo(
-            'Te hemos enviado un correo para confirmar tu cuenta. Revisa tu bandeja de entrada (y la carpeta de spam).',
-          )
+          setInfo(t('login.confirmEmailSent'))
         }
       }
     } catch (err) {
@@ -84,22 +84,22 @@ export default function Login() {
     setMode('signup')
     setSigninFailed(false)
     setError(null)
-    setInfo('Rellena la contraseña que quieras para crear tu cuenta con este email.')
+    setInfo(t('login.fillPasswordToSignup'))
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-bg-base px-4">
       <div className="w-full max-w-sm rounded-2xl bg-bg-elevated p-6 shadow-xl">
-        <h1 className="mb-1 text-2xl font-semibold text-white">Finanzor</h1>
+        <h1 className="mb-1 text-2xl font-semibold text-white">{t('login.appName')}</h1>
         <p className="mb-6 text-sm text-white/60">
-          {mode === 'signin' ? 'Inicia sesión para continuar' : 'Crea tu cuenta'}
+          {mode === 'signin' ? t('login.subtitleSignin') : t('login.subtitleSignup')}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="email"
             required
-            placeholder="Email"
+            placeholder={t('login.emailPlaceholder')}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value)
@@ -111,7 +111,7 @@ export default function Login() {
             type="password"
             required
             minLength={6}
-            placeholder="Contraseña"
+            placeholder={t('login.passwordPlaceholder')}
             value={password}
             onChange={(e) => {
               setPassword(e.target.value)
@@ -139,7 +139,7 @@ export default function Login() {
             disabled={busy}
             className="w-full rounded-lg bg-accent py-2.5 font-medium text-white hover:bg-accent-muted disabled:opacity-50"
           >
-            {busy ? '…' : mode === 'signin' ? 'Entrar' : 'Crear cuenta'}
+            {busy ? t('login.submitBusy') : mode === 'signin' ? t('login.submitSignin') : t('login.submitSignup')}
           </button>
 
           {/* Si el signin falla, sugerimos crear cuenta con el mismo email */}
@@ -150,13 +150,13 @@ export default function Login() {
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-bg-card py-2.5 text-sm font-medium text-white ring-1 ring-white/10 hover:bg-bg-card/70"
             >
               <UserPlus size={15} />
-              Crear cuenta con este email
+              {t('login.createAccountWithEmail')}
             </button>
           )}
         </form>
 
         <div className="my-4 flex items-center gap-2 text-xs text-white/40">
-          <span className="h-px flex-1 bg-white/10" /> o <span className="h-px flex-1 bg-white/10" />
+          <span className="h-px flex-1 bg-white/10" /> {t('login.or')} <span className="h-px flex-1 bg-white/10" />
         </div>
 
         <button
@@ -182,7 +182,7 @@ export default function Login() {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          Continuar con Google
+          {t('login.continueWithGoogle')}
         </button>
 
         <button
@@ -191,12 +191,12 @@ export default function Login() {
           className="mt-4 w-full text-center text-sm text-white/60 hover:text-white"
         >
           {mode === 'signin'
-            ? '¿No tienes cuenta? Crear una'
-            : '¿Ya tienes cuenta? Iniciar sesión'}
+            ? t('login.switchToSignup')
+            : t('login.switchToSignin')}
         </button>
 
         <p className="mt-6 text-center text-[11px] text-white/25">
-          Hecho con ♥ por <span className="font-semibold tracking-wide">Ferava</span>
+          {t('login.madeWith')} <span className="font-semibold tracking-wide">Ferava</span>
         </p>
       </div>
     </div>

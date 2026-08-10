@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   startOfMonth,
   endOfMonth,
@@ -9,15 +10,15 @@ import {
   isSameMonth,
   isSameDay,
 } from 'date-fns'
-import { es } from 'date-fns/locale'
 import { useTransactions } from '../../hooks/useTransactions.js'
 import { useMonth } from '../../hooks/useMonth.jsx'
-
-const WEEKDAYS_ES = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom']
+import { dateFnsLocale } from '../../lib/formatters.js'
 
 export default function MonthCalendar({ onDayClick, className = '' }) {
+  const { t } = useTranslation('calendar')
   const { data: transactions = [] } = useTransactions()
   const { month } = useMonth()
+  const weekdays = t('weekdaysShort', { returnObjects: true })
 
   const days = useMemo(() => {
     const monthStart = startOfMonth(month)
@@ -47,7 +48,7 @@ export default function MonthCalendar({ onDayClick, className = '' }) {
     <div className={`flex flex-col ${className}`}>
       {/* Cabecera con nombres de día */}
       <div className="grid shrink-0 grid-cols-7 border-b border-white/10 pb-1.5">
-        {WEEKDAYS_ES.map((d) => (
+        {weekdays.map((d) => (
           <div
             key={d}
             className="text-center text-[10px] font-medium tracking-wide text-white/35"
@@ -73,7 +74,7 @@ export default function MonthCalendar({ onDayClick, className = '' }) {
               key={key}
               type="button"
               onClick={() => onDayClick?.(key, day)}
-              aria-label={format(day, "EEEE d 'de' LLLL", { locale: es })}
+              aria-label={format(day, "EEEE d 'de' LLLL", { locale: dateFnsLocale() })}
               className={[
                 'flex h-full flex-col items-start border-b border-r border-white/10 p-1 text-left transition hover:bg-white/[0.03]',
                 !inMonth ? 'opacity-30' : '',
@@ -95,7 +96,7 @@ export default function MonthCalendar({ onDayClick, className = '' }) {
                   {data.expense > 0 && (
                     <div
                       className="w-full truncate rounded bg-danger/25 px-1 py-0.5 text-[11px] font-semibold leading-tight text-danger"
-                      title={`Gastos: ${data.expense.toFixed(2)} €`}
+                      title={t('dayModal.expenseAmount', { amount: data.expense.toFixed(2) })}
                     >
                       −{formatShortEuro(data.expense)}
                     </div>
@@ -103,7 +104,7 @@ export default function MonthCalendar({ onDayClick, className = '' }) {
                   {data.income > 0 && (
                     <div
                       className="w-full truncate rounded bg-success/25 px-1 py-0.5 text-[11px] font-semibold leading-tight text-success"
-                      title={`Ingresos: ${data.income.toFixed(2)} €`}
+                      title={t('dayModal.incomeAmount', { amount: data.income.toFixed(2) })}
                     >
                       +{formatShortEuro(data.income)}
                     </div>

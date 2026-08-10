@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Wallet,
   Plus,
@@ -22,56 +23,8 @@ import Button from '../ui/Button.jsx'
  *
  * Llama a onComplete() cuando se termina o se salta.
  */
-const SLIDES = [
-  {
-    icon: Wallet,
-    color: 'danger',
-    title: 'Bienvenido a Finanzor',
-    body: 'Tu app personal para llevar control mes a mes de tus ingresos, gastos y ahorros. Sencilla, visual y diseñada para usar a diario.',
-  },
-  {
-    icon: Plus,
-    color: 'success',
-    title: 'Registra tus movimientos',
-    body: 'Pulsa el botón + de Inicio o Movimientos para añadir un ingreso o gasto. Categoría, importe, fecha — listo en segundos.',
-  },
-  {
-    icon: PieChart,
-    color: 'info',
-    title: 'Ve dónde se va tu dinero',
-    body: 'El Dashboard te muestra ingresos, gastos y saldo actual del mes, además de un gráfico circular con el reparto por categoría.',
-  },
-  {
-    icon: Wallet,
-    color: 'warning',
-    title: 'Define tu presupuesto',
-    body: 'Pon un límite por categoría. La barra se vuelve amarilla al 70% y roja al 90% para avisarte de que estás cerca del tope.',
-  },
-  {
-    icon: Repeat,
-    color: 'accent',
-    title: 'Automatiza gastos fijos',
-    body: 'Alquiler, gimnasio, Netflix... Configúralos una vez con el día del mes y se generan solos cada mes. Pausa o elimina cuando quieras.',
-  },
-  {
-    icon: PiggyBank,
-    color: 'success',
-    title: 'Ahorra para tus metas',
-    body: 'Crea metas (vacaciones, fondo de emergencia, una compra) y aporta poco a poco. La barra te muestra cuánto te falta.',
-  },
-  {
-    icon: CalendarIcon,
-    color: 'info',
-    title: 'Navega entre meses',
-    body: 'Usa las flechas del header para ir a meses anteriores o futuros. Los datos siempre se ordenan por la fecha real del movimiento.',
-  },
-  {
-    icon: CheckCircle2,
-    color: 'success',
-    title: '¡Todo listo!',
-    body: 'Empieza por añadir tu primer movimiento desde el botón + en Inicio. Si en algún momento quieres ver este tutorial otra vez, está en Ajustes.',
-  },
-]
+const SLIDE_ICONS = [Wallet, Plus, PieChart, Wallet, Repeat, PiggyBank, CalendarIcon, CheckCircle2]
+const SLIDE_COLORS = ['danger', 'success', 'info', 'warning', 'accent', 'success', 'info', 'success']
 
 const colorMap = {
   success: { bg: 'bg-success', tint: 'bg-success/15', text: 'text-success' },
@@ -82,6 +35,13 @@ const colorMap = {
 }
 
 export default function Onboarding({ open, onComplete }) {
+  const { t } = useTranslation('onboarding')
+  const rawSlides = t('slides', { returnObjects: true })
+  const SLIDES = (Array.isArray(rawSlides) ? rawSlides : []).map((slide, i) => ({
+    ...slide,
+    icon: SLIDE_ICONS[i],
+    color: SLIDE_COLORS[i],
+  }))
   const [index, setIndex] = useState(0)
   const total = SLIDES.length
   const isLast = index === total - 1
@@ -134,7 +94,7 @@ export default function Onboarding({ open, onComplete }) {
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center"
       role="dialog"
       aria-modal="true"
-      aria-label="Tutorial de Finanzor"
+      aria-label={t('dialogLabel')}
     >
       <div
         className="relative flex h-full w-full flex-col bg-bg-base sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-md sm:rounded-2xl"
@@ -145,10 +105,10 @@ export default function Onboarding({ open, onComplete }) {
         <button
           type="button"
           onClick={onComplete}
-          aria-label="Saltar tutorial"
+          aria-label={t('skipAria')}
           className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-white/5 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10 hover:text-white"
         >
-          Saltar
+          {t('skip')}
           <X size={12} />
         </button>
 
@@ -179,7 +139,7 @@ export default function Onboarding({ open, onComplete }) {
               key={i}
               type="button"
               onClick={() => setIndex(i)}
-              aria-label={`Ir al paso ${i + 1}`}
+              aria-label={t('stepAria', { step: i + 1 })}
               className={[
                 'h-1.5 rounded-full transition-all',
                 i === index ? 'w-6 bg-accent' : 'w-1.5 bg-white/20 hover:bg-white/40',
@@ -199,7 +159,7 @@ export default function Onboarding({ open, onComplete }) {
             className={isFirst ? 'invisible' : ''}
           >
             <ChevronLeft size={16} />
-            Atrás
+            {t('back')}
           </Button>
 
           <span className="text-[11px] text-white/40">
@@ -208,7 +168,7 @@ export default function Onboarding({ open, onComplete }) {
 
           {isLast ? (
             <Button type="button" onClick={onComplete} size="sm">
-              Comenzar
+              {t('start')}
               <CheckCircle2 size={16} />
             </Button>
           ) : (
@@ -217,7 +177,7 @@ export default function Onboarding({ open, onComplete }) {
               size="sm"
               onClick={() => setIndex((i) => Math.min(total - 1, i + 1))}
             >
-              Siguiente
+              {t('next')}
               <ChevronRight size={16} />
             </Button>
           )}

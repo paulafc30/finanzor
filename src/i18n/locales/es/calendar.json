@@ -1,0 +1,32 @@
+{
+  "title": "Calendario",
+  "viewMonth": "Mes",
+  "viewWeek": "Semana",
+  "weekdaysShort": ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"],
+  "weekPrev": "Semana anterior",
+  "weekNext": "Semana siguiente",
+  "yearView": {
+    "monthOnly": "El calendario es mensual.",
+    "switchHint": "Cambia la vista superior a Mes para ver el calendario.",
+    "switchButton": "Cambiar a vista mensual"
+  },
+  "dayModal": {
+    "newTransaction": "Nuevo movimiento",
+    "editTransaction": "Editar movimiento",
+    "backToDay": "Volver al día",
+    "income": "Ingresos",
+    "expense": "Gastos",
+    "balance": "Balance",
+    "noTransactions": "No hay movimientos este día.",
+    "addTransaction": "Añadir movimiento",
+    "noDescription": "Sin descripción",
+    "deleteAriaLabel": "Eliminar",
+    "deleteConfirm": "¿Eliminar este {{type}} de {{amount}}?",
+    "deleteFailed": "No se pudo eliminar: {{error}}",
+    "unknownError": "error",
+    "typeExpense": "gasto",
+    "typeIncome": "ingreso",
+    "expenseAmount": "Gastos: {{amount}} €",
+    "incomeAmount": "Ingresos: {{amount}} €"
+  }
+}

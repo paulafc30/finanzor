@@ -1,0 +1,61 @@
+{
+  "backToSettingsAria": "Back to settings",
+  "title": "Import movements",
+  "upload": {
+    "intro": "Upload a CSV with your bank movements. We automatically detect the columns and categorize expenses by merchant (Mercadona → Groceries, Repsol → Transport, etc.). Before importing anything, you review and edit everything you want."
+  },
+  "uploader": {
+    "dropText": "Drag your CSV here or tap to choose",
+    "hint": "Your bank usually exports it from \"Movements → Export\"",
+    "selectFile": "Select file"
+  },
+  "errors": {
+    "noColumnsDetected": "No columns were detected. Does the file have headers?",
+    "noDataRows": "The file contains no data rows.",
+    "readError": "Error reading the file",
+    "importFailed": "Could not import"
+  },
+  "mapping": {
+    "rows": "Rows",
+    "income": "Income",
+    "expense": "Expenses",
+    "title": "Column mapping",
+    "description": "Assign which CSV column corresponds to each field. If your bank uses two separate columns for income and expenses (Credit / Debit), fill those in instead of \"Amount\".",
+    "date": "Date",
+    "amount": "Amount (positive = income, negative = expense)",
+    "haber": "Credit (income)",
+    "debe": "Debit (expense)",
+    "desc": "Description / Concept",
+    "noUse": "— Don't use —",
+    "validationWarningPrefix": "You need to assign the",
+    "validationWarningField": "Date",
+    "validationWarningSuffix": "column and at least one amount column (Amount, or Credit/Debit) to continue.",
+    "reviewTitle": "Review and edit before importing",
+    "cancel": "Cancel",
+    "importing": "Importing…",
+    "importCount": "Import {{count}} movements"
+  },
+  "preview": {
+    "empty": "No movements left. Upload another CSV or adjust the column mapping.",
+    "toggleTypeTitle": "Click to switch expense/income",
+    "expense": "Expense",
+    "income": "Income",
+    "descriptionPlaceholder": "Description",
+    "noCategory": "No category",
+    "removeRowAria": "Remove row",
+    "hint": "Click \"Expense\" / \"Income\" to change the type. Edit any field directly. Tap the trash icon to discard a row."
+  },
+  "done": {
+    "title": "Import complete!",
+    "messagePrefix": "We added",
+    "messageSuffix": "movements to your account. They're distributed by their real dates on the calendar.",
+    "importAnother": "Import another CSV",
+    "viewHome": "View Home"
+  },
+  "parser": {
+    "sessionInvalid": "Invalid session",
+    "invalidType": "Invalid type in a row",
+    "invalidAmount": "Invalid amount in a row",
+    "invalidDate": "Invalid date in a row"
+  }
+}

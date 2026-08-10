@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format, startOfWeek } from 'date-fns';
 import { Calendar as CalendarIcon, CalendarRange } from 'lucide-react';
 import MonthCalendar from '../components/calendar/MonthCalendar.jsx';
@@ -7,6 +8,7 @@ import DayDetailModal from '../components/calendar/DayDetailModal.jsx';
 import { useMonth } from '../hooks/useMonth.jsx';
 
 export default function CalendarPage() {
+  const { t } = useTranslation('calendar');
   const [selectedDay, setSelectedDay] = useState(null);
   const { isYearView, setViewMode } = useMonth();
   const [calView, setCalView] = useState('month');
@@ -19,19 +21,19 @@ export default function CalendarPage() {
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <CalendarIcon size={20} className="text-info" />
-          <h1 className="text-xl font-semibold">Calendario</h1>
+          <h1 className="text-xl font-semibold">{t('title')}</h1>
         </div>
         <div className="rounded-xl bg-bg-elevated p-6 text-center ring-1 ring-white/5">
           <CalendarRange size={32} className="mx-auto mb-3 text-white/40" />
-          <p className="text-white">El calendario es mensual.</p>
+          <p className="text-white">{t('yearView.monthOnly')}</p>
           <p className="mt-1 text-sm text-white/60">
-            Cambia la vista superior a Mes para ver el calendario.
+            {t('yearView.switchHint')}
           </p>
           <button
             type="button"
             onClick={() => setViewMode('month')}
             className="mt-4 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90">
-            Cambiar a vista mensual
+            {t('yearView.switchButton')}
           </button>
         </div>
       </section>
@@ -48,13 +50,13 @@ export default function CalendarPage() {
       <div className="flex shrink-0 items-center justify-between">
         <div className="flex items-center gap-2">
           <CalendarIcon size={18} className="shrink-0 text-info" />
-          <h1 className="text-lg font-semibold">Calendario</h1>
+          <h1 className="text-lg font-semibold">{t('title')}</h1>
         </div>
 
         <div className="flex rounded-lg bg-bg-elevated p-0.5">
           {[
-            { id: 'month', label: 'Mes' },
-            { id: 'week', label: 'Semana' },
+            { id: 'month', label: t('viewMonth') },
+            { id: 'week', label: t('viewWeek') },
           ].map(({ id, label }) => (
             <button
               key={id}

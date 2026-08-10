@@ -1,4 +1,5 @@
 import { Moon, Sun } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../context/ThemeContext.jsx'
 
 /**
@@ -9,6 +10,7 @@ import { useTheme } from '../../context/ThemeContext.jsx'
  * etiqueta visible.
  */
 export default function ThemeToggle() {
+  const { t } = useTranslation('settings')
   const ctx = useTheme()
   if (!ctx) return null
   const { theme, setTheme } = ctx
@@ -24,18 +26,18 @@ export default function ThemeToggle() {
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-semibold text-white">Apariencia</h3>
+          <h3 className="text-sm font-semibold text-white">{t('appearance.title')}</h3>
           <p className="text-[11px] text-white/50">
             {theme === 'dark'
-              ? 'Modo oscuro activo'
-              : 'Modo claro activo'}
+              ? t('appearance.darkActive')
+              : t('appearance.lightActive')}
           </p>
         </div>
       </div>
 
       <div
         role="tablist"
-        aria-label="Tema claro u oscuro"
+        aria-label={t('appearance.ariaLabel')}
         className="grid grid-cols-2 gap-1 rounded-lg bg-bg-card p-1"
       >
         <button
@@ -51,7 +53,7 @@ export default function ThemeToggle() {
           ].join(' ')}
         >
           <Sun size={14} />
-          Claro
+          {t('appearance.light')}
         </button>
         <button
           type="button"
@@ -66,7 +68,7 @@ export default function ThemeToggle() {
           ].join(' ')}
         >
           <Moon size={14} />
-          Oscuro
+          {t('appearance.dark')}
         </button>
       </div>
     </div>

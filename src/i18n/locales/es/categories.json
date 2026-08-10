@@ -1,0 +1,55 @@
+{
+  "errorPrefix": "Error: ",
+  "backToSettings": "Volver a ajustes",
+  "title": "Categorías",
+  "new": "Nueva",
+  "defaultBadge": {
+    "tooltip": "Categoría por defecto — se puede renombrar pero no archivar",
+    "label": "Fija"
+  },
+  "edit": "Editar",
+  "archive": {
+    "label": "Archivar",
+    "tooltip": "Archivar (conserva el historial)"
+  },
+  "showArchived": "Ver archivadas ({{count}})",
+  "hideArchived": "Ocultar archivadas ({{count}})",
+  "archivedSectionTitle": "Archivadas",
+  "archivedBadge": {
+    "tooltip": "Conservada para que tus movimientos antiguos sigan teniendo categoría",
+    "label": "Archivada"
+  },
+  "restore": {
+    "label": "Restaurar",
+    "tooltip": "Volver a activarla"
+  },
+  "footerNote": "Las \"Fijas\" son las iniciales — puedes renombrarlas o recolorearlas, pero no archivarlas. Las que tú creas (ej. \"Viaje Madrid\", \"Carnet de moto\") puedes archivarlas cuando dejes de usarlas: desaparecen de los formularios nuevos pero los movimientos antiguos siguen mostrándolas.",
+  "modal": {
+    "new": "Nueva categoría",
+    "edit": "Editar categoría"
+  },
+  "confirmArchive": "¿Archivar la categoría \"{{name}}\"?\n\nDejará de aparecer al crear nuevos movimientos, pero los antiguos seguirán mostrándola.",
+  "archiveError": "No se pudo archivar: {{error}}",
+  "unarchiveError": "No se pudo restaurar: {{error}}",
+  "form": {
+    "confirmRename": "Vas a renombrar <strong>\"{{oldName}}\"</strong> a <strong>\"{{newName}}\"</strong>. El nombre nuevo se aplicará también a <strong>todos los movimientos pasados</strong> que tienen esta categoría asignada. ¿Quieres continuar?",
+    "cancel": "Cancelar",
+    "confirmYes": "Sí, renombrar",
+    "renaming": "Renombrando…",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Mascotas, Suscripciones…",
+    "colorLabel": "Color",
+    "colorAriaLabel": "Color {{color}}",
+    "saving": "Guardando…",
+    "saveChanges": "Guardar cambios",
+    "create": "Crear categoría",
+    "genericError": "No se pudo guardar"
+  },
+  "errors": {
+    "nameRequired": "El nombre es obligatorio",
+    "nameEmpty": "El nombre no puede estar vacio",
+    "duplicateName": "Ya tienes una categoria con ese nombre",
+    "defaultNoArchive": "Las categorias por defecto no se pueden archivar",
+    "defaultNoDelete": "Las categorias por defecto no se pueden eliminar"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "settingsLabel": "Ajustes",
+  "bottomNav": {
+    "home": "Inicio",
+    "movements": "Movs.",
+    "calendar": "Calendario",
+    "budget": "Presup.",
+    "savings": "Ahorro"
+  },
+  "monthSwitcher": {
+    "prevYear": "Año anterior",
+    "prevMonth": "Mes anterior",
+    "nextYear": "Año siguiente",
+    "nextMonth": "Mes siguiente",
+    "changeYear": "Cambiar de año",
+    "changeMonthYear": "Cambiar mes/año",
+    "viewToggleLabel": "Vista por mes o por año",
+    "month": "Mes",
+    "year": "Año"
+  },
+  "picker": {
+    "selectMonthYear": "Seleccionar mes y año",
+    "prevBlock": "Bloque anterior",
+    "prevYear": "Año anterior",
+    "nextBlock": "Bloque siguiente",
+    "nextYear": "Año siguiente",
+    "close": "Cerrar",
+    "currentYear": "Año actual",
+    "currentMonth": "Mes actual",
+    "monthsShort": ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+    "monthsFull": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+  }
+}

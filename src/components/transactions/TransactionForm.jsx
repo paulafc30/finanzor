@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { format } from 'date-fns'
 import { Repeat, Calculator, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Button from '../ui/Button.jsx'
 import CalculatorPad from '../ui/CalculatorPad.jsx'
 import { useCategories } from '../../hooks/useCategories.js'
@@ -13,20 +14,22 @@ import {
 } from '../../hooks/useTransactions.js'
 import { useMonth } from '../../hooks/useMonth.jsx'
 
-const schema = z
-  .object({
-    type: z.enum(['expense', 'income']),
-    amount: z.coerce
-      .number({ invalid_type_error: 'Importe invalido' })
-      .positive('El importe debe ser mayor que 0'),
-    description: z.string().max(120).optional().or(z.literal('')),
-    category_id: z.string().uuid().optional().or(z.literal('')),
-    occurred_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha invalida'),
-  })
-  .refine(
-    (v) => v.type === 'income' || (v.category_id && v.category_id.length > 0),
-    { path: ['category_id'], message: 'Categoria obligatoria en gastos' },
-  )
+function buildSchema(t) {
+  return z
+    .object({
+      type: z.enum(['expense', 'income']),
+      amount: z.coerce
+        .number({ invalid_type_error: t('form.errors.invalidAmount') })
+        .positive(t('form.errors.amountPositive')),
+      description: z.string().max(120).optional().or(z.literal('')),
+      category_id: z.string().uuid().optional().or(z.literal('')),
+      occurred_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('form.errors.invalidDate')),
+    })
+    .refine(
+      (v) => v.type === 'income' || (v.category_id && v.category_id.length > 0),
+      { path: ['category_id'], message: t('form.errors.categoryRequired') },
+    )
+}
 
 /**
  * Formulario para alta o edicion de un movimiento.
@@ -36,6 +39,7 @@ const schema = z
  *   usa esa fecha en vez del default normal (util al anadir desde el calendario).
  */
 export default function TransactionForm({ transaction, defaultDate: defaultDateProp, onSuccess }) {
+  const { t } = useTranslation('transactions')
   const isEdit = !!transaction
   const { data: categories = [] } = useCategories()
   const createMutation = useCreateTransaction()
@@ -159,7 +163,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
   const [calcOpen, setCalcOpen] = useState(false)
 
   async function onSubmit(values) {
-    const parsed = schema.safeParse(values)
+    const parsed = buildSchema(t).safeParse(values)
     if (!parsed.success) return
 
     // Validacion adicional: respetar los limites de fecha (algunos
@@ -168,13 +172,13 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
     if (d < dateInputMin) {
       alert(
         isEditingOldMonth
-          ? 'Solo puedes mover la fecha dentro del mismo mes original.'
-          : 'La fecha no puede ser anterior al mes pasado.',
+          ? t('form.alerts.dateBeforeOldMonth')
+          : t('form.alerts.dateBeforePrevMonth'),
       )
       return
     }
     if (dateInputMax && d > dateInputMax) {
-      alert('Solo puedes mover la fecha dentro del mismo mes original.')
+      alert(t('form.alerts.dateAfterOldMonth'))
       return
     }
 
@@ -196,7 +200,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
         onSuccess?.()
       }
     } catch (err) {
-      alert('No se pudo guardar: ' + (err.message ?? 'error desconocido'))
+      alert(t('form.alerts.saveFailed', { message: err.message ?? t('form.alerts.unknownError') }))
     }
   }
 
@@ -206,11 +210,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
       {isEdit && transaction.recurring_id && (
         <div className="flex items-start gap-2 rounded-lg bg-accent/10 p-2.5 text-xs text-white/80 ring-1 ring-accent/20">
           <Repeat size={14} className="mt-0.5 shrink-0 text-accent" />
-          <p>
-            Este movimiento viene de un gasto fijo. Editarlo solo cambia este mes
-            concreto, no la configuracion del gasto fijo en si (eso se edita en
-            Presupuesto).
-          </p>
+          <p>{t('form.recurringNotice')}</p>
         </div>
       )}
 
@@ -226,7 +226,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
               : 'text-white/60 hover:text-white',
           ].join(' ')}
         >
-          Gasto
+          {t('form.expense')}
         </button>
         <button
           type="button"
@@ -238,14 +238,14 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
               : 'text-white/60 hover:text-white',
           ].join(' ')}
         >
-          Ingreso
+          {t('form.income')}
         </button>
       </div>
 
       {/* Importe */}
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Importe (EUR)
+          {t('form.amount')}
         </label>
         <div className="relative">
           <input
@@ -256,16 +256,16 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
             autoFocus
             placeholder="0,00"
             {...register('amount', {
-              required: 'Importe obligatorio',
-              min: { value: 0.01, message: 'Mayor que 0' },
+              required: t('form.errors.amountRequired'),
+              min: { value: 0.01, message: t('form.errors.amountGreaterThanZero') },
             })}
             className="w-full rounded-lg bg-bg-card px-3 py-2.5 pr-12 text-lg font-semibold text-white outline-none ring-1 ring-white/5 focus:ring-accent"
           />
           <button
             type="button"
             onClick={() => setCalcOpen(true)}
-            aria-label="Abrir calculadora"
-            title="Calculadora"
+            aria-label={t('form.openCalculatorAria')}
+            title={t('form.calculatorTitle')}
             className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md p-2 text-white/60 hover:bg-white/5 hover:text-accent"
           >
             <Calculator size={18} />
@@ -290,12 +290,12 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
       {/* Descripcion */}
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Descripcion
+          {t('form.description')}
         </label>
         <input
           type="text"
           maxLength={120}
-          placeholder={type === 'expense' ? 'Mercadona, gasolina...' : 'Sueldo, regalo...'}
+          placeholder={type === 'expense' ? t('form.descriptionPlaceholderExpense') : t('form.descriptionPlaceholderIncome')}
           {...register('description')}
           className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
         />
@@ -305,7 +305,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
       <div>
         <div className="mb-1 flex items-center justify-between">
           <label className="block text-xs uppercase tracking-wide text-white/50">
-            Categoria {type === 'expense' && <span className="text-danger">*</span>}
+            {t('form.category')} {type === 'expense' && <span className="text-danger">*</span>}
           </label>
           <Link
             to="/categorias"
@@ -313,17 +313,17 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
             className="inline-flex items-center gap-0.5 text-[11px] font-medium text-accent hover:text-accent/80"
           >
             <Plus size={11} />
-            Nueva
+            {t('form.new')}
           </Link>
         </div>
         <select
           {...register('category_id', {
             validate: (v) =>
-              type === 'income' || (v && v.length > 0) || 'Categoria obligatoria',
+              type === 'income' || (v && v.length > 0) || t('form.errors.categoryRequiredShort'),
           })}
           className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
         >
-          <option value="">{type === 'income' ? 'Sin categoria' : 'Selecciona...'}</option>
+          <option value="">{type === 'income' ? t('form.noCategory') : t('form.selectCategory')}</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -338,13 +338,13 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
       {/* Fecha */}
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Fecha
+          {t('form.date')}
         </label>
         <input
           type="date"
           min={dateInputMin}
           max={dateInputMax}
-          {...register('occurred_on', { required: 'Fecha obligatoria' })}
+          {...register('occurred_on', { required: t('form.errors.dateRequired') })}
           className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
         />
         {errors.occurred_on && (
@@ -352,12 +352,11 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
         )}
         {isEditingOldMonth ? (
           <p className="mt-1 text-xs text-warning">
-            Este movimiento es de hace más de un mes. Solo puedes moverlo
-            dentro de su mes original para no descuadrar saldos posteriores.
+            {t('form.oldMonthWarning')}
           </p>
         ) : (
           <p className="mt-1 text-xs text-white/40">
-            Puedes poner fechas desde el mes pasado ({firstOfPrevMonth.slice(0, 7)}) en adelante.
+            {t('form.dateHint', { month: firstOfPrevMonth.slice(0, 7) })}
           </p>
         )}
       </div>
@@ -368,7 +367,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
           disabled={isSubmitting || busy}
           className="flex-1"
         >
-          {busy ? 'Guardando...' : isEdit ? 'Guardar cambios' : 'Guardar'}
+          {busy ? t('form.saving') : isEdit ? t('form.saveChanges') : t('form.save')}
         </Button>
       </div>
     </form>

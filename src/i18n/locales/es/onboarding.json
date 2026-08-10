@@ -1,0 +1,43 @@
+{
+  "dialogLabel": "Tutorial de Finanzor",
+  "skip": "Saltar",
+  "skipAria": "Saltar tutorial",
+  "back": "Atrás",
+  "next": "Siguiente",
+  "start": "Comenzar",
+  "stepAria": "Ir al paso {{step}}",
+  "slides": [
+    {
+      "title": "Bienvenido a Finanzor",
+      "body": "Tu app personal para llevar control mes a mes de tus ingresos, gastos y ahorros. Sencilla, visual y diseñada para usar a diario."
+    },
+    {
+      "title": "Registra tus movimientos",
+      "body": "Pulsa el botón + de Inicio o Movimientos para añadir un ingreso o gasto. Categoría, importe, fecha — listo en segundos."
+    },
+    {
+      "title": "Ve dónde se va tu dinero",
+      "body": "El Dashboard te muestra ingresos, gastos y saldo actual del mes, además de un gráfico circular con el reparto por categoría."
+    },
+    {
+      "title": "Define tu presupuesto",
+      "body": "Pon un límite por categoría. La barra se vuelve amarilla al 70% y roja al 90% para avisarte de que estás cerca del tope."
+    },
+    {
+      "title": "Automatiza gastos fijos",
+      "body": "Alquiler, gimnasio, Netflix... Configúralos una vez con el día del mes y se generan solos cada mes. Pausa o elimina cuando quieras."
+    },
+    {
+      "title": "Ahorra para tus metas",
+      "body": "Crea metas (vacaciones, fondo de emergencia, una compra) y aporta poco a poco. La barra te muestra cuánto te falta."
+    },
+    {
+      "title": "Navega entre meses",
+      "body": "Usa las flechas del header para ir a meses anteriores o futuros. Los datos siempre se ordenan por la fecha real del movimiento."
+    },
+    {
+      "title": "¡Todo listo!",
+      "body": "Empieza por añadir tu primer movimiento desde el botón + en Inicio. Si en algún momento quieres ver este tutorial otra vez, está en Ajustes."
+    }
+  ]
+}

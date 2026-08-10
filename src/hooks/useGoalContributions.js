@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from './useSession.js'
 
@@ -43,14 +44,15 @@ export function useGoalContributions(goalId) {
 export function useCreateContribution() {
   const { user } = useSession()
   const qc = useQueryClient()
+  const { t } = useTranslation('savings')
 
   return useMutation({
     mutationFn: async ({ goal_id, amount, contributed_on }) => {
       const value = Number(amount)
       if (!Number.isFinite(value) || value <= 0) {
-        throw new Error('El importe debe ser mayor que 0')
+        throw new Error(t('errors.amountInvalid'))
       }
-      if (!contributed_on) throw new Error('Fecha obligatoria')
+      if (!contributed_on) throw new Error(t('errors.dateRequired'))
 
       // 1) Leer en paralelo: nombre de la meta + id de la categoría "Ahorro"
       const [{ data: goal }, { data: cat }] = await Promise.all([

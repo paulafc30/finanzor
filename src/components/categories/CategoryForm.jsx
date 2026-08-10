@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AlertTriangle } from 'lucide-react'
 import Button from '../ui/Button.jsx'
 import { useCreateCategory, useUpdateCategory } from '../../hooks/useCategories.js'
@@ -20,6 +21,7 @@ const PALETTE = [
  * Si solo cambias el color, guarda directo sin pedir nada.
  */
 export default function CategoryForm({ category, onSuccess }) {
+  const { t } = useTranslation('categories')
   const isEdit = !!category
   const [name, setName] = useState(category?.name ?? '')
   const [color, setColor] = useState(category?.color ?? PALETTE[0])
@@ -49,7 +51,7 @@ export default function CategoryForm({ category, onSuccess }) {
       }
       onSuccess?.()
     } catch (err) {
-      setError(err.message ?? 'No se pudo guardar')
+      setError(err.message ?? t('form.genericError'))
       setConfirming(false)
     }
   }
@@ -71,12 +73,15 @@ export default function CategoryForm({ category, onSuccess }) {
       <div className="space-y-4">
         <div className="flex items-start gap-2 rounded-xl bg-warning/10 p-3 ring-1 ring-warning/20">
           <AlertTriangle size={18} className="mt-0.5 shrink-0 text-warning" />
-          <p className="text-sm text-white">
-            Vas a renombrar <strong>"{category.name}"</strong> a{' '}
-            <strong>"{name.trim()}"</strong>. El nombre nuevo se aplicará también a{' '}
-            <strong>todos los movimientos pasados</strong> que tienen esta categoría
-            asignada. ¿Quieres continuar?
-          </p>
+          <p
+            className="text-sm text-white"
+            dangerouslySetInnerHTML={{
+              __html: t('form.confirmRename', {
+                oldName: category.name,
+                newName: name.trim(),
+              }),
+            }}
+          />
         </div>
 
         {error && <p className="text-sm text-danger">{error}</p>}
@@ -89,7 +94,7 @@ export default function CategoryForm({ category, onSuccess }) {
             disabled={busy}
             className="flex-1"
           >
-            Cancelar
+            {t('form.cancel')}
           </Button>
           <Button
             type="button"
@@ -97,7 +102,7 @@ export default function CategoryForm({ category, onSuccess }) {
             disabled={busy}
             className="flex-1"
           >
-            {busy ? 'Renombrando…' : 'Sí, renombrar'}
+            {busy ? t('form.renaming') : t('form.confirmYes')}
           </Button>
         </div>
       </div>
@@ -108,13 +113,13 @@ export default function CategoryForm({ category, onSuccess }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Nombre
+          {t('form.nameLabel')}
         </label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Mascotas, Suscripciones…"
+          placeholder={t('form.namePlaceholder')}
           autoFocus
           maxLength={40}
           required
@@ -124,7 +129,7 @@ export default function CategoryForm({ category, onSuccess }) {
 
       <div>
         <label className="mb-2 block text-xs uppercase tracking-wide text-white/50">
-          Color
+          {t('form.colorLabel')}
         </label>
         <div className="flex flex-wrap gap-2">
           {PALETTE.map((c) => (
@@ -132,7 +137,7 @@ export default function CategoryForm({ category, onSuccess }) {
               key={c}
               type="button"
               onClick={() => setColor(c)}
-              aria-label={`Color ${c}`}
+              aria-label={t('form.colorAriaLabel', { color: c })}
               className={[
                 'h-8 w-8 rounded-full transition',
                 color === c
@@ -149,7 +154,7 @@ export default function CategoryForm({ category, onSuccess }) {
 
       <div className="flex gap-2 pt-2">
         <Button type="submit" disabled={busy} className="flex-1">
-          {busy ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear categoría'}
+          {busy ? t('form.saving') : isEdit ? t('form.saveChanges') : t('form.create')}
         </Button>
       </div>
     </form>

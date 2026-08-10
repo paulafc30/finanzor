@@ -1,0 +1,54 @@
+{
+  "title": "Budget",
+  "yearView": {
+    "notice": "Budgets are defined per month.",
+    "hint": "Switch the view to \"Month\" to manage the limits for a specific month.",
+    "switchButton": "Switch to monthly view"
+  },
+  "errorPrefix": "Error: ",
+  "copiedNotice": "The previous month's budget has been copied. Adjust the amounts you need by tapping each limit.",
+  "dismissNotice": "Dismiss notice",
+  "fixedExpenses": {
+    "title": "Fixed expenses",
+    "new": "New",
+    "howItWorks": "How fixed expenses work",
+    "item1": "When you enter a month, active ones are automatically created as transactions with the day and category you set for them.",
+    "item2": "<strong>If you add one today</strong>, it's generated instantly also in the month you're viewing, even if the day has already passed.",
+    "item3": "<strong>Deactivating</strong> pauses without deleting: it stops generating in future months, but past transactions remain.",
+    "item4": "<strong>Editing</strong> (amount, day…) only affects future months not yet generated. To adjust a specific month's one, edit the transaction directly.",
+    "item5": "<strong>Deleting</strong> the fixed expense removes future transactions that haven't occurred yet. Past ones are kept so history isn't distorted."
+  },
+  "fixedIncome": {
+    "title": "Fixed income",
+    "new": "New",
+    "hint": "Same as fixed expenses, but positive: salary, rent you collect, a monthly fee… They're materialized automatically every month and counted as income in the statistics."
+  },
+  "byCategory": {
+    "title": "Budgets by category",
+    "emptyTitle": "You haven't set any budgets yet.",
+    "emptyHint": "Tap \"No limit\" on any category to set one.",
+    "howItWorks": "How budgets work",
+    "item1": "Each budget lives <strong>in a specific month</strong>. If in March you raise the Food one to €500, April keeps its own value — they don't all change at once.",
+    "item2": "When you enter a new month with no budgets, we copy the previous month's <strong>only once</strong> so you don't start from scratch every time.",
+    "item3": "Click the limit amount to edit it. Set it to <strong>0</strong> to remove the budget for that category that month.",
+    "item4": "The spending that counts is filtered by the transaction's actual date (<em>occurred_on</em>), not when you logged it.",
+    "item5": "Bar states: up to 70% green, 70-90% orange, from 90% red."
+  },
+  "recurringModal": {
+    "newIncome": "New fixed income",
+    "newExpense": "New fixed expense",
+    "editIncome": "Edit fixed income",
+    "editExpense": "Edit fixed expense"
+  },
+  "row": {
+    "noLimit": "No limit",
+    "editTooltip": "Click to edit the limit",
+    "percentUsed": "{{percent}}% used",
+    "remaining": "{{amount}} left",
+    "exceeded": "Exceeded by {{amount}}",
+    "saveError": "Could not save: {{error}}"
+  },
+  "errors": {
+    "invalidAmount": "Invalid amount"
+  }
+}

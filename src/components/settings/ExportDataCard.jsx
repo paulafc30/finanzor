@@ -1,12 +1,8 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Download, Loader2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase.js'
 import { useSession } from '../../hooks/useSession.js'
-
-const MONTHS = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
-]
 
 const currentYear = new Date().getFullYear()
 const YEARS = Array.from({ length: 5 }, (_, i) => currentYear - i)
@@ -33,11 +29,17 @@ function buildRange(mode, state) {
   }
 }
 
-function toCsv(rows) {
-  const header = ['Fecha', 'Tipo', 'Importe', 'Categoría', 'Descripción']
+function toCsv(rows, t) {
+  const header = [
+    t('exportData.csvHeaders.date'),
+    t('exportData.csvHeaders.type'),
+    t('exportData.csvHeaders.amount'),
+    t('exportData.csvHeaders.category'),
+    t('exportData.csvHeaders.description'),
+  ]
   const lines = rows.map((r) => [
     r.occurred_on,
-    r.type === 'income' ? 'Ingreso' : 'Gasto',
+    r.type === 'income' ? t('exportData.typeIncome') : t('exportData.typeExpense'),
     r.amount.toFixed(2),
     r.category?.name ?? '',
     r.description ?? '',
@@ -56,11 +58,13 @@ function downloadCsv(content, filename) {
 }
 
 export default function ExportDataCard() {
+  const { t } = useTranslation('settings')
   const { user } = useSession()
   const [mode, setMode] = useState('meses') // 'dias' | 'meses' | 'año'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  const MONTHS = t('exportData.months', { returnObjects: true })
   const today = new Date()
 
   const [state, setState] = useState({
@@ -87,7 +91,7 @@ export default function ExportDataCard() {
       const { from, to } = buildRange(mode, state)
 
       if (from > to) {
-        setError('La fecha de inicio no puede ser posterior a la final.')
+        setError(t('exportData.errorDateRange'))
         setLoading(false)
         return
       }
@@ -108,15 +112,15 @@ export default function ExportDataCard() {
 
       if (err) throw err
       if (!data || data.length === 0) {
-        setError('No hay datos en el rango seleccionado.')
+        setError(t('exportData.errorNoData'))
         setLoading(false)
         return
       }
 
-      const csv = toCsv(data)
+      const csv = toCsv(data, t)
       downloadCsv(csv, `finanzor_${from}_${to}.csv`)
     } catch (e) {
-      setError('Error al exportar. Inténtalo de nuevo.')
+      setError(t('exportData.errorGeneric'))
     } finally {
       setLoading(false)
     }
@@ -126,15 +130,15 @@ export default function ExportDataCard() {
     <div className="rounded-xl bg-bg-elevated p-4 space-y-4">
       <div className="flex items-center gap-2">
         <Download size={16} className="text-white/60" />
-        <span className="text-sm font-medium text-white">Exportar datos</span>
+        <span className="text-sm font-medium text-white">{t('exportData.title')}</span>
       </div>
 
       {/* Selector de modo */}
       <div className="flex rounded-lg bg-white/5 p-0.5">
         {[
-          { id: 'dias', label: 'Días' },
-          { id: 'meses', label: 'Meses' },
-          { id: 'año', label: 'Año' },
+          { id: 'dias', label: t('exportData.modeLabels.days') },
+          { id: 'meses', label: t('exportData.modeLabels.months') },
+          { id: 'año', label: t('exportData.modeLabels.year') },
         ].map(({ id, label }) => (
           <button
             key={id}
@@ -155,7 +159,7 @@ export default function ExportDataCard() {
       {mode === 'dias' && (
         <div className="grid grid-cols-2 gap-2">
           <label className="space-y-1">
-            <span className="text-xs text-white/50">Desde</span>
+            <span className="text-xs text-white/50">{t('exportData.from')}</span>
             <input
               type="date"
               value={state.dateFrom}
@@ -164,7 +168,7 @@ export default function ExportDataCard() {
             />
           </label>
           <label className="space-y-1">
-            <span className="text-xs text-white/50">Hasta</span>
+            <span className="text-xs text-white/50">{t('exportData.to')}</span>
             <input
               type="date"
               value={state.dateTo}
@@ -178,7 +182,7 @@ export default function ExportDataCard() {
       {mode === 'meses' && (
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <span className="text-xs text-white/50">Desde</span>
+            <span className="text-xs text-white/50">{t('exportData.from')}</span>
             <select
               value={state.monthFrom}
               onChange={(e) => set('monthFrom', Number(e.target.value))}
@@ -199,7 +203,7 @@ export default function ExportDataCard() {
             </select>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-white/50">Hasta</span>
+            <span className="text-xs text-white/50">{t('exportData.to')}</span>
             <select
               value={state.monthTo}
               onChange={(e) => set('monthTo', Number(e.target.value))}
@@ -224,7 +228,7 @@ export default function ExportDataCard() {
 
       {mode === 'año' && (
         <div className="space-y-1">
-          <span className="text-xs text-white/50">Año</span>
+          <span className="text-xs text-white/50">{t('exportData.year')}</span>
           <select
             value={state.year}
             onChange={(e) => set('year', Number(e.target.value))}
@@ -252,7 +256,7 @@ export default function ExportDataCard() {
         ) : (
           <Download size={15} />
         )}
-        {loading ? 'Exportando…' : 'Exportar CSV'}
+        {loading ? t('exportData.exporting') : t('exportData.exportButton')}
       </button>
     </div>
   )

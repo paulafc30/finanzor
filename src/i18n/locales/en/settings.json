@@ -1,0 +1,82 @@
+{
+  "title": "Settings",
+  "loggedInAs": "Signed in as",
+  "manageCategories": "Manage categories",
+  "importCsv": "Import from CSV",
+  "feedback": "Feedback & issues",
+  "privacyPolicy": "Privacy policy",
+  "viewTutorial": "View app tutorial",
+  "logout": "Log out",
+  "alertThresholdSoon": "Coming soon: alert threshold.",
+  "madeWith": "Made with ♥ by",
+  "language": {
+    "title": "Language",
+    "activeEs": "Español activo",
+    "activeEn": "English active"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "darkActive": "Dark mode active",
+    "lightActive": "Light mode active",
+    "ariaLabel": "Light or dark theme",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "deleteAccount": {
+    "title": "Delete account",
+    "description": "Deletes all your transactions, categories, budgets, goals, and recurring expenses/income. This action cannot be undone.",
+    "button": "Delete account",
+    "confirmTitle": "Are you sure you want to delete your account?",
+    "warningBefore": "This will delete",
+    "warningAll": "all",
+    "warningAfter": "your data: transactions, categories, budgets, goals, contributions, recurring expenses and income, and also your login account (email/Google). You won't be able to sign in with this account again. This action cannot be undone.",
+    "typeToConfirmBefore": "Type",
+    "confirmWord": "DELETE",
+    "typeToConfirmAfter": "to confirm",
+    "cancel": "Cancel",
+    "confirmButton": "Delete everything",
+    "deleting": "Deleting…",
+    "errorFallback": "Couldn't delete the account"
+  },
+  "exportData": {
+    "title": "Export data",
+    "modeLabels": {
+      "days": "Days",
+      "months": "Months",
+      "year": "Year"
+    },
+    "from": "From",
+    "to": "To",
+    "year": "Year",
+    "errorDateRange": "The start date cannot be after the end date.",
+    "errorNoData": "There is no data in the selected range.",
+    "errorGeneric": "Export error. Please try again.",
+    "exporting": "Exporting…",
+    "exportButton": "Export CSV",
+    "months": [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ],
+    "csvHeaders": {
+      "date": "Date",
+      "type": "Type",
+      "amount": "Amount",
+      "category": "Category",
+      "description": "Description"
+    },
+    "typeIncome": "Income",
+    "typeExpense": "Expense"
+  },
+  "notifications": {
+    "title": "Daily reminder",
+    "active": "Notifications on",
+    "inactive": "Notifications off",
+    "unsupported": "This browser doesn't support push notifications. Try an updated Chrome or Firefox, or install the app on your home screen.",
+    "notConfigured": "OneSignal needs to be configured (VITE_ONESIGNAL_APP_ID in .env and Vercel).",
+    "descriptionBefore": "We'll remind you every day at",
+    "descriptionTime": "10:00 PM",
+    "descriptionAfter": "to log your expenses for the day.",
+    "disable": "Disable",
+    "enable": "Enable daily reminder"
+  }
+}

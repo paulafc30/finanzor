@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Info, X, Plus, CalendarRange } from 'lucide-react'
 import Button from '../components/ui/Button.jsx'
 import Modal from '../components/ui/Modal.jsx'
@@ -15,9 +16,9 @@ import {
   useRecurringExpenses,
 } from '../hooks/useRecurringExpenses.js'
 import { useMonth } from '../hooks/useMonth.jsx'
-import { formatEuro } from '../lib/formatters.js'
 
 export default function Budget() {
+  const { t } = useTranslation('budget')
   const { rows, isLoading, error } = useBudgetSummary()
   const copyMutation = useCopyBudgetsFromPreviousMonth()
   const materialize = useMaterializeRecurring()
@@ -89,19 +90,17 @@ export default function Budget() {
   if (isYearView) {
     return (
       <section className="space-y-4">
-        <h1 className="text-xl font-semibold">Presupuesto</h1>
+        <h1 className="text-xl font-semibold">{t('title')}</h1>
         <div className="rounded-xl bg-bg-elevated p-8 text-center ring-1 ring-white/5">
           <CalendarRange size={32} className="mx-auto mb-3 text-white/40" />
-          <p className="text-white">Los presupuestos se definen por mes.</p>
-          <p className="mt-1 text-sm text-white/60">
-            Cambia la vista a "Mes" para gestionar los límites de un mes concreto.
-          </p>
+          <p className="text-white">{t('yearView.notice')}</p>
+          <p className="mt-1 text-sm text-white/60">{t('yearView.hint')}</p>
           <button
             type="button"
             onClick={() => setViewMode('month')}
             className="mt-4 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90"
           >
-            Cambiar a vista mensual
+            {t('yearView.switchButton')}
           </button>
         </div>
       </section>
@@ -119,7 +118,7 @@ export default function Budget() {
   if (error) {
     return (
       <p className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
-        Error: {error.message}
+        {t('errorPrefix')}{error.message}
       </p>
     )
   }
@@ -128,19 +127,16 @@ export default function Budget() {
 
   return (
     <section className="space-y-6">
-      <h1 className="text-xl font-semibold">Presupuesto</h1>
+      <h1 className="text-xl font-semibold">{t('title')}</h1>
 
       {justCopied && (
         <div className="flex items-start gap-2 rounded-xl bg-accent/10 p-3 text-sm text-white ring-1 ring-accent/20">
           <Info size={16} className="mt-0.5 shrink-0 text-accent" />
-          <p className="flex-1">
-            Se ha copiado el presupuesto del mes anterior. Ajusta los importes que
-            necesites tocando cada límite.
-          </p>
+          <p className="flex-1">{t('copiedNotice')}</p>
           <button
             type="button"
             onClick={() => setJustCopied(false)}
-            aria-label="Descartar aviso"
+            aria-label={t('dismissNotice')}
             className="rounded-md p-0.5 text-white/60 hover:bg-white/5 hover:text-white"
           >
             <X size={14} />
@@ -151,13 +147,13 @@ export default function Budget() {
       {/* === Sección: Gastos fijos recurrentes === */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-white">Gastos fijos</h2>
+          <h2 className="text-base font-semibold text-white">{t('fixedExpenses.title')}</h2>
           <Button
             size="sm"
             onClick={() => setRecurringEdit({ __new: true, type: 'expense' })}
           >
             <Plus size={16} />
-            Nuevo
+            {t('fixedExpenses.new')}
           </Button>
         </div>
 
@@ -166,31 +162,14 @@ export default function Budget() {
         <details className="rounded-xl bg-bg-elevated/50 p-3 text-xs text-white/60 [&>summary]:cursor-pointer [&[open]>summary]:mb-2">
           <summary className="flex items-center gap-1.5 text-white/70 hover:text-white">
             <Info size={13} />
-            Cómo funcionan los gastos fijos
+            {t('fixedExpenses.howItWorks')}
           </summary>
           <ul className="ml-1 list-disc space-y-1 pl-4">
-            <li>
-              Al entrar a un mes, los activos se crean como movimientos
-              automáticamente con el día y categoría que les hayas puesto.
-            </li>
-            <li>
-              <strong>Si añades uno hoy</strong>, se genera al instante también
-              en el mes que estés viendo, aunque el día ya hubiera pasado.
-            </li>
-            <li>
-              <strong>Desactivar</strong> pausa sin borrar: deja de generarse en
-              meses futuros, pero los movimientos pasados se mantienen.
-            </li>
-            <li>
-              <strong>Editar</strong> (importe, día…) solo afecta a meses futuros
-              aún no generados. Para ajustar el de un mes concreto, edita el
-              movimiento directamente.
-            </li>
-            <li>
-              <strong>Eliminar</strong> el gasto fijo borra los movimientos
-              futuros que aún no han ocurrido. Los pasados se mantienen para
-              no falsear el histórico.
-            </li>
+            <li>{t('fixedExpenses.item1')}</li>
+            <li dangerouslySetInnerHTML={{ __html: t('fixedExpenses.item2') }} />
+            <li dangerouslySetInnerHTML={{ __html: t('fixedExpenses.item3') }} />
+            <li dangerouslySetInnerHTML={{ __html: t('fixedExpenses.item4') }} />
+            <li dangerouslySetInnerHTML={{ __html: t('fixedExpenses.item5') }} />
           </ul>
         </details>
       </div>
@@ -198,38 +177,32 @@ export default function Budget() {
       {/* === Sección: Ingresos fijos recurrentes === */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-white">Ingresos fijos</h2>
+          <h2 className="text-base font-semibold text-white">{t('fixedIncome.title')}</h2>
           <Button
             size="sm"
             onClick={() => setRecurringEdit({ __new: true, type: 'income' })}
           >
             <Plus size={16} />
-            Nuevo
+            {t('fixedIncome.new')}
           </Button>
         </div>
 
         <RecurringList type="income" onEdit={(r) => setRecurringEdit(r)} />
 
-        <p className="px-1 text-xs text-white/40">
-          Igual que los gastos fijos, pero positivos: nómina, alquiler que cobras,
-          una mensualidad… Se materializan automáticamente cada mes y se contabilizan
-          como ingreso en las estadísticas.
-        </p>
+        <p className="px-1 text-xs text-white/40">{t('fixedIncome.hint')}</p>
       </div>
 
       {/* === Sección: Presupuestos por categoría === */}
       <div className="space-y-3">
-        <h2 className="text-base font-semibold text-white">Presupuestos por categoría</h2>
+        <h2 className="text-base font-semibold text-white">{t('byCategory.title')}</h2>
 
         {/* Barra resumen del presupuesto del mes (movida desde el Dashboard) */}
         {hasAnyBudget && <MonthBudgetBar />}
 
         {!hasAnyBudget && !copyMutation.isPending && (
           <div className="rounded-xl bg-bg-elevated p-6 text-center">
-            <p className="text-white">Aún no has definido presupuestos.</p>
-            <p className="mt-1 text-sm text-white/60">
-              Pulsa "Sin límite" en cualquier categoría para fijar uno.
-            </p>
+            <p className="text-white">{t('byCategory.emptyTitle')}</p>
+            <p className="mt-1 text-sm text-white/60">{t('byCategory.emptyHint')}</p>
           </div>
         )}
 
@@ -242,31 +215,14 @@ export default function Budget() {
         <details className="rounded-xl bg-bg-elevated/50 p-3 text-xs text-white/60 [&>summary]:cursor-pointer [&[open]>summary]:mb-2">
           <summary className="flex items-center gap-1.5 text-white/70 hover:text-white">
             <Info size={13} />
-            Cómo funcionan los presupuestos
+            {t('byCategory.howItWorks')}
           </summary>
           <ul className="ml-1 list-disc space-y-1 pl-4">
-            <li>
-              Cada presupuesto vive <strong>en un mes concreto</strong>. Si en
-              marzo subes el de Alimentación a 500 €, abril sigue con su valor
-              propio, no se cambian todos los meses a la vez.
-            </li>
-            <li>
-              Al entrar a un mes nuevo sin presupuestos, copiamos los del mes
-              anterior <strong>una sola vez</strong> para que no empieces de
-              cero cada vez.
-            </li>
-            <li>
-              Click en el importe del límite para editarlo. Pon <strong>0</strong>
-              para quitar el presupuesto de esa categoría ese mes.
-            </li>
-            <li>
-              El gasto que cuenta se filtra por la fecha real del movimiento
-              (<em>occurred_on</em>), no por cuándo lo apuntaste.
-            </li>
-            <li>
-              Estados de la barra: hasta el 70 % verde, 70-90 % naranja, a partir
-              del 90 % rojo.
-            </li>
+            <li dangerouslySetInnerHTML={{ __html: t('byCategory.item1') }} />
+            <li dangerouslySetInnerHTML={{ __html: t('byCategory.item2') }} />
+            <li dangerouslySetInnerHTML={{ __html: t('byCategory.item3') }} />
+            <li dangerouslySetInnerHTML={{ __html: t('byCategory.item4') }} />
+            <li>{t('byCategory.item5')}</li>
           </ul>
         </details>
       </div>
@@ -277,11 +233,11 @@ export default function Budget() {
         title={
           isNewRecurring
             ? newRecurringType === 'income'
-              ? 'Nuevo ingreso fijo'
-              : 'Nuevo gasto fijo'
+              ? t('recurringModal.newIncome')
+              : t('recurringModal.newExpense')
             : recurringToEdit?.type === 'income'
-            ? 'Editar ingreso fijo'
-            : 'Editar gasto fijo'
+            ? t('recurringModal.editIncome')
+            : t('recurringModal.editExpense')
         }
       >
         <RecurringForm

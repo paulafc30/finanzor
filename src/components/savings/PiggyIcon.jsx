@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 /**
  * Cerdito de ahorros estilo outline, mirando hacia la derecha.
  *
@@ -19,6 +21,7 @@ export default function PiggyIcon({
   className = '',
   ...rest
 }) {
+  const { t } = useTranslation('savings')
   const hasContent = amount != null || label != null
   // Grosor proporcional: más fino a tamaño grande para que no quede tosco.
   const strokeWidth = size >= 120 ? 2 : 2.8
@@ -37,7 +40,7 @@ export default function PiggyIcon({
       className={className}
       role="img"
       aria-label={
-        amount != null ? `Cerdito con ${amount}` : 'Cerdito de ahorros'
+        amount != null ? t('piggyWithAmount', { amount }) : t('piggyAlt')
       }
       {...rest}
     >

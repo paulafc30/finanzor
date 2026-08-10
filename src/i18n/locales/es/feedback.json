@@ -1,0 +1,33 @@
+{
+  "title": "Sugerencias y fallos",
+  "backAria": "Volver a ajustes",
+  "successTitle": "¡Gracias por tu mensaje!",
+  "successBody": "Lo hemos recibido y lo revisaremos pronto. Si dejaste tu email de contacto, te responderemos por ahí.",
+  "savedTitle": "Mensaje guardado",
+  "savedBody": "Tu feedback se ha guardado correctamente, pero no hemos podido enviarlo por email. El equipo lo verá igualmente cuando revise el historial. Si quieres asegurar que llegue, puedes copiarlo y enviarlo manualmente:",
+  "technicalDetail": "Detalle técnico: {{error}}",
+  "sendAnother": "Enviar otro",
+  "backHome": "Volver a Inicio",
+  "intro": "¿Has detectado un fallo o se te ocurre una mejora? Cuéntamelo. Lo guardamos y se envía automáticamente al correo del equipo.",
+  "typeLabel": "Tipo",
+  "typeSuggestion": "Sugerencia",
+  "typeBug": "Fallo / Bug",
+  "typeOther": "Otro",
+  "messageLabel": "Mensaje",
+  "placeholderBug": "Describe qué ocurre, en qué pantalla y qué esperabas que pasara…",
+  "placeholderSuggestion": "¿Qué te gustaría que tuviera Finanzor o cómo lo mejorarías?",
+  "placeholderOther": "Cuéntanos lo que necesites…",
+  "minMaxHint": "Mínimo unas líneas. Máximo 2000 caracteres.",
+  "emailLabel": "Email para responderte (opcional)",
+  "emailPlaceholder": "tu@email.com",
+  "emailHint": "Por defecto usaremos el email con el que iniciaste sesión.",
+  "sending": "Enviando…",
+  "submit": "Enviar feedback",
+  "errorFallback": "No se pudo enviar",
+  "errors": {
+    "messageRequired": "El mensaje es obligatorio",
+    "invalidType": "Tipo inválido",
+    "web3formsNotConfigured": "No hay VITE_WEB3FORMS_KEY configurada",
+    "networkError": "Error de red"
+  }
+}

@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next'
 import { Trash2, ArrowDownCircle, ArrowUpCircle } from 'lucide-react'
-import { formatEuro, formatDate } from '../../lib/formatters.js'
 
 /**
  * Tabla editable con los movimientos a importar.
@@ -10,6 +10,8 @@ import { formatEuro, formatDate } from '../../lib/formatters.js'
  * Llama a onChange(transactions) con la nueva lista cada vez que algo cambia.
  */
 export default function ImportPreviewTable({ items, categories, onChange }) {
+  const { t } = useTranslation('import')
+
   function update(id, patch) {
     onChange(items.map((it) => (it._id === id ? { ...it, ...patch } : it)))
   }
@@ -21,7 +23,7 @@ export default function ImportPreviewTable({ items, categories, onChange }) {
   if (items.length === 0) {
     return (
       <div className="rounded-xl bg-bg-elevated p-6 text-center text-sm text-white/60 ring-1 ring-white/5">
-        No quedan movimientos. Sube otro CSV o ajusta el mapeo de columnas.
+        {t('preview.empty')}
       </div>
     )
   }
@@ -48,17 +50,17 @@ export default function ImportPreviewTable({ items, categories, onChange }) {
                     ? 'bg-danger/15 text-danger hover:bg-danger/25'
                     : 'bg-success/15 text-success hover:bg-success/25',
                 ].join(' ')}
-                title="Click para cambiar gasto/ingreso"
+                title={t('preview.toggleTypeTitle')}
               >
                 {isExpense ? (
                   <>
                     <ArrowDownCircle size={12} />
-                    Gasto
+                    {t('preview.expense')}
                   </>
                 ) : (
                   <>
                     <ArrowUpCircle size={12} />
-                    Ingreso
+                    {t('preview.income')}
                   </>
                 )}
               </button>
@@ -86,7 +88,7 @@ export default function ImportPreviewTable({ items, categories, onChange }) {
               <button
                 type="button"
                 onClick={() => remove(it._id)}
-                aria-label="Eliminar fila"
+                aria-label={t('preview.removeRowAria')}
                 className="rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-danger"
               >
                 <Trash2 size={14} />
@@ -99,7 +101,7 @@ export default function ImportPreviewTable({ items, categories, onChange }) {
                 type="text"
                 value={it.description ?? ''}
                 onChange={(e) => update(it._id, { description: e.target.value })}
-                placeholder="Descripción"
+                placeholder={t('preview.descriptionPlaceholder')}
                 className="flex-1 rounded-md bg-bg-card px-2.5 py-1.5 text-sm text-white outline-none ring-1 ring-white/5 focus:ring-accent"
               />
               <select
@@ -107,7 +109,7 @@ export default function ImportPreviewTable({ items, categories, onChange }) {
                 onChange={(e) => update(it._id, { category_id: e.target.value })}
                 className="rounded-md bg-bg-card px-2.5 py-1.5 text-sm text-white outline-none ring-1 ring-white/5 focus:ring-accent sm:w-44"
               >
-                <option value="">Sin categoría</option>
+                <option value="">{t('preview.noCategory')}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -120,8 +122,7 @@ export default function ImportPreviewTable({ items, categories, onChange }) {
       })}
 
       <p className="px-1 text-xs text-white/40">
-        Click en "Gasto" / "Ingreso" para cambiar el tipo. Edita cualquier campo
-        directamente. Pulsa la papelera para descartar una fila.
+        {t('preview.hint')}
       </p>
     </div>
   )

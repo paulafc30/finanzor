@@ -1,5 +1,6 @@
 import { Wallet } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useBudgetSummary } from '../../hooks/useBudgets.js'
 import { formatEuro } from '../../lib/formatters.js'
 
@@ -10,6 +11,7 @@ import { formatEuro } from '../../lib/formatters.js'
  * Se oculta si no hay ningún presupuesto definido.
  */
 export default function MonthBudgetBar() {
+  const { t } = useTranslation('dashboard')
   const { rows, isLoading } = useBudgetSummary()
 
   if (isLoading) return null
@@ -51,7 +53,7 @@ export default function MonthBudgetBar() {
         <div className="flex min-w-0 items-center gap-2">
           <Wallet size={16} className="shrink-0 text-info" />
           <span className="truncate text-sm font-semibold text-white">
-            Presupuesto del mes
+            {t('budgetBar.title')}
           </span>
         </div>
         <span
@@ -76,10 +78,10 @@ export default function MonthBudgetBar() {
 
       <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 text-xs">
         <span className="text-white/50">
-          Gastado: <span className="font-medium text-white tabular-nums">{formatEuro(totalSpent)}</span>
+          {t('budgetBar.spent')}<span className="font-medium text-white tabular-nums">{formatEuro(totalSpent)}</span>
         </span>
         <span className="text-white/50">
-          {remaining >= 0 ? 'Disponible' : 'Excedido'}:{' '}
+          {remaining >= 0 ? t('budgetBar.available') : t('budgetBar.exceeded')}:{' '}
           <span className={`font-medium tabular-nums ${remaining >= 0 ? 'text-white' : 'text-danger'}`}>
             {formatEuro(Math.abs(remaining))}
           </span>

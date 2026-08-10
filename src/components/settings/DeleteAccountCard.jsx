@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 import Modal from '../ui/Modal.jsx'
 import Button from '../ui/Button.jsx'
@@ -17,12 +18,14 @@ import { useDeleteAccount } from '../../hooks/useDeleteAccount.js'
  * email/Google despues de esto.
  */
 export default function DeleteAccountCard() {
+  const { t } = useTranslation('settings')
   const [open, setOpen] = useState(false)
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState(null)
   const del = useDeleteAccount()
 
-  const canConfirm = confirm.trim().toUpperCase() === 'BORRAR'
+  const confirmWord = t('deleteAccount.confirmWord')
+  const canConfirm = confirm.trim().toUpperCase() === confirmWord.toUpperCase()
 
   async function handleDelete() {
     if (!canConfirm) return
@@ -32,7 +35,7 @@ export default function DeleteAccountCard() {
       // No hace falta cerrar el modal: signOut desmonta toda la app y
       // RequireAuth redirige a /login.
     } catch (err) {
-      setError(err.message ?? 'No se pudo eliminar la cuenta')
+      setError(err.message ?? t('deleteAccount.errorFallback'))
     }
   }
 
@@ -52,11 +55,10 @@ export default function DeleteAccountCard() {
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="text-sm font-semibold text-white">
-              Eliminar cuenta
+              {t('deleteAccount.title')}
             </h3>
             <p className="text-[11px] text-white/60">
-              Borra todos tus movimientos, categorías, presupuestos, metas y
-              gastos/ingresos fijos. Esta acción no se puede deshacer.
+              {t('deleteAccount.description')}
             </p>
           </div>
         </div>
@@ -67,30 +69,29 @@ export default function DeleteAccountCard() {
           className="mt-2 inline-flex items-center gap-2 rounded-lg bg-danger px-3 py-2 text-sm font-medium text-white hover:bg-danger/90"
         >
           <Trash2 size={14} />
-          Eliminar cuenta
+          {t('deleteAccount.button')}
         </button>
       </div>
 
       <Modal
         open={open}
         onClose={handleClose}
-        title="¿Seguro que quieres eliminar tu cuenta?"
+        title={t('deleteAccount.confirmTitle')}
       >
         <div className="space-y-4">
           <div className="flex items-start gap-2 rounded-lg bg-danger/10 p-3 text-xs text-white/80 ring-1 ring-danger/20">
             <AlertTriangle size={14} className="mt-0.5 shrink-0 text-danger" />
             <p>
-              Se eliminarán <strong>todos</strong> tus datos: movimientos,
-              categorías, presupuestos, metas, aportaciones, gastos fijos e
-              ingresos fijos, y también tu cuenta de acceso (email/Google).
-              No podrás volver a iniciar sesión con esta cuenta. Esta acción
-              no se puede deshacer.
+              {t('deleteAccount.warningBefore')} <strong>{t('deleteAccount.warningAll')}</strong>{' '}
+              {t('deleteAccount.warningAfter')}
             </p>
           </div>
 
           <div>
             <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-              Escribe <span className="font-semibold text-danger">BORRAR</span> para confirmar
+              {t('deleteAccount.typeToConfirmBefore')}{' '}
+              <span className="font-semibold text-danger">{confirmWord}</span>{' '}
+              {t('deleteAccount.typeToConfirmAfter')}
             </label>
             <input
               type="text"
@@ -99,7 +100,7 @@ export default function DeleteAccountCard() {
               spellCheck={false}
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              placeholder="BORRAR"
+              placeholder={confirmWord}
               disabled={del.isPending}
               className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-danger disabled:opacity-50"
             />
@@ -119,7 +120,7 @@ export default function DeleteAccountCard() {
               onClick={handleClose}
               disabled={del.isPending}
             >
-              Cancelar
+              {t('deleteAccount.cancel')}
             </Button>
             <Button
               type="button"
@@ -128,7 +129,7 @@ export default function DeleteAccountCard() {
               onClick={handleDelete}
               disabled={!canConfirm || del.isPending}
             >
-              {del.isPending ? 'Eliminando…' : 'Eliminar todo'}
+              {del.isPending ? t('deleteAccount.deleting') : t('deleteAccount.confirmButton')}
             </Button>
           </div>
         </div>

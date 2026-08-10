@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ArrowLeft, AlertTriangle, CheckCircle2, Upload as UploadIcon } from 'lucide-react'
 import Button from '../components/ui/Button.jsx'
 import FileUploader from '../components/import/FileUploader.jsx'
@@ -24,6 +25,7 @@ import { formatEuro } from '../lib/formatters.js'
  *  - 'done'    → importación completada
  */
 export default function ImportPage() {
+  const { t } = useTranslation('import')
   const { data: categories = [] } = useCategories()
   const importMutation = useBulkImportTransactions()
 
@@ -68,10 +70,10 @@ export default function ImportPage() {
     try {
       const parsed = await parseCsvFile(file)
       if (!parsed.headers || parsed.headers.length === 0) {
-        throw new Error('No se han detectado columnas. ¿El archivo tiene cabeceras?')
+        throw new Error(t('errors.noColumnsDetected'))
       }
       if (parsed.rows.length === 0) {
-        throw new Error('El archivo no contiene filas de datos.')
+        throw new Error(t('errors.noDataRows'))
       }
 
       const detected = detectColumns(parsed.headers, parsed.rows)
@@ -92,7 +94,7 @@ export default function ImportPage() {
       setItems(initialItems)
       setStep('mapping')
     } catch (err) {
-      setError(err.message ?? 'Error al leer el archivo')
+      setError(err.message ?? t('errors.readError'))
     }
   }
 
@@ -117,7 +119,7 @@ export default function ImportPage() {
       setImportedCount(res?.inserted ?? 0)
       setStep('done')
     } catch (err) {
-      setError(err.message ?? 'No se pudo importar')
+      setError(err.message ?? t('errors.importFailed'))
     }
   }
 
@@ -148,20 +150,17 @@ export default function ImportPage() {
         <Link
           to="/ajustes"
           className="rounded-full p-1.5 text-white/60 hover:bg-white/5 hover:text-white"
-          aria-label="Volver a ajustes"
+          aria-label={t('backToSettingsAria')}
         >
           <ArrowLeft size={20} />
         </Link>
-        <h1 className="text-xl font-semibold">Importar movimientos</h1>
+        <h1 className="text-xl font-semibold">{t('title')}</h1>
       </div>
 
       {step === 'upload' && (
         <>
           <p className="text-sm text-white/60">
-            Sube un CSV con tus movimientos bancarios. Detectamos automáticamente
-            las columnas y categorizamos los gastos según el comercio (Mercadona →
-            Comida, Repsol → Transporte, etc.). Antes de importar nada, revisas y
-            editas todo lo que quieras.
+            {t('upload.intro')}
           </p>
 
           <FileUploader onFile={handleFile} />
@@ -180,19 +179,19 @@ export default function ImportPage() {
           {/* Resumen totales */}
           <div className="grid grid-cols-3 gap-2 rounded-xl bg-bg-elevated p-3 text-center text-xs ring-1 ring-white/5">
             <div>
-              <p className="text-white/50">Filas</p>
+              <p className="text-white/50">{t('mapping.rows')}</p>
               <p className="mt-0.5 font-semibold text-white tabular-nums">
                 {totals.count}
               </p>
             </div>
             <div>
-              <p className="text-white/50">Ingresos</p>
+              <p className="text-white/50">{t('mapping.income')}</p>
               <p className="mt-0.5 font-semibold text-success tabular-nums">
                 {formatEuro(totals.income)}
               </p>
             </div>
             <div>
-              <p className="text-white/50">Gastos</p>
+              <p className="text-white/50">{t('mapping.expense')}</p>
               <p className="mt-0.5 font-semibold text-danger tabular-nums">
                 {formatEuro(totals.expense)}
               </p>
@@ -210,8 +209,8 @@ export default function ImportPage() {
             <div className="flex items-start gap-2 rounded-xl bg-warning/10 p-3 text-sm text-white ring-1 ring-warning/20">
               <AlertTriangle size={16} className="mt-0.5 shrink-0 text-warning" />
               <p className="flex-1">
-                Necesitas asignar la columna de <strong>Fecha</strong> y al menos
-                una columna de importe (Importe, o Haber/Debe) para continuar.
+                {t('mapping.validationWarningPrefix')} <strong>{t('mapping.validationWarningField')}</strong>{' '}
+                {t('mapping.validationWarningSuffix')}
               </p>
             </div>
           )}
@@ -221,7 +220,7 @@ export default function ImportPage() {
             <>
               <div>
                 <h2 className="mb-2 text-sm font-semibold text-white">
-                  Revisa y edita antes de importar
+                  {t('mapping.reviewTitle')}
                 </h2>
                 <ImportPreviewTable
                   items={items}
@@ -244,7 +243,7 @@ export default function ImportPage() {
                   disabled={importMutation.isPending}
                   className="flex-1"
                 >
-                  Cancelar
+                  {t('mapping.cancel')}
                 </Button>
                 <Button
                   onClick={handleImport}
@@ -253,8 +252,8 @@ export default function ImportPage() {
                 >
                   <UploadIcon size={16} />
                   {importMutation.isPending
-                    ? 'Importando…'
-                    : `Importar ${items.length} movimientos`}
+                    ? t('mapping.importing')
+                    : t('mapping.importCount', { count: items.length })}
                 </Button>
               </div>
             </>
@@ -268,18 +267,17 @@ export default function ImportPage() {
             <CheckCircle2 size={32} className="text-success" />
           </div>
           <h2 className="text-lg font-semibold text-white">
-            ¡Importación completada!
+            {t('done.title')}
           </h2>
           <p className="text-sm text-white/70">
-            Se han añadido <strong>{importedCount}</strong> movimientos a tu cuenta.
-            Repártense por sus fechas reales en el calendario.
+            {t('done.messagePrefix')} <strong>{importedCount}</strong> {t('done.messageSuffix')}
           </p>
           <div className="mt-2 flex gap-2">
             <Button variant="secondary" onClick={reset}>
-              Importar otro CSV
+              {t('done.importAnother')}
             </Button>
             <Link to="/">
-              <Button>Ver Inicio</Button>
+              <Button>{t('done.viewHome')}</Button>
             </Link>
           </div>
         </div>

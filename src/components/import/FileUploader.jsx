@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Upload, FileText } from 'lucide-react'
 import Button from '../ui/Button.jsx'
 
@@ -7,6 +8,7 @@ import Button from '../ui/Button.jsx'
  * Llama a onFile(file) cuando el usuario selecciona uno.
  */
 export default function FileUploader({ onFile, disabled }) {
+  const { t } = useTranslation('import')
   const inputRef = useRef(null)
   const [dragOver, setDragOver] = useState(false)
 
@@ -42,10 +44,10 @@ export default function FileUploader({ onFile, disabled }) {
 
       <div>
         <p className="text-sm font-medium text-white">
-          Arrastra tu CSV aquí o pulsa para elegir
+          {t('uploader.dropText')}
         </p>
         <p className="mt-1 text-xs text-white/50">
-          Tu banco lo exporta normalmente desde "Movimientos → Exportar"
+          {t('uploader.hint')}
         </p>
       </div>
 
@@ -56,7 +58,7 @@ export default function FileUploader({ onFile, disabled }) {
         disabled={disabled}
       >
         <FileText size={14} />
-        Seleccionar archivo
+        {t('uploader.selectFile')}
       </Button>
 
       <input

@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ChevronRight, Tags, LogOut, Upload, MessageCircle, BookOpen, Shield } from 'lucide-react'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from '../hooks/useSession.js'
 import { useOnboarding } from '../hooks/useOnboarding.jsx'
 import ThemeToggle from '../components/settings/ThemeToggle.jsx'
+import LanguageToggle from '../components/settings/LanguageToggle.jsx'
 import DeleteAccountCard from '../components/settings/DeleteAccountCard.jsx'
 import ExportDataCard from '../components/settings/ExportDataCard.jsx'
 // Recordatorio diario oculto temporalmente hasta configurar OneSignal.
@@ -12,6 +14,7 @@ import ExportDataCard from '../components/settings/ExportDataCard.jsx'
 // import NotificationsToggle from '../components/settings/NotificationsToggle.jsx'
 
 export default function Settings() {
+  const { t } = useTranslation('settings')
   const { user } = useSession()
   const { replay: replayOnboarding } = useOnboarding()
 
@@ -21,16 +24,18 @@ export default function Settings() {
 
   return (
     <section className="space-y-4">
-      <h1 className="text-xl font-semibold">Ajustes</h1>
+      <h1 className="text-xl font-semibold">{t('title')}</h1>
 
       <div className="rounded-xl bg-bg-elevated p-4 text-sm">
-        <p className="text-white/60">Sesión iniciada como</p>
+        <p className="text-white/60">{t('loggedInAs')}</p>
         <p className="text-white">{user?.email ?? '—'}</p>
       </div>
 
       {/* <NotificationsToggle />  Oculto hasta configurar OneSignal */}
 
       <ThemeToggle />
+
+      <LanguageToggle />
 
       <ul className="overflow-hidden rounded-xl bg-bg-elevated">
         <li>
@@ -39,7 +44,7 @@ export default function Settings() {
             className="flex items-center gap-3 px-4 py-3 hover:bg-white/5"
           >
             <Tags size={18} className="text-white/60" />
-            <span className="flex-1 text-sm text-white">Gestionar categorías</span>
+            <span className="flex-1 text-sm text-white">{t('manageCategories')}</span>
             <ChevronRight size={16} className="text-white/40" />
           </Link>
         </li>
@@ -49,7 +54,7 @@ export default function Settings() {
             className="flex items-center gap-3 px-4 py-3 hover:bg-white/5"
           >
             <Upload size={18} className="text-white/60" />
-            <span className="flex-1 text-sm text-white">Importar desde CSV</span>
+            <span className="flex-1 text-sm text-white">{t('importCsv')}</span>
             <ChevronRight size={16} className="text-white/40" />
           </Link>
         </li>
@@ -59,7 +64,7 @@ export default function Settings() {
             className="flex items-center gap-3 px-4 py-3 hover:bg-white/5"
           >
             <MessageCircle size={18} className="text-white/60" />
-            <span className="flex-1 text-sm text-white">Sugerencias y fallos</span>
+            <span className="flex-1 text-sm text-white">{t('feedback')}</span>
             <ChevronRight size={16} className="text-white/40" />
           </Link>
         </li>
@@ -71,7 +76,7 @@ export default function Settings() {
             className="flex items-center gap-3 px-4 py-3 hover:bg-white/5"
           >
             <Shield size={18} className="text-white/60" />
-            <span className="flex-1 text-sm text-white">Política de privacidad</span>
+            <span className="flex-1 text-sm text-white">{t('privacyPolicy')}</span>
             <ChevronRight size={16} className="text-white/40" />
           </a>
         </li>
@@ -82,7 +87,7 @@ export default function Settings() {
             className="flex w-full items-center gap-3 px-4 py-3 hover:bg-white/5"
           >
             <BookOpen size={18} className="text-white/60" />
-            <span className="flex-1 text-left text-sm text-white">Ver tutorial de la app</span>
+            <span className="flex-1 text-left text-sm text-white">{t('viewTutorial')}</span>
             <ChevronRight size={16} className="text-white/40" />
           </button>
         </li>
@@ -94,7 +99,7 @@ export default function Settings() {
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-bg-elevated px-4 py-3 text-sm text-white hover:bg-bg-card"
       >
         <LogOut size={16} />
-        Cerrar sesión
+        {t('logout')}
       </button>
 
       <ExportDataCard />
@@ -102,11 +107,11 @@ export default function Settings() {
       <DeleteAccountCard />
 
       <p className="px-1 text-xs text-white/40">
-        Próximamente: umbral de alertas.
+        {t('alertThresholdSoon')}
       </p>
 
       <p className="pb-2 text-center text-xs text-white/25">
-        Hecho con ♥ por <span className="font-semibold tracking-wide">Ferava</span>
+        {t('madeWith')} <span className="font-semibold tracking-wide">Ferava</span>
       </p>
     </section>
   )

@@ -1,5 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { Settings as SettingsIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import MonthSwitcher from './MonthSwitcher.jsx'
 import BottomNav from './BottomNav.jsx'
 
@@ -8,6 +9,7 @@ import BottomNav from './BottomNav.jsx'
 const HIDE_MONTH_SWITCHER_ON = ['/ajustes', '/categorias', '/importar', '/feedback']
 
 export default function AppShell() {
+  const { t } = useTranslation('layout')
   const location = useLocation()
   const showMonthSwitcher = !HIDE_MONTH_SWITCHER_ON.includes(location.pathname)
 
@@ -29,7 +31,7 @@ export default function AppShell() {
         )}
         <Link
           to="/ajustes"
-          aria-label="Ajustes"
+          aria-label={t('settingsLabel')}
           className="shrink-0 rounded-full p-1.5 hover:bg-white/5 sm:p-2"
         >
           <SettingsIcon size={22} />

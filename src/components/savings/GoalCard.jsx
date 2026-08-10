@@ -1,4 +1,5 @@
 import { Archive, ChevronRight, Calendar } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { formatEuro, formatDate } from '../../lib/formatters.js'
 
 /**
@@ -7,6 +8,7 @@ import { formatEuro, formatDate } from '../../lib/formatters.js'
  * Click en cualquier parte abre el detalle (onClick).
  */
 export default function GoalCard({ goal, onClick }) {
+  const { t } = useTranslation('savings')
   const isComplete = goal.percentage >= 100
   const widthPct = Math.min(100, Math.max(0, goal.percentage))
 
@@ -22,15 +24,15 @@ export default function GoalCard({ goal, onClick }) {
           {goal.is_archived && (
             <span
               className="inline-flex items-center gap-0.5 rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] text-white/70"
-              title="Archivada"
+              title={t('archivedBadge')}
             >
               <Archive size={10} />
-              Archivada
+              {t('archivedBadge')}
             </span>
           )}
           {isComplete && !goal.is_archived && (
             <span className="rounded-md bg-success/20 px-1.5 py-0.5 text-[10px] font-medium text-success">
-              ¡Completada!
+              {t('completedBadge')}
             </span>
           )}
         </div>
@@ -39,7 +41,7 @@ export default function GoalCard({ goal, onClick }) {
           <span className="font-semibold text-white">
             {formatEuro(goal.contributed)}
           </span>
-          <span className="text-white/50">de {formatEuro(goal.target_amount)}</span>
+          <span className="text-white/50">{t('of')} {formatEuro(goal.target_amount)}</span>
         </div>
 
         <div className="h-2 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/5">

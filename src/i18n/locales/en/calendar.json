@@ -1,0 +1,32 @@
+{
+  "title": "Calendar",
+  "viewMonth": "Month",
+  "viewWeek": "Week",
+  "weekdaysShort": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  "weekPrev": "Previous week",
+  "weekNext": "Next week",
+  "yearView": {
+    "monthOnly": "The calendar is monthly.",
+    "switchHint": "Switch the view above to Month to see the calendar.",
+    "switchButton": "Switch to month view"
+  },
+  "dayModal": {
+    "newTransaction": "New transaction",
+    "editTransaction": "Edit transaction",
+    "backToDay": "Back to day",
+    "income": "Income",
+    "expense": "Expenses",
+    "balance": "Balance",
+    "noTransactions": "No transactions this day.",
+    "addTransaction": "Add transaction",
+    "noDescription": "No description",
+    "deleteAriaLabel": "Delete",
+    "deleteConfirm": "Delete this {{type}} of {{amount}}?",
+    "deleteFailed": "Couldn't delete: {{error}}",
+    "unknownError": "error",
+    "typeExpense": "expense",
+    "typeIncome": "income",
+    "expenseAmount": "Expenses: €{{amount}}",
+    "incomeAmount": "Income: €{{amount}}"
+  }
+}

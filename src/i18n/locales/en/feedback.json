@@ -1,0 +1,33 @@
+{
+  "title": "Feedback & issues",
+  "backAria": "Back to settings",
+  "successTitle": "Thanks for your message!",
+  "successBody": "We've received it and will review it soon. If you left a contact email, we'll reply there.",
+  "savedTitle": "Message saved",
+  "savedBody": "Your feedback was saved successfully, but we couldn't send it by email. The team will still see it when reviewing the history. If you want to make sure it arrives, you can copy it and send it manually:",
+  "technicalDetail": "Technical detail: {{error}}",
+  "sendAnother": "Send another",
+  "backHome": "Back to Home",
+  "intro": "Found a bug or have an idea for an improvement? Tell us about it. We'll save it and it's automatically sent to the team's email.",
+  "typeLabel": "Type",
+  "typeSuggestion": "Suggestion",
+  "typeBug": "Bug",
+  "typeOther": "Other",
+  "messageLabel": "Message",
+  "placeholderBug": "Describe what happens, on which screen, and what you expected to happen…",
+  "placeholderSuggestion": "What would you like Finanzor to have, or how would you improve it?",
+  "placeholderOther": "Tell us what you need…",
+  "minMaxHint": "A few lines minimum. 2000 characters maximum.",
+  "emailLabel": "Email to reply to you (optional)",
+  "emailPlaceholder": "you@email.com",
+  "emailHint": "By default we'll use the email you signed in with.",
+  "sending": "Sending…",
+  "submit": "Send feedback",
+  "errorFallback": "Couldn't send it",
+  "errors": {
+    "messageRequired": "The message is required",
+    "invalidType": "Invalid type",
+    "web3formsNotConfigured": "VITE_WEB3FORMS_KEY is not set",
+    "networkError": "Network error"
+  }
+}

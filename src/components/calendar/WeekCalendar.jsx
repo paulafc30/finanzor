@@ -1,12 +1,13 @@
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { parseISO, addDays, format, isSameDay, eachDayOfInterval } from 'date-fns'
-import { es } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTransactionsByRange } from '../../hooks/useTransactions.js'
-
-const DAY_SHORT = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom']
+import { dateFnsLocale } from '../../lib/formatters.js'
 
 export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
+  const { t } = useTranslation('calendar')
+  const daysShort = t('weekdaysShort', { returnObjects: true })
   const weekStart = parseISO(weekAnchor)
   const weekEnd = addDays(weekStart, 6)
 
@@ -30,8 +31,8 @@ export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
 
   const sameMonth = weekStart.getMonth() === weekEnd.getMonth()
   const weekLabel = sameMonth
-    ? `${format(weekStart, 'd')} – ${format(weekEnd, 'd MMM yyyy', { locale: es })}`
-    : `${format(weekStart, 'd MMM', { locale: es })} – ${format(weekEnd, 'd MMM yyyy', { locale: es })}`
+    ? `${format(weekStart, 'd')} – ${format(weekEnd, 'd MMM yyyy', { locale: dateFnsLocale() })}`
+    : `${format(weekStart, 'd MMM', { locale: dateFnsLocale() })} – ${format(weekEnd, 'd MMM yyyy', { locale: dateFnsLocale() })}`
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
@@ -41,7 +42,7 @@ export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
           type="button"
           onClick={() => onWeekChange(format(addDays(weekStart, -7), 'yyyy-MM-dd'))}
           className="rounded-lg p-1.5 text-white/50 hover:bg-white/5 hover:text-white"
-          aria-label="Semana anterior"
+          aria-label={t('weekPrev')}
         >
           <ChevronLeft size={18} />
         </button>
@@ -50,7 +51,7 @@ export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
           type="button"
           onClick={() => onWeekChange(format(addDays(weekStart, 7), 'yyyy-MM-dd'))}
           className="rounded-lg p-1.5 text-white/50 hover:bg-white/5 hover:text-white"
-          aria-label="Semana siguiente"
+          aria-label={t('weekNext')}
         >
           <ChevronRight size={18} />
         </button>
@@ -76,7 +77,7 @@ export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
                   isToday ? 'text-accent' : 'text-white/35',
                 ].join(' ')}
               >
-                {DAY_SHORT[idx]}
+                {daysShort[idx]}
               </span>
               <span
                 className={[
@@ -101,7 +102,7 @@ export default function WeekCalendar({ weekAnchor, onWeekChange, onDayClick }) {
               key={`col-${key}`}
               type="button"
               onClick={() => onDayClick?.(key, day)}
-              aria-label={format(day, "EEEE d 'de' LLLL", { locale: es })}
+              aria-label={format(day, "EEEE d 'de' LLLL", { locale: dateFnsLocale() })}
               className={[
                 'flex h-full w-full flex-col gap-0.5 overflow-hidden border-b border-r border-white/10 p-1 text-left transition hover:bg-white/[0.03]',
                 isToday ? 'bg-accent/[0.04]' : '',

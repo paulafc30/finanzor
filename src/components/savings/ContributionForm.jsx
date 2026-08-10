@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
+import { useTranslation } from 'react-i18next'
 import Button from '../ui/Button.jsx'
 import { useCreateContribution } from '../../hooks/useGoalContributions.js'
 
@@ -7,6 +8,7 @@ import { useCreateContribution } from '../../hooks/useGoalContributions.js'
  * Formulario para añadir una aportación a una meta.
  */
 export default function ContributionForm({ goalId, onSuccess }) {
+  const { t } = useTranslation('savings')
   const today = format(new Date(), 'yyyy-MM-dd')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(today)
@@ -24,7 +26,7 @@ export default function ContributionForm({ goalId, onSuccess }) {
       })
       onSuccess?.()
     } catch (err) {
-      setError(err.message ?? 'No se pudo guardar')
+      setError(err.message ?? t('errors.saveFailed'))
     }
   }
 
@@ -32,7 +34,7 @@ export default function ContributionForm({ goalId, onSuccess }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Cantidad (€)
+          {t('amountLabel')}
         </label>
         <input
           type="number"
@@ -50,7 +52,7 @@ export default function ContributionForm({ goalId, onSuccess }) {
 
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Fecha
+          {t('dateLabel')}
         </label>
         <input
           type="date"
@@ -65,7 +67,7 @@ export default function ContributionForm({ goalId, onSuccess }) {
 
       <div className="flex gap-2 pt-2">
         <Button type="submit" disabled={create.isPending} className="flex-1">
-          {create.isPending ? 'Guardando…' : 'Aportar'}
+          {create.isPending ? t('saving') : t('contribute')}
         </Button>
       </div>
     </form>

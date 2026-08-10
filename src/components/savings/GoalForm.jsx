@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Button from '../ui/Button.jsx'
 import { useCreateGoal, useUpdateGoal } from '../../hooks/useGoals.js'
 
@@ -7,6 +8,7 @@ import { useCreateGoal, useUpdateGoal } from '../../hooks/useGoals.js'
  * - Si recibe `goal`, edita; si no, crea.
  */
 export default function GoalForm({ goal, onSuccess }) {
+  const { t } = useTranslation('savings')
   const isEdit = !!goal
   const createMutation = useCreateGoal()
   const updateMutation = useUpdateGoal()
@@ -36,7 +38,7 @@ export default function GoalForm({ goal, onSuccess }) {
       }
       onSuccess?.()
     } catch (err) {
-      setError(err.message ?? 'No se pudo guardar')
+      setError(err.message ?? t('errors.saveFailed'))
     }
   }
 
@@ -44,13 +46,13 @@ export default function GoalForm({ goal, onSuccess }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Nombre
+          {t('nameLabel')}
         </label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Vacaciones, fondo emergencia, portátil…"
+          placeholder={t('namePlaceholder')}
           autoFocus
           maxLength={60}
           required
@@ -60,7 +62,7 @@ export default function GoalForm({ goal, onSuccess }) {
 
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Objetivo (€)
+          {t('targetLabel')}
         </label>
         <input
           type="number"
@@ -77,7 +79,7 @@ export default function GoalForm({ goal, onSuccess }) {
 
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          Fecha objetivo (opcional)
+          {t('targetDateOptionalLabel')}
         </label>
         <input
           type="date"
@@ -86,7 +88,7 @@ export default function GoalForm({ goal, onSuccess }) {
           className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
         />
         <p className="mt-1 text-xs text-white/40">
-          Ayuda a saber para cuándo quieres alcanzar la meta. Es solo informativo.
+          {t('targetDateHint')}
         </p>
       </div>
 
@@ -94,7 +96,7 @@ export default function GoalForm({ goal, onSuccess }) {
 
       <div className="flex gap-2 pt-2">
         <Button type="submit" disabled={busy} className="flex-1">
-          {busy ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear meta'}
+          {busy ? t('saving') : isEdit ? t('saveChanges') : t('createGoal')}
         </Button>
       </div>
     </form>

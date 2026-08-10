@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { ArrowDownCircle, ArrowUpCircle, ChevronDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useTransactions } from '../../hooks/useTransactions.js'
 import { useMonth } from '../../hooks/useMonth.jsx'
 import { formatEuro } from '../../lib/formatters.js'
@@ -18,6 +19,7 @@ import { applyFilter } from './MovementsFilters.jsx'
  * que hay realmente en Movimientos.
  */
 export default function MovementsSummary({ filter }) {
+  const { t } = useTranslation('transactions')
   const { data: transactions = [] } = useTransactions()
   const { isYearView } = useMonth()
 
@@ -82,15 +84,17 @@ export default function MovementsSummary({ filter }) {
       {/* Desglose por origen */}
       <div className="space-y-2 border-t border-white/5 px-3 py-3 text-xs">
         <p className="text-white/50">
-          Desglose por origen — {stats.count} movimiento{stats.count === 1 ? '' : 's'}{' '}
-          {isYearView ? 'este año' : 'este mes'}:
+          {t('summary.breakdownByOrigin', {
+            count: stats.count,
+            period: isYearView ? t('summary.periodYear') : t('summary.periodMonth'),
+          })}
         </p>
-        <OriginRow label="Manuales" stats={stats.byOrigin.manual} />
-        <OriginRow label="Recurrentes" stats={stats.byOrigin.recurring} />
+        <OriginRow label={t('summary.manual')} stats={stats.byOrigin.manual} />
+        <OriginRow label={t('summary.recurring')} stats={stats.byOrigin.recurring} />
         <OriginRow
-          label="Aportes a metas"
+          label={t('summary.savingContributions')}
           stats={stats.byOrigin.saving}
-          hint="Cada aporte a una meta crea un gasto en la categoría Ahorro."
+          hint={t('summary.savingHint')}
         />
       </div>
     </details>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Pencil, Trash2, Archive, ArchiveRestore, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import Modal from '../ui/Modal.jsx'
 import Button from '../ui/Button.jsx'
 import GoalForm from './GoalForm.jsx'
@@ -24,6 +25,7 @@ import { formatEuro, formatDate } from '../../lib/formatters.js'
  *   detail (por defecto), edit (form de meta), contribute (form aportación)
  */
 export default function GoalDetailModal({ goal, open, onClose }) {
+  const { t } = useTranslation('savings')
   const [view, setView] = useState('detail')
   const { data: contributions = [], isLoading } = useGoalContributions(goal?.id)
   const archive = useToggleArchiveGoal()
@@ -44,32 +46,32 @@ export default function GoalDetailModal({ goal, open, onClose }) {
       await archive.mutateAsync({ id: goal.id, is_archived: !goal.is_archived })
       handleClose()
     } catch (err) {
-      alert('No se pudo: ' + (err.message ?? 'error'))
+      alert(t('errors.actionFailed', { message: err.message ?? 'error' }))
     }
   }
 
   async function handleDelete() {
     const ok = window.confirm(
-      `¿Eliminar la meta "${goal.name}"?\n\nSe borrarán también todas las aportaciones registradas. Esta acción no se puede deshacer.`,
+      t('confirmDeleteGoal', { name: goal.name }),
     )
     if (!ok) return
     try {
       await remove.mutateAsync(goal.id)
       handleClose()
     } catch (err) {
-      alert('No se pudo eliminar: ' + (err.message ?? 'error'))
+      alert(t('errors.deleteFailed', { message: err.message ?? 'error' }))
     }
   }
 
   async function handleDeleteContribution(c) {
     const ok = window.confirm(
-      `¿Eliminar esta aportación de ${formatEuro(c.amount)}?`,
+      t('confirmDeleteContribution', { amount: formatEuro(c.amount) }),
     )
     if (!ok) return
     try {
       await removeContribution.mutateAsync({ id: c.id, goal_id: goal.id })
     } catch (err) {
-      alert('No se pudo eliminar: ' + (err.message ?? 'error'))
+      alert(t('errors.deleteFailed', { message: err.message ?? 'error' }))
     }
   }
 
@@ -77,8 +79,8 @@ export default function GoalDetailModal({ goal, open, onClose }) {
 
   const titles = {
     detail: goal.name,
-    edit: 'Editar meta',
-    contribute: 'Nueva aportación',
+    edit: t('editGoal'),
+    contribute: t('newContribution'),
   }
 
   return (
@@ -103,7 +105,7 @@ export default function GoalDetailModal({ goal, open, onClose }) {
                 {formatEuro(goal.contributed)}
               </span>
               <span className="text-white/50">
-                de {formatEuro(goal.target_amount)}
+                {t('of')} {formatEuro(goal.target_amount)}
               </span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/5">
@@ -116,16 +118,16 @@ export default function GoalDetailModal({ goal, open, onClose }) {
               />
             </div>
             <div className="mt-1.5 flex items-center justify-between text-[11px] text-white/40">
-              <span>{goal.percentage.toFixed(0)}% completado</span>
-              {goal.target_date && <span>Para {formatDate(goal.target_date)}</span>}
+              <span>{t('progress', { percent: goal.percentage.toFixed(0) })}</span>
+              {goal.target_date && <span>{t('targetDateFor', { date: formatDate(goal.target_date) })}</span>}
             </div>
             {goal.contributed < goal.target_amount && (
               <p className="mt-2 text-xs text-white/60">
-                Te faltan{' '}
+                {t('remainingPrefix')}{' '}
                 <strong className="text-white">
                   {formatEuro(goal.target_amount - goal.contributed)}
                 </strong>{' '}
-                para alcanzarla.
+                {t('remainingSuffix')}
               </p>
             )}
           </div>
@@ -133,13 +135,13 @@ export default function GoalDetailModal({ goal, open, onClose }) {
           {/* Botón aportar */}
           <Button onClick={() => setView('contribute')} className="w-full">
             <Plus size={16} />
-            Aportar cantidad
+            {t('addContribution')}
           </Button>
 
           {/* Lista de aportaciones */}
           <div>
             <h3 className="mb-2 text-xs uppercase tracking-wide text-white/50">
-              Aportaciones {contributions.length > 0 && `(${contributions.length})`}
+              {t('contributionsTitle')} {contributions.length > 0 && `(${contributions.length})`}
             </h3>
 
             {isLoading ? (
@@ -148,7 +150,7 @@ export default function GoalDetailModal({ goal, open, onClose }) {
               </div>
             ) : contributions.length === 0 ? (
               <p className="rounded-lg bg-bg-card p-3 text-center text-xs text-white/50">
-                Aún no has aportado nada a esta meta.
+                {t('noContributions')}
               </p>
             ) : (
               <ul className="space-y-1">
@@ -167,7 +169,7 @@ export default function GoalDetailModal({ goal, open, onClose }) {
                       <button
                         type="button"
                         onClick={() => handleDeleteContribution(c)}
-                        aria-label="Eliminar aportación"
+                        aria-label={t('deleteContributionAria')}
                         className="rounded-md p-1 text-white/30 hover:bg-white/5 hover:text-danger"
                       >
                         <Trash2 size={13} />
@@ -188,7 +190,7 @@ export default function GoalDetailModal({ goal, open, onClose }) {
               className="flex-1"
             >
               <Pencil size={14} />
-              Editar
+              {t('edit')}
             </Button>
             <Button
               variant="secondary"
@@ -198,7 +200,7 @@ export default function GoalDetailModal({ goal, open, onClose }) {
               className="flex-1"
             >
               {goal.is_archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
-              {goal.is_archived ? 'Desarchivar' : 'Archivar'}
+              {goal.is_archived ? t('unarchive') : t('archive')}
             </Button>
             <Button
               variant="danger"

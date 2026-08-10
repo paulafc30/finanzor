@@ -1,0 +1,82 @@
+{
+  "title": "Ajustes",
+  "loggedInAs": "Sesión iniciada como",
+  "manageCategories": "Gestionar categorías",
+  "importCsv": "Importar desde CSV",
+  "feedback": "Sugerencias y fallos",
+  "privacyPolicy": "Política de privacidad",
+  "viewTutorial": "Ver tutorial de la app",
+  "logout": "Cerrar sesión",
+  "alertThresholdSoon": "Próximamente: umbral de alertas.",
+  "madeWith": "Hecho con ♥ por",
+  "language": {
+    "title": "Idioma",
+    "activeEs": "Español activo",
+    "activeEn": "English active"
+  },
+  "appearance": {
+    "title": "Apariencia",
+    "darkActive": "Modo oscuro activo",
+    "lightActive": "Modo claro activo",
+    "ariaLabel": "Tema claro u oscuro",
+    "light": "Claro",
+    "dark": "Oscuro"
+  },
+  "deleteAccount": {
+    "title": "Eliminar cuenta",
+    "description": "Borra todos tus movimientos, categorías, presupuestos, metas y gastos/ingresos fijos. Esta acción no se puede deshacer.",
+    "button": "Eliminar cuenta",
+    "confirmTitle": "¿Seguro que quieres eliminar tu cuenta?",
+    "warningBefore": "Se eliminarán",
+    "warningAll": "todos",
+    "warningAfter": "tus datos: movimientos, categorías, presupuestos, metas, aportaciones, gastos fijos e ingresos fijos, y también tu cuenta de acceso (email/Google). No podrás volver a iniciar sesión con esta cuenta. Esta acción no se puede deshacer.",
+    "typeToConfirmBefore": "Escribe",
+    "confirmWord": "BORRAR",
+    "typeToConfirmAfter": "para confirmar",
+    "cancel": "Cancelar",
+    "confirmButton": "Eliminar todo",
+    "deleting": "Eliminando…",
+    "errorFallback": "No se pudo eliminar la cuenta"
+  },
+  "exportData": {
+    "title": "Exportar datos",
+    "modeLabels": {
+      "days": "Días",
+      "months": "Meses",
+      "year": "Año"
+    },
+    "from": "Desde",
+    "to": "Hasta",
+    "year": "Año",
+    "errorDateRange": "La fecha de inicio no puede ser posterior a la final.",
+    "errorNoData": "No hay datos en el rango seleccionado.",
+    "errorGeneric": "Error al exportar. Inténtalo de nuevo.",
+    "exporting": "Exportando…",
+    "exportButton": "Exportar CSV",
+    "months": [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ],
+    "csvHeaders": {
+      "date": "Fecha",
+      "type": "Tipo",
+      "amount": "Importe",
+      "category": "Categoría",
+      "description": "Descripción"
+    },
+    "typeIncome": "Ingreso",
+    "typeExpense": "Gasto"
+  },
+  "notifications": {
+    "title": "Recordatorio diario",
+    "active": "Notificaciones activas",
+    "inactive": "Notificaciones desactivadas",
+    "unsupported": "Este navegador no soporta notificaciones push. Prueba con Chrome o Firefox actualizados, o instala la app en tu pantalla de inicio.",
+    "notConfigured": "Falta configurar OneSignal (VITE_ONESIGNAL_APP_ID en .env y Vercel).",
+    "descriptionBefore": "Te avisamos cada día a las",
+    "descriptionTime": "22:00",
+    "descriptionAfter": "para que apuntes los gastos del día.",
+    "disable": "Desactivar",
+    "enable": "Activar recordatorio diario"
+  }
+}

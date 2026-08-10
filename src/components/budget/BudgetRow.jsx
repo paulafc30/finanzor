@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import BudgetBar from './BudgetBar.jsx'
 import { formatEuro } from '../../lib/formatters.js'
 import { useUpsertBudget } from '../../hooks/useBudgets.js'
@@ -11,6 +12,7 @@ import { useUpsertBudget } from '../../hooks/useBudgets.js'
  * - Si pones 0 se elimina el presupuesto
  */
 export default function BudgetRow({ row }) {
+  const { t } = useTranslation('budget')
   const { category, budgetAmount, spentAmount, percentage, status } = row
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(String(budgetAmount || ''))
@@ -41,7 +43,7 @@ export default function BudgetRow({ row }) {
     try {
       await upsert.mutateAsync({ category_id: category.id, amount: value })
     } catch (err) {
-      alert('No se pudo guardar: ' + (err.message ?? 'error'))
+      alert(t('row.saveError', { error: err.message ?? 'error' }))
       setDraft(String(budgetAmount || ''))
     }
   }
@@ -96,9 +98,9 @@ export default function BudgetRow({ row }) {
               type="button"
               onClick={startEdit}
               className="text-white/70 hover:text-white"
-              title="Click para editar el límite"
+              title={t('row.editTooltip')}
             >
-              {budgetAmount > 0 ? formatEuro(budgetAmount) : 'Sin límite'}
+              {budgetAmount > 0 ? formatEuro(budgetAmount) : t('row.noLimit')}
             </button>
           )}
         </div>
@@ -108,11 +110,11 @@ export default function BudgetRow({ row }) {
 
       {budgetAmount > 0 && (
         <div className="mt-1.5 flex justify-between text-[11px] text-white/40">
-          <span>{percentage.toFixed(0)}% usado</span>
+          <span>{t('row.percentUsed', { percent: percentage.toFixed(0) })}</span>
           <span>
             {budgetAmount - spentAmount >= 0
-              ? `Restan ${formatEuro(budgetAmount - spentAmount)}`
-              : `Excedido en ${formatEuro(spentAmount - budgetAmount)}`}
+              ? t('row.remaining', { amount: formatEuro(budgetAmount - spentAmount) })
+              : t('row.exceeded', { amount: formatEuro(spentAmount - budgetAmount) })}
           </span>
         </div>
       )}

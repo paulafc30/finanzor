@@ -1,8 +1,10 @@
 /**
- * Traducción de mensajes de error comunes de Supabase Auth al español.
+ * Traducción de mensajes de error comunes de Supabase Auth al idioma activo.
  *
  * Supabase devuelve los mensajes en inglés (no es localizable). Aquí mapeamos
- * los más típicos a textos comprensibles para el usuario final.
+ * los más típicos a textos comprensibles para el usuario final, usando
+ * i18next (namespace "auth") para que el mensaje mostrado respete el idioma
+ * elegido por el usuario.
  *
  * Uso:
  *   try { ... } catch (err) { setError(translateAuthError(err)) }
@@ -10,68 +12,51 @@
  * Si no hay match exacto se devuelve un fallback genérico (no el mensaje
  * crudo en inglés).
  */
+import i18next from '../i18n/index.js'
 
-// Pares [patrón regex (inglés) → mensaje en español]
+// Pares [patrón regex (inglés) → clave de traducción en auth.errors]
 const RULES = [
   // Login
-  [
-    /invalid login credentials/i,
-    'Email o contraseña incorrectos. Si no tienes cuenta, puedes crear una con este email.',
-  ],
-  [/email not confirmed/i, 'Tu email aún no está confirmado. Revisa tu correo (y la carpeta de spam).'],
-  [/email link is invalid or has expired/i, 'El enlace ha caducado. Pide uno nuevo.'],
-  [/token (has expired|is invalid)/i, 'Tu sesión ha caducado. Vuelve a iniciar sesión.'],
-  [/jwt expired/i, 'Tu sesión ha caducado. Vuelve a iniciar sesión.'],
+  [/invalid login credentials/i, 'errors.invalidCredentials'],
+  [/email not confirmed/i, 'errors.emailNotConfirmed'],
+  [/email link is invalid or has expired/i, 'errors.linkExpired'],
+  [/token (has expired|is invalid)/i, 'errors.sessionExpired'],
+  [/jwt expired/i, 'errors.sessionExpired'],
 
   // Signup
-  [
-    /user already registered/i,
-    'Este email ya está registrado. Si has olvidado tu contraseña, contacta con soporte.',
-  ],
-  [
-    /email address.*already.*registered/i,
-    'Este email ya está registrado. Si has olvidado tu contraseña, contacta con soporte.',
-  ],
-  [/signup is disabled/i, 'El registro está desactivado por el administrador.'],
-  [/signups not allowed/i, 'El registro está desactivado por el administrador.'],
+  [/user already registered/i, 'errors.alreadyRegistered'],
+  [/email address.*already.*registered/i, 'errors.alreadyRegistered'],
+  [/signup is disabled/i, 'errors.signupDisabled'],
+  [/signups not allowed/i, 'errors.signupDisabled'],
 
   // Validaciones de email/contraseña
-  [
-    /unable to validate email address.*invalid format/i,
-    'El email no tiene un formato válido.',
-  ],
-  [/invalid email/i, 'El email no tiene un formato válido.'],
+  [/unable to validate email address.*invalid format/i, 'errors.invalidEmailFormat'],
+  [/invalid email/i, 'errors.invalidEmailFormat'],
   [
     /password should be at least (\d+) characters?/i,
-    (m) => `La contraseña debe tener al menos ${m[1]} caracteres.`,
+    (m) => i18next.t('errors.passwordMinLength', { ns: 'auth', count: m[1] }),
   ],
-  [/password is too weak/i, 'La contraseña es demasiado débil. Usa una más larga o con más variedad.'],
-  [
-    /new password should be different from the old/i,
-    'La nueva contraseña tiene que ser distinta de la anterior.',
-  ],
+  [/password is too weak/i, 'errors.passwordWeak'],
+  [/new password should be different from the old/i, 'errors.passwordSameAsOld'],
 
   // Rate limiting
   [
     /for security purposes.*request this once every (\d+) seconds?/i,
-    (m) => `Por seguridad, espera ${m[1]} segundos antes de volver a intentarlo.`,
+    (m) => i18next.t('errors.rateLimitSeconds', { ns: 'auth', seconds: m[1] }),
   ],
-  [
-    /email rate limit exceeded/i,
-    'Has pedido demasiados correos en poco tiempo. Espera unos minutos.',
-  ],
-  [/rate limit exceeded/i, 'Demasiadas peticiones seguidas. Espera un momento e inténtalo de nuevo.'],
+  [/email rate limit exceeded/i, 'errors.emailRateLimit'],
+  [/rate limit exceeded/i, 'errors.rateLimitExceeded'],
 
   // OAuth / proveedor externo
-  [/oauth state not found or expired/i, 'La sesión de Google ha caducado. Vuelve a intentarlo.'],
-  [/provider is not enabled/i, 'Este método de inicio de sesión no está disponible.'],
+  [/oauth state not found or expired/i, 'errors.oauthExpired'],
+  [/provider is not enabled/i, 'errors.providerNotEnabled'],
 
   // Red / conexión
-  [/network|failed to fetch|networkerror/i, 'Problema de conexión. Comprueba tu internet e inténtalo de nuevo.'],
+  [/network|failed to fetch|networkerror/i, 'errors.network'],
 ]
 
 /**
- * Devuelve un mensaje en español a partir de un error (Error, string o
+ * Devuelve un mensaje traducido a partir de un error (Error, string o
  * { message }).
  */
 export function translateAuthError(err) {
@@ -83,15 +68,17 @@ export function translateAuthError(err) {
         err?.error ??
         ''
 
-  if (!raw) return 'Algo no fue bien. Inténtalo de nuevo.'
+  if (!raw) return i18next.t('errors.empty', { ns: 'auth' })
 
   for (const [pattern, replacement] of RULES) {
     const match = raw.match(pattern)
     if (match) {
-      return typeof replacement === 'function' ? replacement(match) : replacement
+      return typeof replacement === 'function'
+        ? replacement(match)
+        : i18next.t(replacement, { ns: 'auth' })
     }
   }
 
   // Fallback genérico — no exponemos el inglés al usuario final
-  return 'Ha ocurrido un error. Si vuelve a pasar, prueba a recargar la página.'
+  return i18next.t('errors.generic', { ns: 'auth' })
 }

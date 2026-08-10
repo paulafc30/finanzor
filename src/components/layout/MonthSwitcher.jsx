@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useMonth } from '../../hooks/useMonth.jsx'
 import { formatMonthLabel, formatYearLabel } from '../../lib/formatters.js'
 import MonthYearPicker from './MonthYearPicker.jsx'
 
 export default function MonthSwitcher() {
+  const { t } = useTranslation('layout')
   const {
     month,
     prev,
@@ -26,7 +28,7 @@ export default function MonthSwitcher() {
         <button
           type="button"
           onClick={prev}
-          aria-label={isYearView ? 'Año anterior' : 'Mes anterior'}
+          aria-label={isYearView ? t('monthSwitcher.prevYear') : t('monthSwitcher.prevMonth')}
           className="rounded-full p-1.5 hover:bg-white/5 sm:p-2"
         >
           <ChevronLeft size={18} />
@@ -35,7 +37,7 @@ export default function MonthSwitcher() {
           type="button"
           onClick={() => setPickerOpen(true)}
           className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-center text-sm font-medium hover:bg-white/5 sm:px-2"
-          title={isYearView ? 'Cambiar de año' : 'Cambiar mes/año'}
+          title={isYearView ? t('monthSwitcher.changeYear') : t('monthSwitcher.changeMonthYear')}
           aria-haspopup="dialog"
         >
           <span className="whitespace-nowrap">{label}</span>
@@ -44,7 +46,7 @@ export default function MonthSwitcher() {
         <button
           type="button"
           onClick={next}
-          aria-label={isYearView ? 'Año siguiente' : 'Mes siguiente'}
+          aria-label={isYearView ? t('monthSwitcher.nextYear') : t('monthSwitcher.nextMonth')}
           className="rounded-full p-1.5 hover:bg-white/5 sm:p-2"
         >
           <ChevronRight size={18} />
@@ -54,7 +56,7 @@ export default function MonthSwitcher() {
       {/* Toggle Mes / Año */}
       <div
         role="tablist"
-        aria-label="Vista por mes o por año"
+        aria-label={t('monthSwitcher.viewToggleLabel')}
         className="flex shrink-0 rounded-full bg-bg-card p-0.5 ring-1 ring-white/5"
       >
         <button
@@ -69,7 +71,7 @@ export default function MonthSwitcher() {
               : 'text-white/60 hover:text-white',
           ].join(' ')}
         >
-          Mes
+          {t('monthSwitcher.month')}
         </button>
         <button
           type="button"
@@ -83,7 +85,7 @@ export default function MonthSwitcher() {
               : 'text-white/60 hover:text-white',
           ].join(' ')}
         >
-          Año
+          {t('monthSwitcher.year')}
         </button>
       </div>
 

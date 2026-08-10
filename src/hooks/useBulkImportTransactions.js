@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from './useSession.js'
 
@@ -11,10 +12,11 @@ import { useSession } from './useSession.js'
 export function useBulkImportTransactions() {
   const { user } = useSession()
   const qc = useQueryClient()
+  const { t } = useTranslation('import')
 
   return useMutation({
     mutationFn: async (items) => {
-      if (!user) throw new Error('Sesión inválida')
+      if (!user) throw new Error(t('parser.sessionInvalid'))
       if (!items || items.length === 0) {
         return { inserted: 0 }
       }
@@ -31,13 +33,13 @@ export function useBulkImportTransactions() {
       // Validación previa
       for (const r of rows) {
         if (!['income', 'expense'].includes(r.type)) {
-          throw new Error('Tipo inválido en alguna fila')
+          throw new Error(t('parser.invalidType'))
         }
         if (!Number.isFinite(r.amount) || r.amount <= 0) {
-          throw new Error('Importe inválido en alguna fila')
+          throw new Error(t('parser.invalidAmount'))
         }
         if (!/^\d{4}-\d{2}-\d{2}$/.test(r.occurred_on)) {
-          throw new Error('Fecha inválida en alguna fila')
+          throw new Error(t('parser.invalidDate'))
         }
       }
 

@@ -1,0 +1,55 @@
+{
+  "errorPrefix": "Error: ",
+  "backToSettings": "Back to settings",
+  "title": "Categories",
+  "new": "New",
+  "defaultBadge": {
+    "tooltip": "Default category — can be renamed but not archived",
+    "label": "Fixed"
+  },
+  "edit": "Edit",
+  "archive": {
+    "label": "Archive",
+    "tooltip": "Archive (keeps the history)"
+  },
+  "showArchived": "Show archived ({{count}})",
+  "hideArchived": "Hide archived ({{count}})",
+  "archivedSectionTitle": "Archived",
+  "archivedBadge": {
+    "tooltip": "Kept so your old transactions still show a category",
+    "label": "Archived"
+  },
+  "restore": {
+    "label": "Restore",
+    "tooltip": "Make it active again"
+  },
+  "footerNote": "\"Fixed\" ones are the starting categories — you can rename or recolor them, but not archive them. The ones you create (e.g. \"Madrid Trip\", \"Motorcycle License\") can be archived once you stop using them: they disappear from new forms but old transactions keep showing them.",
+  "modal": {
+    "new": "New category",
+    "edit": "Edit category"
+  },
+  "confirmArchive": "Archive the category \"{{name}}\"?\n\nIt will stop appearing when creating new transactions, but old ones will keep showing it.",
+  "archiveError": "Could not archive: {{error}}",
+  "unarchiveError": "Could not restore: {{error}}",
+  "form": {
+    "confirmRename": "You're about to rename <strong>\"{{oldName}}\"</strong> to <strong>\"{{newName}}\"</strong>. The new name will also apply to <strong>all past transactions</strong> assigned to this category. Do you want to continue?",
+    "cancel": "Cancel",
+    "confirmYes": "Yes, rename",
+    "renaming": "Renaming…",
+    "nameLabel": "Name",
+    "namePlaceholder": "Pets, Subscriptions…",
+    "colorLabel": "Color",
+    "colorAriaLabel": "Color {{color}}",
+    "saving": "Saving…",
+    "saveChanges": "Save changes",
+    "create": "Create category",
+    "genericError": "Could not save"
+  },
+  "errors": {
+    "nameRequired": "Name is required",
+    "nameEmpty": "Name cannot be empty",
+    "duplicateName": "You already have a category with that name",
+    "defaultNoArchive": "Default categories cannot be archived",
+    "defaultNoDelete": "Default categories cannot be deleted"
+  }
+}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Delete, X } from 'lucide-react'
 
 /**
@@ -15,6 +16,7 @@ import { Delete, X } from 'lucide-react'
  *  - onClose(): cerrar sin aceptar
  */
 export default function CalculatorPad({ open, initialValue = '', onAccept, onClose }) {
+  const { t } = useTranslation('ui')
   const [display, setDisplay] = useState('0')
   const [prev, setPrev] = useState(null)
   const [op, setOp] = useState(null)
@@ -127,7 +129,7 @@ export default function CalculatorPad({ open, initialValue = '', onAccept, onClo
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Calculadora"
+      aria-label={t('calculator.dialogLabel')}
       className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose?.()
@@ -135,11 +137,11 @@ export default function CalculatorPad({ open, initialValue = '', onAccept, onClo
     >
       <div className="w-full max-w-sm rounded-t-2xl bg-bg-elevated p-4 shadow-xl sm:rounded-2xl">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white">Calculadora</h3>
+          <h3 className="text-sm font-semibold text-white">{t('calculator.title')}</h3>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label={t('calculator.close')}
             className="rounded-full p-1.5 text-white/60 hover:bg-white/5 hover:text-white"
           >
             <X size={16} />
@@ -160,8 +162,8 @@ export default function CalculatorPad({ open, initialValue = '', onAccept, onClo
 
         {/* Teclado: 4x5 */}
         <div className="grid grid-cols-4 gap-2">
-          <KeyBtn variant="util" onClick={clearAll}>C</KeyBtn>
-          <KeyBtn variant="util" onClick={backspace} aria-label="Borrar">
+          <KeyBtn variant="util" onClick={clearAll}>{t('calculator.clear')}</KeyBtn>
+          <KeyBtn variant="util" onClick={backspace} aria-label={t('calculator.backspace')}>
             <Delete size={18} />
           </KeyBtn>
           <KeyBtn variant="op" active={op === '÷' && waitingNext} onClick={() => applyOperator('÷')}>÷</KeyBtn>
@@ -184,7 +186,7 @@ export default function CalculatorPad({ open, initialValue = '', onAccept, onClo
 
           <KeyBtn className="col-span-2" onClick={() => pushDigit('0')}>0</KeyBtn>
           <KeyBtn onClick={pushDot}>,</KeyBtn>
-          <KeyBtn variant="accent" onClick={accept}>Cerrar</KeyBtn>
+          <KeyBtn variant="accent" onClick={accept}>{t('calculator.accept')}</KeyBtn>
         </div>
       </div>
     </div>

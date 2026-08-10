@@ -1,0 +1,16 @@
+{
+  "modal": {
+    "close": "Cerrar"
+  },
+  "calculator": {
+    "title": "Calculadora",
+    "dialogLabel": "Calculadora",
+    "close": "Cerrar",
+    "backspace": "Borrar",
+    "clear": "C",
+    "accept": "Cerrar"
+  },
+  "fab": {
+    "add": "Añadir"
+  }
+}

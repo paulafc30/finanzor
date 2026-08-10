@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from './useSession.js'
 
@@ -61,14 +62,15 @@ export function useGoals({ includeArchived = false } = {}) {
 export function useCreateGoal() {
   const { user } = useSession()
   const qc = useQueryClient()
+  const { t } = useTranslation('savings')
 
   return useMutation({
     mutationFn: async ({ name, target_amount, target_date }) => {
       const cleanName = name?.trim()
-      if (!cleanName) throw new Error('El nombre es obligatorio')
+      if (!cleanName) throw new Error(t('errors.nameRequired'))
       const target = Number(target_amount)
       if (!Number.isFinite(target) || target <= 0) {
-        throw new Error('El objetivo debe ser mayor que 0')
+        throw new Error(t('errors.targetRequired'))
       }
 
       const { data, error } = await supabase
@@ -95,18 +97,19 @@ export function useCreateGoal() {
 export function useUpdateGoal() {
   const { user } = useSession()
   const qc = useQueryClient()
+  const { t } = useTranslation('savings')
 
   return useMutation({
     mutationFn: async ({ id, ...patch }) => {
       const cleaned = {}
       if (patch.name !== undefined) {
         const v = patch.name.trim()
-        if (!v) throw new Error('El nombre no puede estar vacío')
+        if (!v) throw new Error(t('errors.nameEmpty'))
         cleaned.name = v
       }
       if (patch.target_amount !== undefined) {
         const v = Number(patch.target_amount)
-        if (!Number.isFinite(v) || v <= 0) throw new Error('Objetivo inválido')
+        if (!Number.isFinite(v) || v <= 0) throw new Error(t('errors.targetInvalid'))
         cleaned.target_amount = v
       }
       if (patch.target_date !== undefined) cleaned.target_date = patch.target_date || null

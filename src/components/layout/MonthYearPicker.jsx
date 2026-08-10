@@ -1,15 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
-
-const MONTHS_SHORT = [
-  'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
-  'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic',
-]
-const MONTHS_FULL = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
-]
+import { useTranslation } from 'react-i18next'
 
 /**
  * Selector tipo calendario para elegir mes y anio (o solo anio).
@@ -25,6 +17,9 @@ const MONTHS_FULL = [
  * En movil aparece como bottom-sheet; en sm+ como modal centrado.
  */
 export default function MonthYearPicker({ open, mode = 'month', value, onSelect, onClose }) {
+  const { t } = useTranslation('layout')
+  const MONTHS_SHORT = t('picker.monthsShort', { returnObjects: true })
+  const MONTHS_FULL = t('picker.monthsFull', { returnObjects: true })
   const now = new Date()
   const selDate = value instanceof Date ? value : new Date()
 
@@ -94,7 +89,7 @@ export default function MonthYearPicker({ open, mode = 'month', value, onSelect,
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Seleccionar mes y año"
+      aria-label={t('picker.selectMonthYear')}
       className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose?.()
@@ -123,7 +118,7 @@ export default function MonthYearPicker({ open, mode = 'month', value, onSelect,
           <button
             type="button"
             onClick={prev}
-            aria-label={mode === 'year' ? 'Bloque anterior' : 'Año anterior'}
+            aria-label={mode === 'year' ? t('picker.prevBlock') : t('picker.prevYear')}
             className="rounded-full p-2 text-white/70 hover:bg-white/5 hover:text-white"
           >
             <ChevronLeft size={18} />
@@ -136,7 +131,7 @@ export default function MonthYearPicker({ open, mode = 'month', value, onSelect,
           <button
             type="button"
             onClick={next}
-            aria-label={mode === 'year' ? 'Bloque siguiente' : 'Año siguiente'}
+            aria-label={mode === 'year' ? t('picker.nextBlock') : t('picker.nextYear')}
             className="rounded-full p-2 text-white/70 hover:bg-white/5 hover:text-white"
           >
             <ChevronRight size={18} />
@@ -144,7 +139,7 @@ export default function MonthYearPicker({ open, mode = 'month', value, onSelect,
           <button
             type="button"
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label={t('picker.close')}
             className="ml-1 rounded-full p-2 text-white/60 hover:bg-white/5 hover:text-white"
           >
             <X size={16} />
@@ -198,7 +193,7 @@ export default function MonthYearPicker({ open, mode = 'month', value, onSelect,
             onClick={jumpToToday}
             className="rounded-full bg-bg-card px-3 py-1 text-[11px] font-medium text-white/70 ring-1 ring-white/5 hover:text-white"
           >
-            {mode === 'year' ? 'Año actual' : 'Mes actual'}
+            {mode === 'year' ? t('picker.currentYear') : t('picker.currentMonth')}
           </button>
         </div>
         </div>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft,
   Plus,
@@ -34,6 +35,7 @@ import {
  * renombrar y cambiar color.
  */
 export default function Categories() {
+  const { t } = useTranslation('categories')
   // Cargamos siempre TODAS (activas + archivadas) para poder mostrarlas
   // segun el toggle.
   const { data: allCategories = [], isLoading, error } = useCategories({
@@ -66,14 +68,12 @@ export default function Categories() {
 
   async function handleArchive(cat) {
     if (cat.is_default) return
-    const ok = window.confirm(
-      `¿Archivar la categoría "${cat.name}"?\n\nDejará de aparecer al crear nuevos movimientos, pero los antiguos seguirán mostrándola.`,
-    )
+    const ok = window.confirm(t('confirmArchive', { name: cat.name }))
     if (!ok) return
     try {
       await archiveMutation.mutateAsync(cat)
     } catch (err) {
-      alert('No se pudo archivar: ' + (err.message ?? 'error'))
+      alert(t('archiveError', { error: err.message ?? 'error' }))
     }
   }
 
@@ -81,7 +81,7 @@ export default function Categories() {
     try {
       await unarchiveMutation.mutateAsync(cat)
     } catch (err) {
-      alert('No se pudo restaurar: ' + (err.message ?? 'error'))
+      alert(t('unarchiveError', { error: err.message ?? 'error' }))
     }
   }
 
@@ -96,7 +96,7 @@ export default function Categories() {
   if (error) {
     return (
       <p className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
-        Error: {error.message}
+        {t('errorPrefix')}{error.message}
       </p>
     )
   }
@@ -107,14 +107,14 @@ export default function Categories() {
         <Link
           to="/ajustes"
           className="rounded-full p-1.5 text-white/60 hover:bg-white/5 hover:text-white"
-          aria-label="Volver a ajustes"
+          aria-label={t('backToSettings')}
         >
           <ArrowLeft size={20} />
         </Link>
-        <h1 className="flex-1 text-xl font-semibold">Categorías</h1>
+        <h1 className="flex-1 text-xl font-semibold">{t('title')}</h1>
         <Button size="sm" onClick={handleNew}>
           <Plus size={16} />
-          Nueva
+          {t('new')}
         </Button>
       </div>
 
@@ -134,11 +134,11 @@ export default function Categories() {
                 <span className="truncate text-sm text-white">{c.name}</span>
                 {c.is_default && (
                   <span
-                    title="Categoría por defecto — se puede renombrar pero no archivar"
+                    title={t('defaultBadge.tooltip')}
                     className="inline-flex items-center gap-0.5 rounded-md bg-accent/15 px-1.5 py-0.5 text-[10px] font-medium text-accent"
                   >
                     <Shield size={10} />
-                    Fija
+                    {t('defaultBadge.label')}
                   </span>
                 )}
               </div>
@@ -147,7 +147,7 @@ export default function Categories() {
             <button
               type="button"
               onClick={() => handleEdit(c)}
-              aria-label="Editar"
+              aria-label={t('edit')}
               className="rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-white"
             >
               <Pencil size={15} />
@@ -158,8 +158,8 @@ export default function Categories() {
               <button
                 type="button"
                 onClick={() => handleArchive(c)}
-                aria-label="Archivar"
-                title="Archivar (conserva el historial)"
+                aria-label={t('archive.label')}
+                title={t('archive.tooltip')}
                 disabled={archiveMutation.isPending}
                 className="rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-warning disabled:opacity-50"
               >
@@ -179,8 +179,8 @@ export default function Categories() {
         >
           {showArchived ? <EyeOff size={13} /> : <Eye size={13} />}
           {showArchived
-            ? `Ocultar archivadas (${archived.length})`
-            : `Ver archivadas (${archived.length})`}
+            ? t('hideArchived', { count: archived.length })
+            : t('showArchived', { count: archived.length })}
         </button>
       )}
 
@@ -188,7 +188,7 @@ export default function Categories() {
       {showArchived && archived.length > 0 && (
         <div className="space-y-2 pt-2">
           <h2 className="px-1 text-[11px] uppercase tracking-wide text-white/40">
-            Archivadas
+            {t('archivedSectionTitle')}
           </h2>
           <ul className="space-y-2">
             {archived.map((c) => (
@@ -204,11 +204,11 @@ export default function Categories() {
                   <div className="flex items-center gap-1.5">
                     <span className="truncate text-sm text-white/70">{c.name}</span>
                     <span
-                      title="Conservada para que tus movimientos antiguos sigan teniendo categoría"
+                      title={t('archivedBadge.tooltip')}
                       className="inline-flex items-center gap-0.5 rounded-md bg-white/10 px-1.5 py-0.5 text-[10px] font-medium text-white/60"
                     >
                       <Archive size={10} />
-                      Archivada
+                      {t('archivedBadge.label')}
                     </span>
                   </div>
                 </div>
@@ -216,13 +216,13 @@ export default function Categories() {
                 <button
                   type="button"
                   onClick={() => handleUnarchive(c)}
-                  aria-label="Restaurar"
-                  title="Volver a activarla"
+                  aria-label={t('restore.label')}
+                  title={t('restore.tooltip')}
                   disabled={unarchiveMutation.isPending}
                   className="inline-flex items-center gap-1 rounded-md bg-bg-card px-2 py-1.5 text-xs text-white/80 hover:bg-white/10 hover:text-accent disabled:opacity-50"
                 >
                   <ArchiveRestore size={13} />
-                  Restaurar
+                  {t('restore.label')}
                 </button>
               </li>
             ))}
@@ -230,17 +230,12 @@ export default function Categories() {
         </div>
       )}
 
-      <p className="px-1 text-xs text-white/40">
-        Las "Fijas" son las iniciales — puedes renombrarlas o recolorearlas, pero no
-        archivarlas. Las que tú creas (ej. "Viaje Madrid", "Carnet de moto") puedes
-        archivarlas cuando dejes de usarlas: desaparecen de los formularios nuevos
-        pero los movimientos antiguos siguen mostrándolas.
-      </p>
+      <p className="px-1 text-xs text-white/40">{t('footerNote')}</p>
 
       <Modal
         open={open}
         onClose={() => setEditing(null)}
-        title={editing === 'new' ? 'Nueva categoría' : 'Editar categoría'}
+        title={editing === 'new' ? t('modal.new') : t('modal.edit')}
       >
         <CategoryForm
           category={editing && editing !== 'new' ? editing : null}

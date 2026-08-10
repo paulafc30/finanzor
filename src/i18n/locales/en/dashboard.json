@@ -1,0 +1,47 @@
+{
+  "subtitle": {
+    "month": "Monthly financial summary",
+    "year": "Yearly financial summary"
+  },
+  "kpi": {
+    "income": "Income",
+    "expense": "Expenses",
+    "balanceToday": "Balance today",
+    "balanceYear": "Balance this year",
+    "savingsRate": "Savings Rate",
+    "vsLastMonth": "vs. last month"
+  },
+  "estimatedBalance": "Estimated balance by end of month: ",
+  "withFutureMovements": "with future movements",
+  "addTransaction": "Add transaction",
+  "newTransaction": "New transaction",
+  "comparisonChart": {
+    "title": "Comparison by category",
+    "vsLabel": "vs. {{label}}",
+    "noData": "Not enough data yet to compare.",
+    "yearLabel": "Year {{year}}",
+    "avgLastMonths": "Average of last {{count}} months",
+    "currentMonth": "Current month"
+  },
+  "donut": {
+    "title": "Expenses by category",
+    "total": "Total",
+    "noExpensesMonth": "No expenses this month",
+    "noExpensesYear": "No expenses this year",
+    "noCategory": "No category"
+  },
+  "budgetBar": {
+    "title": "Monthly budget",
+    "spent": "Spent: ",
+    "available": "Available",
+    "exceeded": "Exceeded"
+  },
+  "recent": {
+    "title": "Recent transactions",
+    "viewAll": "View all",
+    "noneMonth": "No transactions this month.",
+    "noneYear": "No transactions this year.",
+    "noDescription": "No description",
+    "dateFormat": "MMMM d"
+  }
+}

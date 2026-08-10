@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
 import TransactionForm from '../components/transactions/TransactionForm.jsx'
@@ -10,6 +11,7 @@ import MovementsFilters, {
 import MovementsSummary from '../components/transactions/MovementsSummary.jsx'
 
 export default function Movements() {
+  const { t } = useTranslation('transactions')
   // null = cerrado, 'new' = creando, transaction object = editando
   const [editing, setEditing] = useState(null)
   const open = editing !== null
@@ -24,7 +26,7 @@ export default function Movements() {
 
   return (
     <section className="space-y-4">
-      <h1 className="text-xl font-semibold">Movimientos</h1>
+      <h1 className="text-xl font-semibold">{t('title')}</h1>
 
       <MovementsFilters filter={filter} onChange={setFilter} />
 
@@ -34,12 +36,12 @@ export default function Movements() {
 
       <TransactionList filter={filter} onEdit={(t) => setEditing(t)} />
 
-      <Fab onClick={() => setEditing('new')} ariaLabel="Añadir movimiento" />
+      <Fab onClick={() => setEditing('new')} ariaLabel={t('addMovementAria')} />
 
       <Modal
         open={open}
         onClose={() => setEditing(null)}
-        title={editing === 'new' ? 'Nuevo movimiento' : 'Editar movimiento'}
+        title={editing === 'new' ? t('newMovement') : t('editMovement')}
       >
         <TransactionForm
           transaction={editing && editing !== 'new' ? editing : null}

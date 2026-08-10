@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from './useSession.js'
 
@@ -37,6 +38,7 @@ export function useRecurringExpenses({ type = null } = {}) {
 export function useCreateRecurring() {
   const { user } = useSession()
   const qc = useQueryClient()
+  const { t } = useTranslation('recurring')
 
   return useMutation({
     mutationFn: async (input) => {
@@ -52,15 +54,15 @@ export function useCreateRecurring() {
         is_active: input.is_active ?? true,
         type: input.type === 'income' ? 'income' : 'expense',
       }
-      if (!payload.name) throw new Error('El nombre es obligatorio')
+      if (!payload.name) throw new Error(t('errors.nameRequired'))
       if (!Number.isFinite(payload.amount) || payload.amount <= 0) {
-        throw new Error('Importe inválido')
+        throw new Error(t('errors.amountInvalid'))
       }
       if (payload.day_of_month < 1 || payload.day_of_month > 28) {
-        throw new Error('El día debe estar entre 1 y 28')
+        throw new Error(t('errors.dayInvalid'))
       }
       if (payload.type === 'expense' && !payload.category_id) {
-        throw new Error('Categoría obligatoria en gastos fijos')
+        throw new Error(t('errors.categoryRequiredForExpense'))
       }
 
       const { data, error } = await supabase

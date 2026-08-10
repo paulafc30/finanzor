@@ -1,4 +1,5 @@
 import { BarChart3 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import {
   BarChart,
   Bar,
@@ -26,6 +27,7 @@ import { formatEuro } from '../../lib/formatters.js'
  * `CategoryDonut` para ver la composicion del mes.
  */
 export default function CategoryComparisonChart() {
+  const { t } = useTranslation('dashboard')
   const { data, isLoading } = useExpenseComparison()
   const ctx = useTheme()
   const isDark = ctx?.theme !== 'light'
@@ -47,10 +49,10 @@ export default function CategoryComparisonChart() {
   if (items.length === 0) {
     return (
       <div className="hidden lg:block rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5">
-        <Header subtitle={data?.previousLabel} />
+        <Header subtitle={data?.previousLabel} t={t} />
         <div className="flex h-48 items-center justify-center">
           <p className="text-sm text-white/50">
-            Aún no hay datos suficientes para comparar.
+            {t('comparisonChart.noData')}
           </p>
         </div>
       </div>
@@ -79,7 +81,7 @@ export default function CategoryComparisonChart() {
 
   return (
     <div className="hidden lg:block rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5">
-      <Header subtitle={data.previousLabel} />
+      <Header subtitle={data.previousLabel} t={t} />
 
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
@@ -147,14 +149,14 @@ export default function CategoryComparisonChart() {
   )
 }
 
-function Header({ subtitle }) {
+function Header({ subtitle, t }) {
   return (
     <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
       <BarChart3 size={16} className="text-info" />
-      Comparativa por categoría
+      {t('comparisonChart.title')}
       {subtitle && (
         <span className="ml-auto text-[11px] font-normal text-white/50">
-          vs. {subtitle}
+          {t('comparisonChart.vsLabel', { label: subtitle })}
         </span>
       )}
     </h3>
