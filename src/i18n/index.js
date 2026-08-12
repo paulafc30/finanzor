@@ -76,14 +76,24 @@ const en = {
   onboarding: enOnboarding,
 }
 
+// IMPORTANTE: cada feature es un namespace REAL de i18next (no una clave
+// anidada dentro del namespace por defecto "translation"), porque los
+// componentes llaman a useTranslation('auth'), useTranslation('settings'), etc.
+// Si los recursos se registraran como { es: { translation: { auth: ... } } },
+// i18next buscaria un namespace "auth" que no existe y devolveria la clave
+// tal cual (bug que rompio toda la UI en produccion).
+const ns = Object.keys(es)
+
 i18next
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      es: { translation: es },
-      en: { translation: en },
+      es,
+      en,
     },
+    ns,
+    defaultNS: 'common',
     fallbackLng: 'es',
     supportedLngs: ['es', 'en'],
     detection: {
