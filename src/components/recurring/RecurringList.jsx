@@ -7,6 +7,9 @@ import {
   useDeleteRecurring,
 } from '../../hooks/useRecurringExpenses.js'
 
+// Índice = Date.getDay() (0=domingo..6=sábado), igual que en RecurringForm.
+const WEEKDAY_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+
 /**
  * Lista de recurrentes con toggle activar/desactivar, editar y eliminar.
  *
@@ -95,7 +98,12 @@ export default function RecurringList({ type = 'expense', onEdit }) {
                 />
               </div>
               <p className="text-xs text-white/50">
-                {t('amountDayLine', { amount: formatEuro(r.amount), day: r.day_of_month })}
+                {r.frequency === 'weekly'
+                  ? t('amountWeekdayLine', {
+                      amount: formatEuro(r.amount),
+                      weekday: t(`weekdays.${WEEKDAY_KEYS[r.day_of_week]}`),
+                    })
+                  : t('amountDayLine', { amount: formatEuro(r.amount), day: r.day_of_month })}
               </p>
             </div>
 

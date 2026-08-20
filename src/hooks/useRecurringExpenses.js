@@ -21,7 +21,7 @@ export function useRecurringExpenses({ type = null } = {}) {
       let q = supabase
         .from('recurring_expenses')
         .select(`
-          id, name, amount, day_of_month, is_active, type, created_at,
+          id, name, amount, day_of_month, day_of_week, frequency, is_active, type, created_at,
           category:categories(id, name, color)
         `)
         .eq('user_id', user.id)
@@ -42,6 +42,7 @@ export function useCreateRecurring() {
 
   return useMutation({
     mutationFn: async (input) => {
+      const frequency = input.frequency === 'weekly' ? 'weekly' : 'monthly'
       const payload = {
         user_id: user.id,
         name: input.name?.trim(),
@@ -50,7 +51,9 @@ export function useCreateRecurring() {
         // sueltos: un ingreso puede ir "sin categoria"); para gastos es
         // obligatoria por coherencia con la UI de Movimientos.
         category_id: input.category_id || null,
-        day_of_month: Number(input.day_of_month),
+        frequency,
+        day_of_month: frequency === 'monthly' ? Number(input.day_of_month) : null,
+        day_of_week: frequency === 'weekly' ? Number(input.day_of_week) : null,
         is_active: input.is_active ?? true,
         type: input.type === 'income' ? 'income' : 'expense',
       }
@@ -58,8 +61,17 @@ export function useCreateRecurring() {
       if (!Number.isFinite(payload.amount) || payload.amount <= 0) {
         throw new Error(t('errors.amountInvalid'))
       }
-      if (payload.day_of_month < 1 || payload.day_of_month > 28) {
-        throw new Error(t('errors.dayInvalid'))
+      if (frequency === 'monthly') {
+        if (payload.day_of_month < 1 || payload.day_of_month > 28) {
+          throw new Error(t('errors.dayInvalid'))
+        }
+      } else if (
+        payload.day_of_week === null ||
+        payload.day_of_week < 0 ||
+        payload.day_of_week > 6 ||
+        Number.isNaN(payload.day_of_week)
+      ) {
+        throw new Error(t('errors.weekdayInvalid'))
       }
       if (payload.type === 'expense' && !payload.category_id) {
         throw new Error(t('errors.categoryRequiredForExpense'))
@@ -90,9 +102,17 @@ export function useUpdateRecurring() {
       if (patch.name !== undefined) cleaned.name = patch.name.trim()
       if (patch.amount !== undefined) cleaned.amount = Number(patch.amount)
       if (patch.category_id !== undefined) cleaned.category_id = patch.category_id || null
-      if (patch.day_of_month !== undefined) cleaned.day_of_month = Number(patch.day_of_month)
       if (patch.is_active !== undefined) cleaned.is_active = !!patch.is_active
       if (patch.type !== undefined) cleaned.type = patch.type === 'income' ? 'income' : 'expense'
+      // frequency, day_of_month y day_of_week viajan siempre juntos: al
+      // cambiar de mensual a semanal (o viceversa) hay que limpiar el campo
+      // que deja de aplicar, si no la constraint cruzada de la BD lo rechaza.
+      if (patch.frequency !== undefined) {
+        const frequency = patch.frequency === 'weekly' ? 'weekly' : 'monthly'
+        cleaned.frequency = frequency
+        cleaned.day_of_month = frequency === 'monthly' ? Number(patch.day_of_month) : null
+        cleaned.day_of_week = frequency === 'weekly' ? Number(patch.day_of_week) : null
+      }
 
       const { data, error } = await supabase
         .from('recurring_expenses')
@@ -178,17 +198,25 @@ export function useDeleteRecurring() {
 /**
  * Materializa los recurrentes activos en el MES CALENDARIO ACTUAL.
  *
- * REGLAS:
+ * REGLAS COMUNES:
  *  - Solo se generan movimientos en el mes en curso (mes real de hoy).
  *    Da igual que el usuario navegue a mayo, abril o agosto: nunca se
  *    crearán recurrentes en esos meses al pasar por ellos.
  *  - Solo materializa los que están `is_active = true`. Si lo desactivas,
  *    deja de generarse en futuros meses; los pasados se mantienen.
- *  - Solo materializa recurrentes cuyo `created_at` esté en este mes o
- *    en uno anterior (un fijo creado el 15 de junio no produce nada
- *    en mayo, pero sí en junio aunque el día 15 ya hubiera pasado).
- *  - Idempotente: si el movimiento de este mes ya existe (mismo
- *    `recurring_id`), no se duplica.
+ *  - Solo materializa ocurrencias desde el `created_at` del recurrente en
+ *    adelante (uno creado el 15 de junio no produce nada antes de esa fecha).
+ *
+ * MENSUALES (frequency='monthly'):
+ *  - Una única ocurrencia el `day_of_month` del mes en curso (idempotente:
+ *    dedupe por `recurring_id`, sin mirar la fecha exacta, para tolerar que
+ *    el usuario cambie el día después de haberse generado ya ese mes).
+ *
+ * SEMANALES (frequency='weekly'):
+ *  - Una ocurrencia por cada `day_of_week` que haya caído este mes hasta
+ *    hoy (normalmente ~4-5 al mes). Dedupe por `recurring_id` + fecha
+ *    exacta, porque aquí sí puede haber varias filas legítimas del mismo
+ *    recurrente en el mismo mes.
  */
 export function useMaterializeRecurring() {
   const { user } = useSession()
@@ -205,12 +233,13 @@ export function useMaterializeRecurring() {
       const todayDay = now.getDate() // 1-31
       const monthStart = format(new Date(year, monthIdx, 1), 'yyyy-MM-dd')
       const monthEnd = format(new Date(year, monthIdx + 1, 1), 'yyyy-MM-dd')
+      const todayStr = format(now, 'yyyy-MM-dd')
 
       // 1. Recurrentes activos (de ambos tipos). Incluimos created_at
       //    para saltar los creados despues del mes en curso.
       const { data: recurrings, error: e1 } = await supabase
         .from('recurring_expenses')
-        .select('id, name, amount, category_id, day_of_month, type, created_at')
+        .select('id, name, amount, category_id, day_of_month, day_of_week, frequency, type, created_at')
         .eq('user_id', user.id)
         .eq('is_active', true)
       if (e1) throw e1
@@ -219,43 +248,38 @@ export function useMaterializeRecurring() {
       // 2. Movimientos del mes actual que ya provienen de recurrentes
       const { data: existing, error: e2 } = await supabase
         .from('transactions')
-        .select('recurring_id')
+        .select('recurring_id, occurred_on')
         .eq('user_id', user.id)
         .gte('occurred_on', monthStart)
         .lt('occurred_on', monthEnd)
         .not('recurring_id', 'is', null)
       if (e2) throw e2
 
-      const alreadyMaterialized = new Set(
-        (existing ?? []).map((t) => t.recurring_id),
+      // Para mensuales: basta con saber SI ya existe alguna fila este mes.
+      const materializedIds = new Set((existing ?? []).map((t) => t.recurring_id))
+      // Para semanales: hace falta la fecha exacta, porque puede haber
+      // varias filas legítimas del mismo recurrente en el mismo mes.
+      const materializedPairs = new Set(
+        (existing ?? []).map((t) => `${t.recurring_id}|${t.occurred_on}`),
       )
 
-      // 3. Construir las filas que faltan
-      const toInsert = recurrings
-        .filter((r) => !alreadyMaterialized.has(r.id))
-        .filter((r) => {
-          // Saltar recurrentes creados despues del primer dia del mes
-          // en curso: solo cuentan desde el mes de su creacion.
-          if (!r.created_at) return true
-          const created = new Date(r.created_at)
-          const createdMonthStart = format(
-            new Date(created.getFullYear(), created.getMonth(), 1),
-            'yyyy-MM-dd',
-          )
-          return monthStart >= createdMonthStart
-        })
-        .filter((r) => {
-          // Solo materializar cuando ya ha llegado (o pasado) el dia del
-          // mes que el recurrente tiene fijado. Asi una nomina con dia 28
-          // no aparece en movimientos el dia 4. Cuando el usuario entre
-          // a la app el dia 28 o despues, ese mismo dia se materializa.
+      const createdDateStr = (r) =>
+        r.created_at ? format(new Date(r.created_at), 'yyyy-MM-dd') : '0000-01-01'
+
+      const toInsert = []
+
+      for (const r of recurrings) {
+        const isWeekly = r.frequency === 'weekly'
+        const createdOn = createdDateStr(r)
+
+        if (!isWeekly) {
+          // ── Mensual ──
+          if (materializedIds.has(r.id)) continue
           const day = Math.max(1, Math.min(28, r.day_of_month))
-          return day <= todayDay
-        })
-        .map((r) => {
-          const day = Math.max(1, Math.min(28, r.day_of_month))
+          if (day > todayDay) continue
           const occurred = format(new Date(year, monthIdx, day), 'yyyy-MM-dd')
-          return {
+          if (occurred < createdOn) continue
+          toInsert.push({
             user_id: user.id,
             type: r.type === 'income' ? 'income' : 'expense',
             amount: r.amount,
@@ -263,8 +287,36 @@ export function useMaterializeRecurring() {
             category_id: r.category_id,
             occurred_on: occurred,
             recurring_id: r.id,
+          })
+          continue
+        }
+
+        // ── Semanal ── genera todas las fechas de este mes que caigan en
+        // `day_of_week` (0=domingo..6=sábado, como Date.getDay()), desde el
+        // primer día del mes hasta hoy, saltando las ya materializadas y
+        // las anteriores a la creación del recurrente.
+        const dow = r.day_of_week
+        if (dow == null) continue
+        const first = new Date(year, monthIdx, 1)
+        const offset = (dow - first.getDay() + 7) % 7
+        let d = new Date(year, monthIdx, 1 + offset)
+        while (d.getMonth() === monthIdx) {
+          const occurred = format(d, 'yyyy-MM-dd')
+          if (occurred > todayStr) break
+          if (occurred >= createdOn && !materializedPairs.has(`${r.id}|${occurred}`)) {
+            toInsert.push({
+              user_id: user.id,
+              type: r.type === 'income' ? 'income' : 'expense',
+              amount: r.amount,
+              description: r.name,
+              category_id: r.category_id,
+              occurred_on: occurred,
+              recurring_id: r.id,
+            })
           }
-        })
+          d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 7)
+        }
+      }
 
       if (toInsert.length === 0) return { inserted: 0 }
 

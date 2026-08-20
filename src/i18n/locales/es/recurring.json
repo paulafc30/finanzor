@@ -8,9 +8,23 @@
   "categoryLabel": "Categoría",
   "noCategory": "Sin categoría",
   "selectPlaceholder": "Selecciona…",
+  "frequencyLabel": "Frecuencia",
+  "frequencyMonthly": "Mensual",
+  "frequencyWeekly": "Semanal",
   "dayLabel": "Día del mes",
   "dayHint": "Limitado a 1–28 para que funcione siempre, incluso en febrero.",
-  "activeLabel": "Activo (se generará cada mes automáticamente)",
+  "weekdayLabel": "Día de la semana",
+  "weekdayHint": "Se generará un movimiento cada semana ese día, hasta hoy.",
+  "weekdays": {
+    "sunday": "Domingo",
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miércoles",
+    "thursday": "Jueves",
+    "friday": "Viernes",
+    "saturday": "Sábado"
+  },
+  "activeLabel": "Activo (se generará automáticamente)",
   "saving": "Guardando…",
   "saveChanges": "Guardar cambios",
   "createIncome": "Crear ingreso fijo",
@@ -24,6 +38,7 @@
   "statusActive": "Activo",
   "statusInactive": "Inactivo",
   "amountDayLine": "{{amount}} · día {{day}} de cada mes",
+  "amountWeekdayLine": "{{amount}} · cada {{weekday}}",
   "editAria": "Editar",
   "deleteAria": "Eliminar",
   "errors": {
@@ -33,6 +48,7 @@
     "nameRequired": "El nombre es obligatorio",
     "amountInvalid": "Importe inválido",
     "dayInvalid": "El día debe estar entre 1 y 28",
+    "weekdayInvalid": "Elige un día de la semana válido",
     "categoryRequiredForExpense": "Categoría obligatoria en gastos fijos"
   }
 }

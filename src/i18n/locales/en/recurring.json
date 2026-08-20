@@ -8,9 +8,23 @@
   "categoryLabel": "Category",
   "noCategory": "No category",
   "selectPlaceholder": "Select…",
+  "frequencyLabel": "Frequency",
+  "frequencyMonthly": "Monthly",
+  "frequencyWeekly": "Weekly",
   "dayLabel": "Day of the month",
   "dayHint": "Limited to 1–28 so it always works, even in February.",
-  "activeLabel": "Active (will be generated automatically every month)",
+  "weekdayLabel": "Day of the week",
+  "weekdayHint": "A movement will be generated every week on that day, up to today.",
+  "weekdays": {
+    "sunday": "Sunday",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday"
+  },
+  "activeLabel": "Active (will be generated automatically)",
   "saving": "Saving…",
   "saveChanges": "Save changes",
   "createIncome": "Create fixed income",
@@ -24,6 +38,7 @@
   "statusActive": "Active",
   "statusInactive": "Inactive",
   "amountDayLine": "{{amount}} · day {{day}} of every month",
+  "amountWeekdayLine": "{{amount}} · every {{weekday}}",
   "editAria": "Edit",
   "deleteAria": "Delete",
   "errors": {
@@ -33,6 +48,7 @@
     "nameRequired": "Name is required",
     "amountInvalid": "Invalid amount",
     "dayInvalid": "The day must be between 1 and 28",
+    "weekdayInvalid": "Choose a valid day of the week",
     "categoryRequiredForExpense": "Category is required for fixed expenses"
   }
 }

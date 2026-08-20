@@ -7,6 +7,10 @@ import {
   useUpdateRecurring,
 } from '../../hooks/useRecurringExpenses.js'
 
+// Índice = Date.getDay() (0=domingo..6=sábado), igual que se guarda
+// day_of_week en BD y se calcula en useMaterializeRecurring.
+const WEEKDAY_KEYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+
 /**
  * Formulario de recurrente (gasto fijo o ingreso fijo).
  *
@@ -33,7 +37,9 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
   const [name, setName] = useState(recurring?.name ?? '')
   const [amount, setAmount] = useState(recurring?.amount ?? '')
   const [categoryId, setCategoryId] = useState(recurring?.category?.id ?? '')
+  const [frequency, setFrequency] = useState(recurring?.frequency ?? 'monthly')
   const [day, setDay] = useState(recurring?.day_of_month ?? 1)
+  const [weekday, setWeekday] = useState(recurring?.day_of_week ?? 1)
   const [isActive, setIsActive] = useState(recurring?.is_active ?? true)
   const [error, setError] = useState(null)
 
@@ -42,7 +48,9 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
     setName(recurring?.name ?? '')
     setAmount(recurring?.amount ?? '')
     setCategoryId(recurring?.category?.id ?? '')
+    setFrequency(recurring?.frequency ?? 'monthly')
     setDay(recurring?.day_of_month ?? 1)
+    setWeekday(recurring?.day_of_week ?? 1)
     setIsActive(recurring?.is_active ?? true)
     setError(null)
   }, [recurring, defaultType])
@@ -56,7 +64,9 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
         name,
         amount,
         category_id: categoryId || null,
+        frequency,
         day_of_month: day,
+        day_of_week: weekday,
         is_active: isActive,
       }
       if (isEdit) {
@@ -159,21 +169,76 @@ export default function RecurringForm({ recurring, defaultType = 'expense', onSu
 
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
-          {t('dayLabel')}
+          {t('frequencyLabel')}
         </label>
-        <input
-          type="number"
-          min="1"
-          max="28"
-          value={day}
-          onChange={(e) => setDay(e.target.value)}
-          required
-          className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
-        />
-        <p className="mt-1 text-xs text-white/40">
-          {t('dayHint')}
-        </p>
+        <div className="grid grid-cols-2 gap-2 rounded-lg bg-bg-card p-1">
+          <button
+            type="button"
+            onClick={() => setFrequency('monthly')}
+            className={[
+              'rounded-md py-2 text-sm font-medium transition',
+              frequency === 'monthly'
+                ? 'bg-accent text-white'
+                : 'text-white/60 hover:text-white',
+            ].join(' ')}
+          >
+            {t('frequencyMonthly')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setFrequency('weekly')}
+            className={[
+              'rounded-md py-2 text-sm font-medium transition',
+              frequency === 'weekly'
+                ? 'bg-accent text-white'
+                : 'text-white/60 hover:text-white',
+            ].join(' ')}
+          >
+            {t('frequencyWeekly')}
+          </button>
+        </div>
       </div>
+
+      {frequency === 'monthly' ? (
+        <div>
+          <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
+            {t('dayLabel')}
+          </label>
+          <input
+            type="number"
+            min="1"
+            max="28"
+            value={day}
+            onChange={(e) => setDay(e.target.value)}
+            required
+            className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
+          />
+          <p className="mt-1 text-xs text-white/40">
+            {t('dayHint')}
+          </p>
+        </div>
+      ) : (
+        <div>
+          <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
+            {t('weekdayLabel')}
+          </label>
+          <select
+            value={weekday}
+            onChange={(e) => setWeekday(Number(e.target.value))}
+            required
+            className="w-full rounded-lg bg-bg-card px-3 py-2.5 text-white outline-none ring-1 ring-white/5 focus:ring-accent"
+          >
+            {WEEKDAY_KEYS.map((key, idx) => (
+              <option key={idx} value={idx}>
+                {t(`weekdays.${key}`)}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-white/40">
+            {t('weekdayHint')}
+          </p>
+        </div>
+      )}
 
       <label className="flex items-center gap-2 text-sm text-white">
         <input
