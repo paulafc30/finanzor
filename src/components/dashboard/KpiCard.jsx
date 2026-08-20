@@ -101,6 +101,7 @@ export default function KpiCard({
         palette.cardBg,
         palette.cardRing,
         onClick ? 'cursor-pointer transition-opacity hover:opacity-80 active:opacity-60' : '',
+        'flex h-full flex-col',
         className,
       ].join(' ')}
     >
@@ -121,7 +122,9 @@ export default function KpiCard({
         {loading ? '…' : value}
       </p>
 
-      {deltaNode && <div className="mt-1.5">{deltaNode}</div>}
+      {/* Se reserva siempre este hueco (tenga o no delta) para que todas
+          las cards de la fila midan lo mismo, aunque una no tenga delta. */}
+      <div className="mt-1.5 min-h-[28px] flex-1">{deltaNode}</div>
     </Wrapper>
   )
 }
