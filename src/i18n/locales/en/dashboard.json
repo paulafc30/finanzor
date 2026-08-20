@@ -9,6 +9,7 @@
     "balanceToday": "Balance today",
     "balanceYear": "Balance this year",
     "budgetPercent": "% Budget",
+    "avgDailyExpense": "Avg. daily spend",
     "vsLastMonth": "vs. last month"
   },
   "estimatedBalance": "Estimated balance by end of month: ",

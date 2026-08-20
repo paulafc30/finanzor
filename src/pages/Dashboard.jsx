@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { TrendingUp, TrendingDown, Wallet, CalendarClock } from 'lucide-react'
+import { TrendingUp, TrendingDown, Wallet, CalendarClock, Receipt } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
 import TransactionForm from '../components/transactions/TransactionForm.jsx'
@@ -51,11 +51,39 @@ export default function Dashboard() {
     // ¿Hay movimientos con fecha futura en el mes visible?
     const hasFuture = incomeAll !== income || expenseAll !== expense
 
-    return { income: incomeAll, expense: expenseAll, balance, balanceAll, hasFuture }
+    return { income: incomeAll, expense: expenseAll, expenseToDate: expense, balance, balanceAll, hasFuture }
   }, [transactions, todayStr])
 
   const prevIncome = prev?.income ?? 0
   const prevExpense = prev?.expense ?? 0
+
+  // Días transcurridos del periodo visible, para el gasto medio diario.
+  // - Mes/año actual: días hasta hoy (incluido).
+  // - Mes/año ya cerrado (pasado): todos sus días.
+  // - Mes/año futuro: 0 (aún no hay "medio diario" que calcular).
+  const daysElapsed = useMemo(() => {
+    const now = new Date()
+    if (isYearView) {
+      const year = month.getFullYear()
+      if (year === now.getFullYear()) {
+        return Math.floor((now - new Date(year, 0, 1)) / 86400000) + 1
+      }
+      if (year < now.getFullYear()) {
+        return Math.floor((new Date(year + 1, 0, 1) - new Date(year, 0, 1)) / 86400000)
+      }
+      return 0
+    }
+    const y = month.getFullYear()
+    const m = month.getMonth()
+    if (y === now.getFullYear() && m === now.getMonth()) {
+      return now.getDate()
+    }
+    if (new Date(y, m, 1) < new Date(now.getFullYear(), now.getMonth(), 1)) {
+      return new Date(y, m + 1, 0).getDate() // días totales de ese mes
+    }
+    return 0
+  }, [month, isYearView])
+  const avgDailyExpense = daysElapsed > 0 ? summary.expenseToDate / daysElapsed : null
 
   // Saldo actual = solo lo ocurrido hasta hoy + carry-forward
   const balanceLabel = isYearView ? t('kpi.balanceYear') : t('kpi.balanceToday')
@@ -77,9 +105,8 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* KPIs — 3 columnas. La card de % Presupuesto se quitó de aquí
-          (pendiente de decidir cómo mostrarla bien) hasta que se retome. */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* KPIs en grid 2x2 (móvil) / 4x1 (desktop) */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <KpiCard
           label={t('kpi.income')}
           value={formatEuro(summary.income)}
@@ -109,6 +136,14 @@ export default function Dashboard() {
           icon={Wallet}
           tone="info"
           loading={isLoading || cfLoading}
+        />
+        <KpiCard
+          label={t('kpi.avgDailyExpense')}
+          value={avgDailyExpense !== null ? formatEuro(avgDailyExpense) : '—'}
+          icon={Receipt}
+          tone="accent"
+          loading={isLoading}
+          onClick={() => navigate('/movimientos', { state: { filterType: 'expense' } })}
         />
       </div>
 

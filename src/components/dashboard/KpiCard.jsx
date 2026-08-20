@@ -59,6 +59,7 @@ export default function KpiCard({
   deltaIsAbsolute = false,
   deltaLabel = null,
   onClick = null,
+  className = '',
 }) {
   const palette = tonePalette[tone] ?? tonePalette.accent
 
@@ -100,6 +101,7 @@ export default function KpiCard({
         palette.cardBg,
         palette.cardRing,
         onClick ? 'cursor-pointer transition-opacity hover:opacity-80 active:opacity-60' : '',
+        className,
       ].join(' ')}
     >
       <div
