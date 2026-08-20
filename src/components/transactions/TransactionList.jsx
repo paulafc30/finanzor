@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Trash2, ArrowDownCircle, ArrowUpCircle, Repeat } from 'lucide-react'
+import { Trash2, ArrowDownCircle, ArrowUpCircle, Repeat, CreditCard, Banknote } from 'lucide-react'
 import { format } from 'date-fns'
 import { formatEuro, dateFnsLocale } from '../../lib/formatters.js'
 import {
@@ -144,6 +144,19 @@ export default function TransactionList({ onEdit, filter = null }) {
                           size={12}
                           className="shrink-0 text-accent"
                           aria-label={t('list.recurringMovementAria')}
+                        />
+                      )}
+                      {tx.payment_method === 'cash' ? (
+                        <Banknote
+                          size={12}
+                          className="shrink-0 text-white/40"
+                          aria-label={t('list.paymentMethodCashAria')}
+                        />
+                      ) : (
+                        <CreditCard
+                          size={12}
+                          className="shrink-0 text-white/40"
+                          aria-label={t('list.paymentMethodCardAria')}
                         />
                       )}
                     </div>

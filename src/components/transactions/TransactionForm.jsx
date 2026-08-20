@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { format } from 'date-fns'
-import { Repeat, Calculator, Plus } from 'lucide-react'
+import { Repeat, Calculator, Plus, CreditCard, Banknote } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Button from '../ui/Button.jsx'
@@ -18,6 +18,7 @@ function buildSchema(t) {
   return z
     .object({
       type: z.enum(['expense', 'income']),
+      payment_method: z.enum(['card', 'cash']),
       amount: z.coerce
         .number({ invalid_type_error: t('form.errors.invalidAmount') })
         .positive(t('form.errors.amountPositive')),
@@ -109,6 +110,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
   const initial = isEdit
     ? {
         type: transaction.type,
+        payment_method: transaction.payment_method ?? 'card',
         amount: String(transaction.amount),
         description: transaction.description ?? '',
         category_id: transaction.category?.id ?? '',
@@ -116,6 +118,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
       }
     : {
         type: 'expense',
+        payment_method: 'card',
         amount: '',
         description: '',
         category_id: '',
@@ -158,6 +161,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
   }, [categories.length, transaction?.id])
 
   const type = watch('type')
+  const paymentMethod = watch('payment_method')
   const amount = watch('amount')
   const busy = createMutation.isPending || updateMutation.isPending
   const [calcOpen, setCalcOpen] = useState(false)
@@ -192,6 +196,7 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
         // pero conservamos tipo y fecha para encadenar varios.
         reset({
           type: parsed.data.type,
+          payment_method: parsed.data.payment_method,
           amount: '',
           description: '',
           category_id: '',
@@ -239,6 +244,19 @@ export default function TransactionForm({ transaction, defaultDate: defaultDateP
           ].join(' ')}
         >
           {t('form.income')}
+        </button>
+      </div>
+
+      {/* Metodo de pago — chip discreto y opcional, no un toggle a lo ancho.
+          Por defecto va en "tarjeta"; solo se nota si el usuario lo toca. */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setValue('payment_method', paymentMethod === 'cash' ? 'card' : 'cash')}
+          className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium text-white/40 ring-1 ring-white/10 transition hover:text-white/70"
+        >
+          {paymentMethod === 'cash' ? <Banknote size={12} /> : <CreditCard size={12} />}
+          {paymentMethod === 'cash' ? t('form.paymentMethodCash') : t('form.paymentMethodCard')}
         </button>
       </div>
 

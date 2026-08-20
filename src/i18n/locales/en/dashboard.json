@@ -8,7 +8,7 @@
     "expense": "Expenses",
     "balanceToday": "Balance today",
     "balanceYear": "Balance this year",
-    "savingsRate": "Savings Rate",
+    "budgetPercent": "% Budget",
     "vsLastMonth": "vs. last month"
   },
   "estimatedBalance": "Estimated balance by end of month: ",

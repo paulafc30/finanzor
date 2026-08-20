@@ -24,6 +24,7 @@ export function useTransactionsByRange(from, to) {
           amount,
           description,
           occurred_on,
+          payment_method,
           category:categories(id, name, icon, color)
         `)
         .gte('occurred_on', from)
@@ -61,6 +62,7 @@ export function useTransactions() {
           description,
           occurred_on,
           recurring_id,
+          payment_method,
           category:categories(id, name, icon, color)
         `)
         .gte('occurred_on', rangeStart)
@@ -91,6 +93,7 @@ export function useCreateTransaction() {
         description: input.description?.trim() || null,
         category_id: input.category_id || null,
         occurred_on: input.occurred_on,
+        payment_method: input.payment_method || 'card',
       }
       const { data, error } = await supabase
         .from('transactions')
@@ -134,6 +137,7 @@ export function useUpdateTransaction() {
         cleaned.category_id = patch.category_id || null
       }
       if (patch.occurred_on !== undefined) cleaned.occurred_on = patch.occurred_on
+      if (patch.payment_method !== undefined) cleaned.payment_method = patch.payment_method
 
       const { data, error } = await supabase
         .from('transactions')

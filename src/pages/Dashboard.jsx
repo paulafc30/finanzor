@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { TrendingUp, TrendingDown, Wallet, Percent, CalendarClock } from 'lucide-react'
+import { TrendingUp, TrendingDown, Wallet, CalendarClock } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
 import Fab from '../components/ui/Fab.jsx'
 import TransactionForm from '../components/transactions/TransactionForm.jsx'
@@ -48,11 +48,10 @@ export default function Dashboard() {
 
     const balance = income - expense
     const balanceAll = incomeAll - expenseAll
-    const savingsRate = income > 0 ? (balance / income) * 100 : 0
     // ¿Hay movimientos con fecha futura en el mes visible?
     const hasFuture = incomeAll !== income || expenseAll !== expense
 
-    return { income: incomeAll, expense: expenseAll, balance, balanceAll, savingsRate, hasFuture }
+    return { income: incomeAll, expense: expenseAll, balance, balanceAll, hasFuture }
   }, [transactions, todayStr])
 
   const prevIncome = prev?.income ?? 0
@@ -78,15 +77,17 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* KPIs en grid 2x2 (móvil) / 4x1 (desktop) */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {/* KPIs — 3 columnas. La card de % Presupuesto se quitó de aquí
+          (pendiente de decidir cómo mostrarla bien) hasta que se retome. */}
+      <div className="grid grid-cols-3 gap-3">
         <KpiCard
           label={t('kpi.income')}
           value={formatEuro(summary.income)}
           icon={TrendingUp}
           tone="success"
           loading={isLoading}
-          delta={isYearView ? null : diffPct(summary.income, prevIncome)}
+          delta={isYearView ? null : diffAbs(summary.income, prevIncome)}
+          deltaIsAbsolute
           deltaLabel={t('kpi.vsLastMonth')}
           onClick={() => navigate('/movimientos', { state: { filterType: 'income' } })}
         />
@@ -96,7 +97,8 @@ export default function Dashboard() {
           icon={TrendingDown}
           tone="danger"
           loading={isLoading}
-          delta={isYearView ? null : diffPct(summary.expense, prevExpense)}
+          delta={isYearView ? null : diffAbs(summary.expense, prevExpense)}
+          deltaIsAbsolute
           deltaPositiveIsGood={false}
           deltaLabel={t('kpi.vsLastMonth')}
           onClick={() => navigate('/movimientos', { state: { filterType: 'expense' } })}
@@ -107,13 +109,6 @@ export default function Dashboard() {
           icon={Wallet}
           tone="info"
           loading={isLoading || cfLoading}
-        />
-        <KpiCard
-          label={t('kpi.savingsRate')}
-          value={summary.income > 0 ? `${summary.savingsRate.toFixed(1)}%` : '—'}
-          icon={Percent}
-          tone="accent"
-          loading={isLoading}
         />
       </div>
 
@@ -161,21 +156,8 @@ export default function Dashboard() {
 }
 
 /**
- * Diferencia porcentual respecto al valor previo. Si el porcentaje resulta
- * absurdamente grande (>999%) — pasa cuando el mes anterior tenía un valor
- * muy pequeño — devolvemos un objeto con la diferencia absoluta para que la
- * card pinte "+1.234,56 €" en lugar de un "+12350%" inútil.
+ * Diferencia en euros respecto al valor previo (mes anterior).
  */
-function diffPct(current, prev) {
-  if (prev === 0 && current === 0) return null
-  if (prev === 0) return null
-  const pct = ((current - prev) / Math.abs(prev)) * 100
-  if (Math.abs(pct) > 999) {
-    return { fallbackToAbs: true, value: current - prev }
-  }
-  return pct
-}
-
 function diffAbs(current, prev) {
   if (current === 0 && prev === 0) return null
   return current - prev

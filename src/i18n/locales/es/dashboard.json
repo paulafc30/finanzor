@@ -8,7 +8,7 @@
     "expense": "Gastos",
     "balanceToday": "Saldo a hoy",
     "balanceYear": "Saldo del año",
-    "savingsRate": "Tasa de Ahorro",
+    "budgetPercent": "% Presupuesto",
     "vsLastMonth": "vs. mes pasado"
   },
   "estimatedBalance": "Saldo estimado a fin de mes: ",
