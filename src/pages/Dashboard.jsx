@@ -9,6 +9,7 @@ import KpiCard from '../components/dashboard/KpiCard.jsx'
 import CategoryDonut from '../components/dashboard/CategoryDonut.jsx'
 import RecentTransactions from '../components/dashboard/RecentTransactions.jsx'
 import CategoryComparisonChart from '../components/dashboard/CategoryComparisonChart.jsx'
+import ChartCarousel from '../components/dashboard/ChartCarousel.jsx'
 import { useTransactions } from '../hooks/useTransactions.js'
 import { usePreviousMonthSummary } from '../hooks/usePreviousMonthSummary.js'
 import { useCarryForward } from '../hooks/useCarryForward.js'
@@ -177,8 +178,19 @@ export default function Dashboard() {
           autogestiona el `hidden lg:block`. */}
       <CategoryComparisonChart />
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <CategoryDonut />
+      {/* Movil (<lg): carrusel swipe con el donut y la comparativa, que en
+          desktop ya se ve arriba a ancho completo. */}
+      <div className="lg:hidden">
+        <ChartCarousel>
+          <CategoryDonut />
+          <CategoryComparisonChart forceVisible />
+        </ChartCarousel>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="hidden lg:block">
+          <CategoryDonut />
+        </div>
         <RecentTransactions limit={6} />
       </div>
 

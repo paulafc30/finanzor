@@ -22,22 +22,20 @@ import { formatEuro } from '../../lib/formatters.js'
  * - Vista mes: actual vs media de los 3 meses anteriores.
  * - Vista anio: actual vs anio anterior completo.
  *
- * Solo se monta en desktop (`lg+`): la grafica con dos barras por categoria
- * en pantallas estrechas queda apretada y poco legible. En movil ya hay
- * `CategoryDonut` para ver la composicion del mes.
+ * En desktop (`lg+`) se muestra siempre. En movil el padre la monta dentro
+ * de `ChartCarousel` (junto a `CategoryDonut`) pasando `forceVisible`, ya
+ * que ahí el ancho de slide es suficiente para las dos barras.
  */
-export default function CategoryComparisonChart() {
+export default function CategoryComparisonChart({ forceVisible = false }) {
   const { t } = useTranslation('dashboard')
   const { data, isLoading } = useExpenseComparison()
   const ctx = useTheme()
   const isDark = ctx?.theme !== 'light'
+  const visibilityClass = forceVisible ? 'block' : 'hidden lg:block'
 
-  // No renderizamos nada hasta lg+; el padre podria seguir mostrando otras
-  // tarjetas en moviles. Usamos `hidden lg:block` para ahorrar la consulta
-  // en moviles, aunque la query se hace igual; Recharts no se monta.
   if (isLoading) {
     return (
-      <div className="hidden lg:block rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5">
+      <div className={`${visibilityClass} rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5`}>
         <div className="flex h-64 items-center justify-center">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
         </div>
@@ -48,7 +46,7 @@ export default function CategoryComparisonChart() {
   const items = data?.items ?? []
   if (items.length === 0) {
     return (
-      <div className="hidden lg:block rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5">
+      <div className={`${visibilityClass} rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5`}>
         <Header subtitle={data?.previousLabel} t={t} />
         <div className="flex h-48 items-center justify-center">
           <p className="text-sm text-white/50">
@@ -80,7 +78,7 @@ export default function CategoryComparisonChart() {
   const refBarColor = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(15,23,42,0.2)'
 
   return (
-    <div className="hidden lg:block rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5">
+    <div className={`${visibilityClass} rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5`}>
       <Header subtitle={data.previousLabel} t={t} />
 
       <div className="h-72">
