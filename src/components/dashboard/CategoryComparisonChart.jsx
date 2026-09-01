@@ -32,6 +32,9 @@ export default function CategoryComparisonChart({ forceVisible = false }) {
   const ctx = useTheme()
   const isDark = ctx?.theme !== 'light'
   const visibilityClass = forceVisible ? 'block' : 'hidden lg:block'
+  // En el carrusel movil le damos mas alto: el mismo numero de categorias
+  // necesita mas aire vertical cuando las barras van mas separadas.
+  const heightClass = forceVisible ? 'h-[26rem]' : 'h-72'
 
   if (isLoading) {
     return (
@@ -81,13 +84,13 @@ export default function CategoryComparisonChart({ forceVisible = false }) {
     <div className={`${visibilityClass} rounded-xl bg-bg-elevated p-4 ring-1 ring-white/5`}>
       <Header subtitle={data.previousLabel} t={t} />
 
-      <div className="h-72">
+      <div className={heightClass}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
-            margin={{ top: 4, right: 8, bottom: 48, left: 8 }}
-            barCategoryGap="22%"
-            barGap={4}
+            margin={{ top: 4, right: 8, bottom: 56, left: 8 }}
+            barCategoryGap={forceVisible ? '35%' : '22%'}
+            barGap={forceVisible ? 6 : 4}
           >
             <CartesianGrid stroke={gridColor} vertical={false} />
             <XAxis
@@ -96,7 +99,7 @@ export default function CategoryComparisonChart({ forceVisible = false }) {
               tickLine={false}
               axisLine={{ stroke: gridColor }}
               interval={0}
-              height={60}
+              height={68}
             />
             <YAxis
               tick={{ fill: axisColor, fontSize: 11 }}
@@ -128,8 +131,9 @@ export default function CategoryComparisonChart({ forceVisible = false }) {
                 value === 'actual' ? data.currentLabel : data.previousLabel
               }
             />
-            {/* Barra "actual" coloreada por categoria */}
-            <Bar dataKey="actual" radius={[4, 4, 0, 0]}>
+            {/* Barra "actual" coloreada por categoria. minPointSize evita que
+                los importes pequenos desaparezcan del todo. */}
+            <Bar dataKey="actual" radius={[4, 4, 0, 0]} minPointSize={2}>
               {chartData.map((entry, idx) => (
                 <Cell key={idx} fill={entry.color} />
               ))}
@@ -139,6 +143,7 @@ export default function CategoryComparisonChart({ forceVisible = false }) {
               dataKey="referencia"
               radius={[4, 4, 0, 0]}
               fill={refBarColor}
+              minPointSize={2}
             />
           </BarChart>
         </ResponsiveContainer>
