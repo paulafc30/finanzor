@@ -3,6 +3,8 @@ import { Settings as SettingsIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import MonthSwitcher from './MonthSwitcher.jsx'
 import BottomNav from './BottomNav.jsx'
+import { supabase } from '../../lib/supabase.js'
+import { useSession } from '../../hooks/useSession.js'
 
 // Rutas donde NO tiene sentido el selector de mes (ajustes, gestión de
 // categorías, etc.) — son configuración, no datos del mes.
@@ -11,6 +13,7 @@ const HIDE_MONTH_SWITCHER_ON = ['/ajustes', '/categorias', '/importar', '/feedba
 export default function AppShell() {
   const { t } = useTranslation('layout')
   const location = useLocation()
+  const { isAnonymous } = useSession()
   const showMonthSwitcher = !HIDE_MONTH_SWITCHER_ON.includes(location.pathname)
 
   return (
@@ -37,6 +40,19 @@ export default function AppShell() {
           <SettingsIcon size={22} />
         </Link>
       </header>
+
+      {isAnonymous && (
+        <div className="flex items-center justify-between gap-3 bg-accent/15 px-4 py-1.5 text-xs text-white/90">
+          <span>{t('demoBanner.text')}</span>
+          <button
+            type="button"
+            onClick={() => supabase.auth.signOut()}
+            className="shrink-0 font-semibold underline underline-offset-2"
+          >
+            {t('demoBanner.exit')}
+          </button>
+        </div>
+      )}
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-3 pb-24 pt-4 sm:px-4">
         <Outlet />

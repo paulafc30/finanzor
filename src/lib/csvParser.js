@@ -29,7 +29,7 @@ function findHeaderLineIndex(lines) {
 export async function parseCsvFile(file) {
   const rawText = await file.text()
   // Quitar BOM si existe
-  const text = rawText.replace(/^﻿/, '')
+  const text = rawText.replace(/^\uFEFF/, '')
   const lines = text.split(/\r?\n/)
 
   const headerIdx = findHeaderLineIndex(lines)

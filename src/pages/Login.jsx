@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { UserPlus, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { UserPlus, AlertTriangle, CheckCircle2, Eye } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from '../hooks/useSession.js'
 import { translateAuthError } from '../lib/authErrors.js'
+import { startDemo } from '../lib/demo.js'
 
 /**
  * Pantalla de login / signup.
@@ -19,6 +21,7 @@ export default function Login() {
   const { t } = useTranslation('auth')
   const { user, loading } = useSession()
   const location = useLocation()
+  const queryClient = useQueryClient()
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -26,6 +29,7 @@ export default function Login() {
   const [info, setInfo] = useState(null)
   const [busy, setBusy] = useState(false)
   const [signinFailed, setSigninFailed] = useState(false)
+  const [demoBusy, setDemoBusy] = useState(false)
 
   if (loading) return null
   if (user) {
@@ -78,6 +82,21 @@ export default function Login() {
       options: { redirectTo: window.location.origin },
     })
     if (error) setError(translateAuthError(error))
+  }
+
+  async function handleDemo() {
+    clearMessages()
+    setDemoBusy(true)
+    try {
+      await startDemo()
+      // La sesión anónima ya activó la app mientras se sembraban los datos:
+      // refrescamos para que las pantallas muestren los datos de ejemplo.
+      await queryClient.invalidateQueries()
+    } catch (err) {
+      setError(translateAuthError(err))
+    } finally {
+      setDemoBusy(false)
+    }
   }
 
   function offerSignup() {
@@ -183,6 +202,16 @@ export default function Login() {
             />
           </svg>
           {t('login.continueWithGoogle')}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleDemo}
+          disabled={demoBusy || busy}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-bg-card py-2.5 text-sm font-medium text-white ring-1 ring-accent/40 hover:bg-bg-card/70 disabled:opacity-50"
+        >
+          <Eye size={15} />
+          {demoBusy ? t('login.demoBusy') : t('login.tryDemo')}
         </button>
 
         <button

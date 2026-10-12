@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { AlertTriangle } from 'lucide-react'
 import Button from '../ui/Button.jsx'
 import { useCreateCategory, useUpdateCategory } from '../../hooks/useCategories.js'
@@ -73,15 +73,14 @@ export default function CategoryForm({ category, onSuccess }) {
       <div className="space-y-4">
         <div className="flex items-start gap-2 rounded-xl bg-warning/10 p-3 ring-1 ring-warning/20">
           <AlertTriangle size={18} className="mt-0.5 shrink-0 text-warning" />
-          <p
-            className="text-sm text-white"
-            dangerouslySetInnerHTML={{
-              __html: t('form.confirmRename', {
-                oldName: category.name,
-                newName: name.trim(),
-              }),
-            }}
-          />
+          <p className="text-sm text-white">
+            <Trans
+              t={t}
+              i18nKey="form.confirmRename"
+              values={{ oldName: category.name, newName: name.trim() }}
+              components={{ strong: <strong /> }}
+            />
+          </p>
         </div>
 
         {error && <p className="text-sm text-danger">{error}</p>}

@@ -50,6 +50,7 @@ const RULES = [
   // OAuth / proveedor externo
   [/oauth state not found or expired/i, 'errors.oauthExpired'],
   [/provider is not enabled/i, 'errors.providerNotEnabled'],
+  [/anonymous sign-?ins? (are|is) disabled/i, 'errors.anonymousDisabled'],
 
   // Red / conexión
   [/network|failed to fetch|networkerror/i, 'errors.network'],

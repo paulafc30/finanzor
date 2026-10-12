@@ -161,4 +161,4 @@ producto**, no qué archivo se tocó.
 - Comentarios de cabecera de archivo con "Author / Date" — git lo sabe.
 - Comentarios que repiten la siguiente línea en español.
 - `// TODO` sin contexto ni fecha. Si vale la pena, abrir issue o nota en
-  `PLAN.md`.
+  `docs/PLAN.md`.

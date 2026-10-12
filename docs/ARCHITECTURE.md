@@ -199,4 +199,4 @@ Configurada con `vite-plugin-pwa` y `public/manifest.webmanifest`. Iconos en
 - **Sin TypeScript** ([ADR-0002](adr/0002-javascript-en-vez-de-typescript.md)).
 - **OneSignal oculto** hasta tener `VITE_ONESIGNAL_APP_ID` configurado en
   `.env.local` y Vercel. El componente y los hooks siguen en el repo.
-- **Sin exportación/borrado de cuenta** (TODO en `Settings.jsx`).
+- **Modo demo**: botón "Ver demo sin registrarme" en el login. Usa sesión anónima de Supabase + RPC `seed_demo_data` (migración 0013). Ver `supabase/README.md`.

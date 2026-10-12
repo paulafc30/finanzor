@@ -15,7 +15,7 @@ import ExportDataCard from '../components/settings/ExportDataCard.jsx'
 
 export default function Settings() {
   const { t } = useTranslation('settings')
-  const { user } = useSession()
+  const { user, isAnonymous } = useSession()
   const { replay: replayOnboarding } = useOnboarding()
 
   async function handleLogout() {
@@ -28,7 +28,7 @@ export default function Settings() {
 
       <div className="rounded-xl bg-bg-elevated p-4 text-sm">
         <p className="text-white/60">{t('loggedInAs')}</p>
-        <p className="text-white">{user?.email ?? '—'}</p>
+        <p className="text-white">{isAnonymous ? t('demoUser') : (user?.email ?? '—')}</p>
       </div>
 
       {/* <NotificationsToggle />  Oculto hasta configurar OneSignal */}
@@ -102,9 +102,13 @@ export default function Settings() {
         {t('logout')}
       </button>
 
-      <ExportDataCard />
+      {!isAnonymous && (
+        <>
+          <ExportDataCard />
 
-      <DeleteAccountCard />
+          <DeleteAccountCard />
+        </>
+      )}
 
       <p className="px-1 text-xs text-white/40">
         {t('alertThresholdSoon')}

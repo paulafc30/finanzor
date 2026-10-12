@@ -1,5 +1,6 @@
 {
   "title": "Settings",
+  "demoUser": "Demo account (anonymous)",
   "loggedInAs": "Signed in as",
   "manageCategories": "Manage categories",
   "importCsv": "Import from CSV",

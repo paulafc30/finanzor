@@ -23,15 +23,31 @@
 // SUPABASE_ANON_KEY y SUPABASE_SERVICE_ROLE_KEY ya están disponibles como
 // variables de entorno dentro de cualquier Edge Function del proyecto.
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
+// Orígenes que pueden llamar a la función. Se puede ampliar sin tocar el
+// código con el secreto ALLOWED_ORIGINS (lista separada por comas).
+const ALLOWED_ORIGINS = (
+  Deno.env.get('ALLOWED_ORIGINS') ??
+  'https://finanzor.ferava.es,http://localhost:5173'
+)
+  .split(',')
+  .map((o) => o.trim())
+
+function buildCorsHeaders(req: Request) {
+  const origin = req.headers.get('Origin') ?? ''
+  return {
+    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin)
+      ? origin
+      : ALLOWED_ORIGINS[0],
+    'Access-Control-Allow-Headers':
+      'authorization, x-client-info, apikey, content-type',
+    Vary: 'Origin',
+  }
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = buildCorsHeaders(req)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }

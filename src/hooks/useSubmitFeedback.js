@@ -45,7 +45,7 @@ export function useSubmitFeedback() {
           message: trimmed,
           email: replyEmail,
           user_agent: userAgent,
-          app_version: '0.1.0',
+          app_version: __APP_VERSION__,
         })
         .select()
         .single()

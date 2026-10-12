@@ -1,5 +1,6 @@
 {
   "title": "Ajustes",
+  "demoUser": "Cuenta de demo (anónima)",
   "loggedInAs": "Sesión iniciada como",
   "manageCategories": "Gestionar categorías",
   "importCsv": "Importar desde CSV",

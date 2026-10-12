@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { Info, X, Plus, CalendarRange } from 'lucide-react'
 import Button from '../components/ui/Button.jsx'
 import Modal from '../components/ui/Modal.jsx'
@@ -166,10 +166,18 @@ export default function Budget() {
           </summary>
           <ul className="ml-1 list-disc space-y-1 pl-4">
             <li>{t('fixedExpenses.item1')}</li>
-            <li dangerouslySetInnerHTML={{ __html: t('fixedExpenses.item2') }} />
-            <li dangerouslySetInnerHTML={{ __html: t('fixedExpenses.item3') }} />
-            <li dangerouslySetInnerHTML={{ __html: t('fixedExpenses.item4') }} />
-            <li dangerouslySetInnerHTML={{ __html: t('fixedExpenses.item5') }} />
+            <li>
+              <Trans t={t} i18nKey="fixedExpenses.item2" components={{ strong: <strong /> }} />
+            </li>
+            <li>
+              <Trans t={t} i18nKey="fixedExpenses.item3" components={{ strong: <strong /> }} />
+            </li>
+            <li>
+              <Trans t={t} i18nKey="fixedExpenses.item4" components={{ strong: <strong /> }} />
+            </li>
+            <li>
+              <Trans t={t} i18nKey="fixedExpenses.item5" components={{ strong: <strong /> }} />
+            </li>
           </ul>
         </details>
       </div>

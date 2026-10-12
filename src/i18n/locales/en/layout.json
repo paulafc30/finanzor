@@ -1,4 +1,8 @@
 {
+  "demoBanner": {
+    "text": "You're in demo mode with sample data.",
+    "exit": "Exit"
+  },
   "settingsLabel": "Settings",
   "bottomNav": {
     "home": "Home",

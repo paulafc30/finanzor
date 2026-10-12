@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase.js'
  * - loading: true mientras se resuelve la sesión inicial
  * - session: el objeto sesión o null
  * - user: shortcut a session?.user
+ * - isAnonymous: true si es una sesión de demo (sin email)
  *
  * Reacciona automáticamente a login/logout via onAuthStateChange.
  */
@@ -32,5 +33,7 @@ export function useSession() {
     }
   }, [])
 
-  return { session, user: session?.user ?? null, loading }
+  const user = session?.user ?? null
+  // Cuenta anónima creada por el botón "Ver demo" (supabase.auth.signInAnonymously)
+  return { session, user, isAnonymous: Boolean(user?.is_anonymous), loading }
 }

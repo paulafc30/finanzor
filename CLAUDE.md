@@ -1,6 +1,6 @@
 Soy desarrolladora fullstack.
 
-Trabaja siempre basándote en el contexto de los archivos subidos."
+Trabaja siempre basándote en el contexto de los archivos subidos.
 
 No expliques lo obvio: Solo dame el código necesario y una breve justificación si es crítica. Evita introducciones largas o conclusiones innecesarias.
 
@@ -16,4 +16,4 @@ docs/ (Para entender el flujo)
 
 package.json (Para dependencias)
 
-.env.example (Para configuración)
+.env.local.example (Para configuración)

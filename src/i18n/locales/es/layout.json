@@ -1,4 +1,8 @@
 {
+  "demoBanner": {
+    "text": "Estás en modo demo con datos de ejemplo.",
+    "exit": "Salir"
+  },
   "settingsLabel": "Ajustes",
   "bottomNav": {
     "home": "Inicio",
