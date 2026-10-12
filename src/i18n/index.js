@@ -97,7 +97,10 @@ i18next
     fallbackLng: 'es',
     supportedLngs: ['es', 'en'],
     detection: {
-      order: ['localStorage', 'navigator'],
+      // Solo se respeta la elección explícita del usuario (toggle de idioma).
+      // No usamos 'navigator': el idioma por defecto de la app es siempre
+      // español, aunque el navegador esté en inglés.
+      order: ['localStorage'],
       lookupLocalStorage: STORAGE_KEY,
       caches: ['localStorage'],
     },
