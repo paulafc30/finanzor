@@ -106,7 +106,7 @@ export function MonthProvider({ children }) {
         setViewModeState(mode)
       },
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [month, viewMode])
 
   return <MonthContext.Provider value={value}>{children}</MonthContext.Provider>
