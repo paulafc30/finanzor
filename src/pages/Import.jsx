@@ -16,6 +16,10 @@ import {
 import { suggestCategoryByDescription } from '../lib/categoryRules.js'
 import { formatEuro } from '../lib/formatters.js'
 
+// Límites razonables para un extracto bancario (evita bloquear el navegador).
+const MAX_FILE_BYTES = 2 * 1024 * 1024 // 2 MB
+const MAX_ROWS = 5000
+
 /**
  * Flujo de importación de movimientos desde CSV.
  *
@@ -68,12 +72,18 @@ export default function ImportPage() {
   async function handleFile(file) {
     setError(null)
     try {
+      if (file.size > MAX_FILE_BYTES) {
+        throw new Error(t('errors.fileTooLarge'))
+      }
       const parsed = await parseCsvFile(file)
       if (!parsed.headers || parsed.headers.length === 0) {
         throw new Error(t('errors.noColumnsDetected'))
       }
       if (parsed.rows.length === 0) {
         throw new Error(t('errors.noDataRows'))
+      }
+      if (parsed.rows.length > MAX_ROWS) {
+        throw new Error(t('errors.tooManyRows', { max: MAX_ROWS }))
       }
 
       const detected = detectColumns(parsed.headers, parsed.rows)

@@ -29,6 +29,13 @@ function buildRange(mode, state) {
   }
 }
 
+// Evita CSV injection: Excel/Sheets interpretan como fórmula una celda que
+// empieza por = + - @ (o tab / retorno). Se antepone un apóstrofo.
+function safeText(value) {
+  const s = String(value ?? '')
+  return /^[=+\-@\t\r]/.test(s) ? `'${s}` : s
+}
+
 function toCsv(rows, t) {
   const header = [
     t('exportData.csvHeaders.date'),
@@ -41,8 +48,8 @@ function toCsv(rows, t) {
     r.occurred_on,
     r.type === 'income' ? t('exportData.typeIncome') : t('exportData.typeExpense'),
     r.amount.toFixed(2),
-    r.category?.name ?? '',
-    r.description ?? '',
+    safeText(r.category?.name),
+    safeText(r.description),
   ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
   return [header.join(','), ...lines].join('\n')
 }

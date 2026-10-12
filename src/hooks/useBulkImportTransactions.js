@@ -25,7 +25,9 @@ export function useBulkImportTransactions() {
         user_id: user.id,
         type: it.type,
         amount: Number(it.amount),
-        description: it.description?.trim() || null,
+        // 120 = límite de la columna (ver 0014_input_limits). Los conceptos
+        // bancarios largos se recortan en vez de hacer fallar toda la importación.
+        description: it.description?.trim().slice(0, 120) || null,
         category_id: it.category_id || null,
         occurred_on: it.occurred_on,
       }))

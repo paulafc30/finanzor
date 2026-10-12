@@ -10,6 +10,8 @@
     "selectFile": "Select file"
   },
   "errors": {
+    "fileTooLarge": "The file is too large (maximum 2 MB).",
+    "tooManyRows": "The file has too many rows (maximum {{max}}).",
     "noColumnsDetected": "No columns were detected. Does the file have headers?",
     "noDataRows": "The file contains no data rows.",
     "readError": "Error reading the file",
