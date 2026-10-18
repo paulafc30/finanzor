@@ -12,5 +12,8 @@
   },
   "fab": {
     "add": "Add"
+  },
+  "infoHint": {
+    "label": "How does it work?"
   }
 }

@@ -4,6 +4,7 @@ import { Coffee } from 'lucide-react'
 import { useTransactionHistory } from '../../hooks/useTransactionHistory.js'
 import { sumPettySpending } from '../../lib/subscriptions.js'
 import { formatEuro } from '../../lib/formatters.js'
+import InfoHint from '../ui/InfoHint.jsx'
 
 const THRESHOLD = 10 // € — un gasto "hormiga" es de este importe o menos
 
@@ -50,6 +51,8 @@ export default function PettySpendingCard() {
           ))}
         </ul>
       )}
+
+      <InfoHint className="mt-3">{t('insights.petty.info')}</InfoHint>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Trash2, Plus, Wand2 } from 'lucide-react'
 import Button from '../ui/Button.jsx'
+import InfoHint from '../ui/InfoHint.jsx'
 import {
   useCategoryRules,
   useCreateCategoryRule,
@@ -93,6 +94,8 @@ export default function CategoryRulesCard({ categories }) {
         </Button>
       </form>
       {error && <p className="text-xs text-danger">{error}</p>}
+
+      <InfoHint>{t('rules.info')}</InfoHint>
     </div>
   )
 }

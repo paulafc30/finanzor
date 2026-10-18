@@ -20,6 +20,10 @@
       "body": "El Dashboard te muestra ingresos, gastos y saldo actual del mes, además de un gráfico circular con el reparto por categoría."
     },
     {
+      "title": "Cuánto puedes gastar hoy",
+      "body": "En Inicio verás cuánto puedes gastar al día hasta fin de mes y una previsión de cómo acabarás el mes, contando los gastos fijos que aún faltan por llegar."
+    },
+    {
       "title": "Define tu presupuesto",
       "body": "Pon un límite por categoría. La barra se vuelve amarilla al 70% y roja al 90% para avisarte de que estás cerca del tope."
     },
@@ -28,8 +32,20 @@
       "body": "Alquiler, gimnasio, Netflix... Configúralos una vez con el día del mes y se generan solos cada mes. Pausa o elimina cuando quieras."
     },
     {
+      "title": "Suscripciones y gastos hormiga",
+      "body": "En Movimientos detectamos cargos que se repiten (Netflix, gimnasio…) para convertirlos en recurrentes con un toque, y sumamos tus gastos pequeños de los últimos 30 días para que veas cuánto se te va."
+    },
+    {
+      "title": "Reglas automáticas",
+      "body": "Al importar un CSV, si cambias la categoría de un movimiento puedes pulsar «Recordar» y la próxima vez se asignará sola. Gestiona tus reglas en Categorías."
+    },
+    {
       "title": "Ahorra para tus metas",
       "body": "Crea metas (vacaciones, fondo de emergencia, una compra) y aporta poco a poco. La barra te muestra cuánto te falta."
+    },
+    {
+      "title": "Proyección de metas",
+      "body": "Abre una meta y mueve el slider para ver en qué fecha la alcanzarías aportando más o menos cada mes."
     },
     {
       "title": "Navega entre meses",

@@ -106,14 +106,16 @@
       "create": "Crear recurrente",
       "creating": "Creando…",
       "dismiss": "Ignorar",
-      "error": "No se pudo crear el recurrente"
+      "error": "No se pudo crear el recurrente",
+      "info": "Buscamos en tus últimos 12 meses gastos del mismo comercio, con importe parecido (±10 %) y que se repiten cada mes al menos 3 veces (cada semana, 4 veces) y siguen activos. Al pulsar «Crear recurrente» se generará solo cada mes, sin duplicar el cargo de este mes. La X lo oculta de esta lista en este dispositivo."
     },
     "petty": {
       "title": "Gastos hormiga",
       "subtitle_one": "{{count}} compra de {{max}} o menos · últimos 30 días",
       "subtitle_other": "{{count}} compras de {{max}} o menos · últimos 30 días",
       "yearly": "A este ritmo, unos {{amount}} al año.",
-      "noCategory": "Sin categoría"
+      "noCategory": "Sin categoría",
+      "info": "Suma los gastos de 10 € o menos de los últimos 30 días, sin contar recurrentes ni aportaciones a metas. La estimación anual es ese total × 12. Sirve para ver cuánto se te va en cafés, snacks y compras pequeñas."
     }
   }
 }

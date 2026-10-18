@@ -59,6 +59,7 @@
     "categoryPlaceholder": "Category",
     "add": "Add",
     "delete": "Delete rule",
-    "error": "Could not save the rule"
+    "error": "Could not save the rule",
+    "info": "Created with \"Always remember\" in the CSV import preview, or here by hand. Matching is by whole words, ignoring case and accents (\"dia\" does not match \"media\"). If several rules match, the longest keyword wins."
   }
 }

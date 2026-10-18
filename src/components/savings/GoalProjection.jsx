@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { CalendarCheck } from 'lucide-react'
 import { projectGoal, averageMonthlyContribution } from '../../lib/goalProjection.js'
 import { formatEuro, formatMonthLabel } from '../../lib/formatters.js'
+import InfoHint from '../ui/InfoHint.jsx'
 
 const STEP = 5 // € por paso del slider
 
@@ -77,6 +78,8 @@ export default function GoalProjection({ goal, contributions }) {
           {t('projection.offTrack', { required: formatEuro(p.requiredMonthly) })}
         </p>
       )}
+
+      <InfoHint className="mt-3">{t('projection.info')}</InfoHint>
     </div>
   )
 }

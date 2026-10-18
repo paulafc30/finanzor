@@ -7,6 +7,10 @@ import {
   Repeat,
   PiggyBank,
   Calendar as CalendarIcon,
+  Gauge,
+  Coffee,
+  Wand2,
+  CalendarCheck,
   CheckCircle2,
   X,
   ChevronLeft,
@@ -23,8 +27,15 @@ import Button from '../ui/Button.jsx'
  *
  * Llama a onComplete() cuando se termina o se salta.
  */
-const SLIDE_ICONS = [Wallet, Plus, PieChart, Wallet, Repeat, PiggyBank, CalendarIcon, CheckCircle2]
-const SLIDE_COLORS = ['danger', 'success', 'info', 'warning', 'accent', 'success', 'info', 'success']
+// El orden debe coincidir con `slides` en locales/*/onboarding.json
+const SLIDE_ICONS = [
+  Wallet, Plus, PieChart, Gauge, Wallet, Repeat,
+  Coffee, Wand2, PiggyBank, CalendarCheck, CalendarIcon, CheckCircle2,
+]
+const SLIDE_COLORS = [
+  'danger', 'success', 'info', 'accent', 'warning', 'accent',
+  'warning', 'info', 'success', 'success', 'info', 'success',
+]
 
 const colorMap = {
   success: { bg: 'bg-success', tint: 'bg-success/15', text: 'text-success' },

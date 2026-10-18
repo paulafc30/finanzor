@@ -52,6 +52,7 @@
     "basis_one": "Último día del mes · gastos fijos pendientes: {{pending}}",
     "basis_other": "{{count}} días restantes (hoy incluido) · gastos pendientes: {{pending}}",
     "projectedEnd": "Previsión a fin de mes",
-    "needMoreData": "Hacen falta unos días de datos"
+    "needMoreData": "Hacen falta unos días de datos",
+    "info": "Es lo que puedes gastar cada día hasta fin de mes sin quedarte en negativo: (saldo a hoy − gastos que aún están por llegar) ÷ días que quedan, contando hoy. Los gastos pendientes son los movimientos con fecha futura y los recurrentes que todavía no se han generado este mes. No cuenta ingresos pendientes: hasta que no llegan, no se pueden gastar. La previsión a fin de mes sí los suma, y resta además tu ritmo de gasto habitual (los gastos que no son recurrentes) por los días que faltan; necesita al menos 3 días de datos."
   }
 }

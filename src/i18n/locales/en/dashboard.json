@@ -52,6 +52,7 @@
     "basis_one": "Last day of the month · pending bills: {{pending}}",
     "basis_other": "{{count}} days left (today included) · pending bills: {{pending}}",
     "projectedEnd": "End-of-month forecast",
-    "needMoreData": "Needs a few days of data"
+    "needMoreData": "Needs a few days of data",
+    "info": "What you can spend each day until month end without going negative: (balance today − expenses still to come) ÷ days left, today included. Pending expenses are future-dated transactions and recurring items not yet generated this month. Pending income is not counted: until it arrives, it can't be spent. The month-end forecast does add it, and also subtracts your usual spending pace (non-recurring expenses) for the remaining days; it needs at least 3 days of data."
   }
 }

@@ -106,14 +106,16 @@
       "create": "Create recurring",
       "creating": "Creating…",
       "dismiss": "Dismiss",
-      "error": "Could not create the recurring item"
+      "error": "Could not create the recurring item",
+      "info": "We look at the last 12 months for charges from the same merchant, with a similar amount (±10%), repeating monthly at least 3 times (weekly, 4 times) and still active. \"Create recurring\" will generate it automatically each month without duplicating this month's charge. The X hides it from this list on this device."
     },
     "petty": {
       "title": "Small expenses",
       "subtitle_one": "{{count}} purchase of {{max}} or less · last 30 days",
       "subtitle_other": "{{count}} purchases of {{max}} or less · last 30 days",
       "yearly": "At this pace, about {{amount}} a year.",
-      "noCategory": "No category"
+      "noCategory": "No category",
+      "info": "Adds up expenses of €10 or less from the last 30 days, excluding recurring items and goal contributions. The yearly estimate is that total × 12. It shows how much goes on coffee, snacks and small purchases."
     }
   }
 }

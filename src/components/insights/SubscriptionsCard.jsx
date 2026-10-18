@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Repeat, X } from 'lucide-react'
 import Button from '../ui/Button.jsx'
+import InfoHint from '../ui/InfoHint.jsx'
 import { useTransactionHistory } from '../../hooks/useTransactionHistory.js'
 import { useRecurringExpenses } from '../../hooks/useRecurringExpenses.js'
 import { useCategories } from '../../hooks/useCategories.js'
@@ -132,6 +133,8 @@ export default function SubscriptionsCard() {
       </ul>
 
       {error && <p className="mt-2 text-xs text-danger">{error}</p>}
+
+      <InfoHint className="mt-3">{t('insights.subscriptions.info')}</InfoHint>
     </div>
   )
 }

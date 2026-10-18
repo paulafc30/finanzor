@@ -63,6 +63,7 @@
     "perMonth": "{{amount}}/mes",
     "onTrack": "Llegas a tiempo a tu fecha objetivo.",
     "offTrack": "No llegas a tu fecha objetivo: necesitas {{required}}/mes.",
-    "deadlinePassed": "La fecha objetivo ya ha pasado."
+    "deadlinePassed": "La fecha objetivo ya ha pasado.",
+    "info": "Suponemos que aportas la cantidad elegida cada mes, con la primera aportación dentro de un mes. El slider empieza en tu media real de los últimos 3 meses (o, si no hay aportaciones, en lo necesario para tu fecha objetivo). Es solo una simulación: no cambia tus aportaciones reales."
   }
 }

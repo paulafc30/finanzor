@@ -20,6 +20,10 @@
       "body": "The Dashboard shows your income, expenses, and current balance for the month, plus a pie chart of spending by category."
     },
     {
+      "title": "How much you can spend today",
+      "body": "On Home you'll see how much you can spend per day until month end, plus a forecast of how the month will end, counting the fixed expenses still to come."
+    },
+    {
       "title": "Set your budget",
       "body": "Set a limit per category. The bar turns yellow at 70% and red at 90% to warn you that you're close to the limit."
     },
@@ -28,8 +32,20 @@
       "body": "Rent, gym, Netflix... Set them up once with the day of the month and they'll be created automatically every month. Pause or delete them anytime."
     },
     {
+      "title": "Subscriptions and small expenses",
+      "body": "In Movements we detect repeating charges (Netflix, gym…) so you can turn them into recurring items with one tap, and we add up your small expenses from the last 30 days so you see where it goes."
+    },
+    {
+      "title": "Automatic rules",
+      "body": "When importing a CSV, if you change a transaction's category you can tap \"Remember\" and it will be assigned automatically next time. Manage your rules in Categories."
+    },
+    {
       "title": "Save toward your goals",
       "body": "Create goals (vacation, emergency fund, a purchase) and contribute little by little. The bar shows how much is left."
+    },
+    {
+      "title": "Goal projection",
+      "body": "Open a goal and move the slider to see the date you'd reach it by contributing more or less each month."
     },
     {
       "title": "Navigate between months",

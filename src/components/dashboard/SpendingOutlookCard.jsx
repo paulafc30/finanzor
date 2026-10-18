@@ -4,6 +4,7 @@ import { Gauge } from 'lucide-react'
 import { useRecurringExpenses } from '../../hooks/useRecurringExpenses.js'
 import { computeOutlook } from '../../lib/forecast.js'
 import { formatEuro } from '../../lib/formatters.js'
+import InfoHint from '../ui/InfoHint.jsx'
 
 /**
  * Gasto diario disponible + previsión de fin de mes (solo mes en curso).
@@ -75,6 +76,8 @@ export default function SpendingOutlookCard({ balance, transactions }) {
           </span>
         )}
       </div>
+
+      <InfoHint className="mt-3">{t('outlook.info')}</InfoHint>
     </div>
   )
 }

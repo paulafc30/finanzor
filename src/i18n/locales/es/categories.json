@@ -59,6 +59,7 @@
     "categoryPlaceholder": "Categoría",
     "add": "Añadir",
     "delete": "Eliminar regla",
-    "error": "No se pudo guardar la regla"
+    "error": "No se pudo guardar la regla",
+    "info": "Se crean al pulsar «Recordar» en la vista previa de una importación de CSV, o aquí a mano. La comparación es por palabras completas, sin mayúsculas ni tildes (la palabra «dia» no encaja en «media»). Si encajan varias reglas, gana la palabra clave más larga."
   }
 }

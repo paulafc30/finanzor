@@ -63,6 +63,7 @@
     "perMonth": "{{amount}}/month",
     "onTrack": "You'll reach your target date on time.",
     "offTrack": "You won't reach your target date: you need {{required}}/month.",
-    "deadlinePassed": "The target date has already passed."
+    "deadlinePassed": "The target date has already passed.",
+    "info": "We assume you contribute the chosen amount every month, with the first contribution one month from now. The slider starts at your real average of the last 3 months (or, with no contributions, what you need to hit your target date). It's only a simulation: it doesn't change your real contributions."
   }
 }
