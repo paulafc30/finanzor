@@ -107,7 +107,7 @@
       "creating": "Creating…",
       "dismiss": "Dismiss",
       "error": "Could not create the recurring item",
-      "info": "We look at the last 12 months for charges from the same merchant, with a similar amount (±10%), repeating monthly at least 3 times (weekly, 4 times) and still active. \"Create recurring\" will generate it automatically each month without duplicating this month's charge. The X hides it from this list on this device."
+      "info": "We look at the last 12 months for charges from the same merchant, with practically the same amount (±2%), repeating monthly at least 3 times (weekly, 4 times) and still active. \"Create recurring\" will generate it automatically each month without duplicating this month's charge. The X hides it from this list on this device."
     },
     "petty": {
       "title": "Small expenses",

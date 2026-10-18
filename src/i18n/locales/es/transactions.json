@@ -107,7 +107,7 @@
       "creating": "Creando…",
       "dismiss": "Ignorar",
       "error": "No se pudo crear el recurrente",
-      "info": "Buscamos en tus últimos 12 meses gastos del mismo comercio, con importe parecido (±10 %) y que se repiten cada mes al menos 3 veces (cada semana, 4 veces) y siguen activos. Al pulsar «Crear recurrente» se generará solo cada mes, sin duplicar el cargo de este mes. La X lo oculta de esta lista en este dispositivo."
+      "info": "Buscamos en tus últimos 12 meses gastos del mismo comercio, con el mismo importe (±2 %) y que se repiten cada mes al menos 3 veces (cada semana, 4 veces) y siguen activos. Al pulsar «Crear recurrente» se generará solo cada mes, sin duplicar el cargo de este mes. La X lo oculta de esta lista en este dispositivo."
     },
     "petty": {
       "title": "Gastos hormiga",

@@ -72,13 +72,17 @@ export function detectSubscriptions({ transactions = [], recurrings = [], today 
   for (const [key, txs] of groups) {
     if (txs.length < 3) continue
 
-    // Agrupamos alrededor del importe mediano: ±10 % o ±1 €, lo que sea mayor.
-    const allCents = txs.map((t) => toCents(t.amount)).sort((a, b) => a - b)
-    const medAll = median(allCents)
-    const tol = Math.max(100, Math.round(medAll * 0.1))
-    const stable = txs
-      .filter((t) => Math.abs(toCents(t.amount) - medAll) <= tol)
-      .sort((a, b) => (a.occurred_on < b.occurred_on ? -1 : a.occurred_on > b.occurred_on ? 1 : 0))
+    // Una suscripción cobra (casi) siempre lo mismo. Nos quedamos con los
+    // cargos cuyo importe es igual al del ÚLTIMO cargo, con margen de ±2 %
+    // (o 10 céntimos): cubre cambios de divisa o redondeos, pero descarta
+    // compras mensuales de importe variable como la farmacia o una cena.
+    // Si el precio subió hace poco, hacen falta 3 cargos al precio nuevo.
+    const byDate = [...txs].sort((a, b) =>
+      a.occurred_on < b.occurred_on ? -1 : a.occurred_on > b.occurred_on ? 1 : 0,
+    )
+    const latestC = toCents(byDate[byDate.length - 1].amount)
+    const tol = Math.max(10, Math.round(latestC * 0.02))
+    const stable = byDate.filter((t) => Math.abs(toCents(t.amount) - latestC) <= tol)
     if (stable.length < 3) continue
 
     const days = stable.map((t) => dayNumber(t.occurred_on))
