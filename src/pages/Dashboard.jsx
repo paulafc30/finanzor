@@ -8,6 +8,7 @@ import TransactionForm from '../components/transactions/TransactionForm.jsx'
 import KpiCard from '../components/dashboard/KpiCard.jsx'
 import CategoryDonut from '../components/dashboard/CategoryDonut.jsx'
 import RecentTransactions from '../components/dashboard/RecentTransactions.jsx'
+import SpendingOutlookCard from '../components/dashboard/SpendingOutlookCard.jsx'
 import CategoryComparisonChart from '../components/dashboard/CategoryComparisonChart.jsx'
 import { useTransactions } from '../hooks/useTransactions.js'
 import { usePreviousMonthSummary } from '../hooks/usePreviousMonthSummary.js'
@@ -84,6 +85,11 @@ export default function Dashboard() {
     return 0
   }, [month, isYearView])
   const avgDailyExpense = daysElapsed > 0 ? summary.expenseToDate / daysElapsed : null
+
+  const isCurrentMonth = useMemo(() => {
+    const now = new Date()
+    return !isYearView && month.getFullYear() === now.getFullYear() && month.getMonth() === now.getMonth()
+  }, [month, isYearView])
 
   // Saldo actual = solo lo ocurrido hasta hoy + carry-forward
   const balanceLabel = isYearView ? t('kpi.balanceYear') : t('kpi.balanceToday')
@@ -166,6 +172,12 @@ export default function Dashboard() {
           </div>
           <span className="shrink-0 text-[10px] text-white/35">{t('withFutureMovements')}</span>
         </div>
+      )}
+
+      {/* Gasto diario disponible + previsión de fin de mes. Solo tiene
+          sentido en el mes en curso. */}
+      {isCurrentMonth && !isLoading && !cfLoading && (
+        <SpendingOutlookCard balance={balanceValue} transactions={transactions} />
       )}
 
       {/* La barra resumen del presupuesto vive en la pagina Presupuesto,

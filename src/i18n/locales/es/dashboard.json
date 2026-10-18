@@ -44,5 +44,14 @@
     "noneYear": "Sin movimientos este año.",
     "noDescription": "Sin descripción",
     "dateFormat": "d 'de' LLLL"
+  },
+  "outlook": {
+    "title": "Puedes gastar al día",
+    "perDay": "{{amount}} / día",
+    "overspent": "Te pasas {{amount}}",
+    "basis_one": "Último día del mes · gastos fijos pendientes: {{pending}}",
+    "basis_other": "{{count}} días restantes (hoy incluido) · gastos pendientes: {{pending}}",
+    "projectedEnd": "Previsión a fin de mes",
+    "needMoreData": "Hacen falta unos días de datos"
   }
 }

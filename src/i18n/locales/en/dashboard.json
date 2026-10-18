@@ -44,5 +44,14 @@
     "noneYear": "No transactions this year.",
     "noDescription": "No description",
     "dateFormat": "MMMM d"
+  },
+  "outlook": {
+    "title": "You can spend per day",
+    "perDay": "{{amount}} / day",
+    "overspent": "Over by {{amount}}",
+    "basis_one": "Last day of the month · pending bills: {{pending}}",
+    "basis_other": "{{count}} days left (today included) · pending bills: {{pending}}",
+    "projectedEnd": "End-of-month forecast",
+    "needMoreData": "Needs a few days of data"
   }
 }
