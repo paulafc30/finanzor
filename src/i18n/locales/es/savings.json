@@ -69,10 +69,11 @@
   "piggyBrokenAlt": "Hucha de cerdito rota con las monedas en el suelo",
   "piggy": {
     "empty": "Vaciar hucha",
-    "confirmEmpty": "¿Vaciar la hucha?\n\nLos {{amount}} ahorrados volverán a tu saldo como un ingreso «Hucha vaciada». Tus aportaciones y metas no se borran.",
-    "emptied": "¡Hucha vaciada! {{amount}} vuelven a tu saldo",
-    "emptiedDescription": "Hucha vaciada",
+    "confirmEmpty": "¿Vaciar la hucha?\n\nSe darán por gastados los {{amount}}. Tu saldo y tus movimientos no cambian, porque ese dinero ya salió de tu saldo cuando lo ahorraste.",
+    "emptied": "¡Hucha vaciada! {{amount}} dados por gastados",
     "nothingToEmpty": "La hucha ya está vacía",
-    "noCategory": "No se encuentra la categoría «Ahorro»"
+    "noCategory": "No se encuentra la categoría «Ahorro»",
+    "migrationMissing": "Falta aplicar la migración 0017 en Supabase",
+    "info": "Vaciar la hucha significa que ese dinero ya se ha gastado. No cambia tu saldo ni crea ningún movimiento: el dinero ya salió de tu saldo cuando lo pasaste a ahorro. Solo pone el contador de la hucha a 0 €."
   }
 }

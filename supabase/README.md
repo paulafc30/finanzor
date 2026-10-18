@@ -9,6 +9,7 @@ Para aplicar el esquema en un proyecto nuevo de Supabase, abre el **SQL Editor**
 5. `migrations/0013_demo_mode_and_fixes.sql` — modo demo (`seed_demo_data`), arreglo del trigger de categorías, policy de feedback
 6. `migrations/0015_category_rules.sql` — reglas de categorización propias del usuario (`category_rules`, con RLS)
 7. `migrations/0016_demo_seed_v2.sql` — la demo incluye suscripción sin registrar, gastos hormiga y una regla de ejemplo (ejecutar después de 0015)
+8. `migrations/0017_piggy_withdrawals.sql` — "Vaciar hucha" da el dinero por gastado sin tocar saldo ni movimientos (`piggy_withdrawals`, con RLS); convierte los ingresos "Hucha vaciada" de la versión anterior
 
 Con el CLI de Supabase basta `supabase db push`.
 

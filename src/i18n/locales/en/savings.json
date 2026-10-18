@@ -69,10 +69,11 @@
   "piggyBrokenAlt": "Broken piggy bank with coins on the floor",
   "piggy": {
     "empty": "Empty piggy bank",
-    "confirmEmpty": "Empty the piggy bank?\n\nThe {{amount}} saved will return to your balance as an income \"Piggy bank emptied\". Your contributions and goals are not deleted.",
-    "emptied": "Piggy bank emptied! {{amount}} back in your balance",
-    "emptiedDescription": "Piggy bank emptied",
+    "confirmEmpty": "Empty the piggy bank?\n\nThe {{amount}} will be treated as spent. Your balance and transactions don't change, because that money already left your balance when you saved it.",
+    "emptied": "Piggy bank emptied! {{amount}} treated as spent",
     "nothingToEmpty": "The piggy bank is already empty",
-    "noCategory": "The \"Ahorro\" category was not found"
+    "noCategory": "The \"Ahorro\" category was not found",
+    "migrationMissing": "Migration 0017 has not been applied in Supabase",
+    "info": "Emptying the piggy bank means that money has been spent. It doesn't change your balance or create any transaction: the money already left your balance when you moved it to savings. It only resets the piggy bank counter to €0."
   }
 }

@@ -9,6 +9,7 @@ import GoalDetailModal from '../components/savings/GoalDetailModal.jsx'
 import PiggyIcon from '../components/savings/PiggyIcon.jsx'
 import PiggyBrokenIcon from '../components/savings/PiggyBrokenIcon.jsx'
 import Button from '../components/ui/Button.jsx'
+import InfoHint from '../components/ui/InfoHint.jsx'
 import { useEmptyPiggy } from '../hooks/useEmptyPiggy.js'
 import { useGoals } from '../hooks/useGoals.js'
 import { useSavingsFromExpenses } from '../hooks/useSavingsFromExpenses.js'
@@ -137,6 +138,7 @@ export default function Savings() {
           >
             {t('piggy.empty')}
           </Button>
+          <InfoHint className="mt-1">{t('piggy.info')}</InfoHint>
         </div>
       </div>
 

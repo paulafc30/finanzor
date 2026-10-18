@@ -1,19 +1,24 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from './useSession.js'
 import { useCategories } from './useCategories.js'
 import { toCents, fromCents } from '../lib/forecast.js'
 
+// Códigos de "la tabla no existe" (PostgREST / Postgres): migración 0017 sin aplicar.
+const MISSING_TABLE = new Set(['PGRST205', '42P01'])
+
 /**
- * Vaciar la hucha ("romperla"): el dinero vuelve al saldo.
+ * Vaciar la hucha = dar ese dinero por GASTADO.
  *
- * La hucha muestra   gastos(categoría Ahorro) − ingresos(categoría Ahorro).
- * Vaciarla crea UN ingreso "Hucha vaciada" en la categoría Ahorro por ese
- * neto, así la hucha queda en 0 y el saldo recupera el dinero, sin borrar
- * el historial de aportaciones. El neto se vuelve a calcular en el momento
- * (no se fía de lo que hay en pantalla) y todo va en céntimos.
+ * Al aportar a la hucha el dinero ya salió del saldo (es un gasto de la
+ * categoría Ahorro). Vaciarla NO crea movimientos ni toca el saldo: solo
+ * registra un "vaciado" en `piggy_withdrawals` y la hucha vuelve a 0.
+ *
+ *   hucha = gastos(Ahorro) − suma(piggy_withdrawals)
+ *
+ * El importe se vuelve a calcular en el momento (no se fía de lo que hay en
+ * pantalla) y todo va en céntimos.
  */
 export function useEmptyPiggy() {
   const { user } = useSession()
@@ -26,39 +31,39 @@ export function useEmptyPiggy() {
     mutationFn: async () => {
       if (!ahorroId) throw new Error(t('piggy.noCategory'))
 
-      const { data, error } = await supabase
+      const { data: rows, error } = await supabase
         .from('transactions')
         .select('type, amount')
         .eq('user_id', user.id)
         .eq('category_id', ahorroId)
       if (error) throw error
 
+      const { data: withdrawals, error: wErr } = await supabase
+        .from('piggy_withdrawals')
+        .select('amount')
+        .eq('user_id', user.id)
+      if (wErr) {
+        throw new Error(MISSING_TABLE.has(wErr.code) ? t('piggy.migrationMissing') : wErr.message)
+      }
+
       let netC = 0
-      for (const row of data ?? []) {
+      for (const row of rows ?? []) {
         const c = toCents(row.amount)
         netC += row.type === 'income' ? -c : c
       }
+      for (const w of withdrawals ?? []) netC -= toCents(w.amount)
       if (netC <= 0) throw new Error(t('piggy.nothingToEmpty'))
 
-      const { error: insErr } = await supabase.from('transactions').insert({
-        user_id: user.id,
-        type: 'income',
-        amount: fromCents(netC),
-        description: t('piggy.emptiedDescription'),
-        category_id: ahorroId,
-        occurred_on: format(new Date(), 'yyyy-MM-dd'),
-      })
+      const { error: insErr } = await supabase
+        .from('piggy_withdrawals')
+        .insert({ user_id: user.id, amount: fromCents(netC) })
       if (insErr) throw insErr
 
       return { amount: fromCents(netC) }
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['transactions', user?.id] })
+      // Solo cambia el contador de la hucha: saldo y movimientos no se tocan.
       qc.invalidateQueries({ queryKey: ['savings-from-expenses', user?.id] })
-      qc.invalidateQueries({ queryKey: ['monthly-summary', user?.id] })
-      qc.invalidateQueries({ queryKey: ['accumulated-balance', user?.id] })
-      qc.invalidateQueries({ queryKey: ['previous-month-summary', user?.id] })
-      qc.invalidateQueries({ queryKey: ['carry-forward', user?.id] })
     },
   })
 }
