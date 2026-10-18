@@ -153,10 +153,12 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Saldo estimado — solo aparece cuando hay movimientos con fecha
-          futura en el mes visible. Muestra cómo quedará el saldo si todos
+      {/* Saldo estimado — solo en meses que NO son el actual (p. ej. un mes
+          futuro). En el mes en curso lo cubre la previsión de fin de mes de
+          SpendingOutlookCard, que es más completa. Aparece cuando hay
+          movimientos con fecha futura en el mes visible. Muestra cómo quedará el saldo si todos
           los movimientos planificados se ejecutan. */}
-      {!isYearView && summary.hasFuture && !isLoading && (
+      {!isYearView && !isCurrentMonth && summary.hasFuture && !isLoading && (
         <div className="flex items-center gap-2.5 rounded-xl bg-info/10 px-3 py-2.5 ring-1 ring-info/20">
           <CalendarClock size={16} className="shrink-0 text-info" />
           <div className="min-w-0 flex-1 text-sm">
