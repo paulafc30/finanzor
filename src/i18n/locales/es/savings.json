@@ -27,7 +27,7 @@
   "unarchive": "Desarchivar",
   "editGoal": "Editar meta",
   "newContribution": "Nueva aportación",
-  "confirmDeleteGoal": "¿Eliminar la meta \"{{name}}\"?\n\nSe borrarán también todas las aportaciones registradas. Esta acción no se puede deshacer.",
+  "confirmDeleteGoal": "¿Eliminar la meta \"{{name}}\"?\n\nSe borrarán también todas las aportaciones registradas. El dinero ya aportado NO vuelve al saldo: sus movimientos de Ahorro se conservan como gastos. Esta acción no se puede deshacer.",
   "confirmDeleteContribution": "¿Eliminar esta aportación de {{amount}}?",
   "amountLabel": "Cantidad (€)",
   "dateLabel": "Fecha",
@@ -65,5 +65,14 @@
     "offTrack": "No llegas a tu fecha objetivo: necesitas {{required}}/mes.",
     "deadlinePassed": "La fecha objetivo ya ha pasado.",
     "info": "Suponemos que aportas la cantidad elegida cada mes, con la primera aportación dentro de un mes. El slider empieza en tu media real de los últimos 3 meses (o, si no hay aportaciones, en lo necesario para tu fecha objetivo). Es solo una simulación: no cambia tus aportaciones reales."
+  },
+  "piggyBrokenAlt": "Hucha de cerdito rota con las monedas en el suelo",
+  "piggy": {
+    "empty": "Vaciar hucha",
+    "confirmEmpty": "¿Vaciar la hucha?\n\nLos {{amount}} ahorrados volverán a tu saldo como un ingreso «Hucha vaciada». Tus aportaciones y metas no se borran.",
+    "emptied": "¡Hucha vaciada! {{amount}} vuelven a tu saldo",
+    "emptiedDescription": "Hucha vaciada",
+    "nothingToEmpty": "La hucha ya está vacía",
+    "noCategory": "No se encuentra la categoría «Ahorro»"
   }
 }

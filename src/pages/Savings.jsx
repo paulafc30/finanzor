@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff, TrendingUp } from 'lucide-react'
 import Modal from '../components/ui/Modal.jsx'
@@ -7,15 +7,43 @@ import GoalCard from '../components/savings/GoalCard.jsx'
 import GoalForm from '../components/savings/GoalForm.jsx'
 import GoalDetailModal from '../components/savings/GoalDetailModal.jsx'
 import PiggyIcon from '../components/savings/PiggyIcon.jsx'
+import PiggyBrokenIcon from '../components/savings/PiggyBrokenIcon.jsx'
+import Button from '../components/ui/Button.jsx'
+import { useEmptyPiggy } from '../hooks/useEmptyPiggy.js'
 import { useGoals } from '../hooks/useGoals.js'
 import { useSavingsFromExpenses } from '../hooks/useSavingsFromExpenses.js'
 import { formatEuro } from '../lib/formatters.js'
+
+// Duración de la animación de la hucha rota (3,6 s) + un margen
+const BREAK_MS = 4200
 
 export default function Savings() {
   const { t } = useTranslation('savings')
   const [showArchived, setShowArchived] = useState(false)
   const { goals, isLoading, error } = useGoals({ includeArchived: showArchived })
   const { data: savingsExp } = useSavingsFromExpenses()
+  const emptyPiggy = useEmptyPiggy()
+  const [piggyPhase, setPiggyPhase] = useState('idle') // 'idle' | 'broken'
+  const [emptiedAmount, setEmptiedAmount] = useState(0)
+  const resetTimer = useRef(null)
+
+  useEffect(() => () => clearTimeout(resetTimer.current), [])
+
+  const piggyTotal = savingsExp?.allTotal ?? 0
+
+  async function handleEmptyPiggy() {
+    if (piggyPhase !== 'idle' || emptyPiggy.isPending || piggyTotal <= 0) return
+    if (!window.confirm(t('piggy.confirmEmpty', { amount: formatEuro(piggyTotal) }))) return
+    try {
+      const res = await emptyPiggy.mutateAsync()
+      setEmptiedAmount(res.amount)
+      setPiggyPhase('broken')
+      // Tras la animación, el cerdito vuelve a su sitio con 0 €.
+      resetTimer.current = setTimeout(() => setPiggyPhase('idle'), BREAK_MS)
+    } catch (err) {
+      alert(t('errors.actionFailed', { message: err.message ?? t('errors.unknownError') }))
+    }
+  }
 
   const [creating, setCreating] = useState(false)
   const [openGoal, setOpenGoal] = useState(null)
@@ -79,16 +107,37 @@ export default function Savings() {
           </p>
         </div>
 
-        {/* Cerdito grande con la cifra total renderizada dentro */}
-        <div className="flex justify-center py-2">
-          <PiggyIcon
-            size={180}
-            amount={piggyFormat(savingsExp?.allTotal ?? 0)}
-            label={t('piggyLabelSaved')}
-            className="text-success"
-          />
+        {/* Cerdito grande con la cifra total. Al vaciarla se muestra rota
+            unos segundos y vuelve a su sitio con 0 €. La altura fija evita
+            saltos de layout entre los dos dibujos. */}
+        <div className="flex min-h-[10rem] items-center justify-center py-2">
+          {piggyPhase === 'broken' ? (
+            <PiggyBrokenIcon size={180} className="text-success" />
+          ) : (
+            <PiggyIcon
+              size={180}
+              amount={piggyFormat(piggyTotal)}
+              label={t('piggyLabelSaved')}
+              className="text-success"
+            />
+          )}
         </div>
 
+        <div className="mt-1 flex flex-col items-center gap-1.5" aria-live="polite">
+          {piggyPhase === 'broken' && (
+            <p className="text-center text-sm font-medium text-success">
+              {t('piggy.emptied', { amount: formatEuro(emptiedAmount) })}
+            </p>
+          )}
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleEmptyPiggy}
+            disabled={piggyPhase !== 'idle' || emptyPiggy.isPending || piggyTotal <= 0}
+          >
+            {t('piggy.empty')}
+          </Button>
+        </div>
       </div>
 
       {/* Resumen total de metas activas */}

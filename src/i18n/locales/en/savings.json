@@ -27,7 +27,7 @@
   "unarchive": "Unarchive",
   "editGoal": "Edit goal",
   "newContribution": "New contribution",
-  "confirmDeleteGoal": "Delete the goal \"{{name}}\"?\n\nAll recorded contributions will also be deleted. This action cannot be undone.",
+  "confirmDeleteGoal": "Delete the goal \"{{name}}\"?\n\nAll recorded contributions will be deleted too. The money already contributed will NOT return to your balance: its Savings transactions are kept as expenses. This cannot be undone.",
   "confirmDeleteContribution": "Delete this contribution of {{amount}}?",
   "amountLabel": "Amount (€)",
   "dateLabel": "Date",
@@ -65,5 +65,14 @@
     "offTrack": "You won't reach your target date: you need {{required}}/month.",
     "deadlinePassed": "The target date has already passed.",
     "info": "We assume you contribute the chosen amount every month, with the first contribution one month from now. The slider starts at your real average of the last 3 months (or, with no contributions, what you need to hit your target date). It's only a simulation: it doesn't change your real contributions."
+  },
+  "piggyBrokenAlt": "Broken piggy bank with coins on the floor",
+  "piggy": {
+    "empty": "Empty piggy bank",
+    "confirmEmpty": "Empty the piggy bank?\n\nThe {{amount}} saved will return to your balance as an income \"Piggy bank emptied\". Your contributions and goals are not deleted.",
+    "emptied": "Piggy bank emptied! {{amount}} back in your balance",
+    "emptiedDescription": "Piggy bank emptied",
+    "nothingToEmpty": "The piggy bank is already empty",
+    "noCategory": "The \"Ahorro\" category was not found"
   }
 }
