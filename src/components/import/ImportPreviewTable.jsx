@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { Trash2, ArrowDownCircle, ArrowUpCircle } from 'lucide-react'
+import { Trash2, ArrowDownCircle, ArrowUpCircle, BookmarkPlus, Check } from 'lucide-react'
+import { extractKeyword, matchUserRule } from '../../lib/categoryRules.js'
 
 /**
  * Tabla editable con los movimientos a importar.
@@ -9,11 +10,20 @@ import { Trash2, ArrowDownCircle, ArrowUpCircle } from 'lucide-react'
  *
  * Llama a onChange(transactions) con la nueva lista cada vez que algo cambia.
  */
-export default function ImportPreviewTable({ items, categories, onChange }) {
+export default function ImportPreviewTable({ items, categories, onChange, userRules = [], onRemember }) {
   const { t } = useTranslation('import')
 
   function update(id, patch) {
     onChange(items.map((it) => (it._id === id ? { ...it, ...patch } : it)))
+  }
+
+  async function remember(it, keyword) {
+    try {
+      await onRemember(keyword, it.category_id)
+      update(it._id, { _remembered: true })
+    } catch {
+      /* si falla, el botón sigue disponible para reintentar */
+    }
   }
 
   function remove(id) {
@@ -106,7 +116,13 @@ export default function ImportPreviewTable({ items, categories, onChange }) {
               />
               <select
                 value={it.category_id ?? ''}
-                onChange={(e) => update(it._id, { category_id: e.target.value })}
+                onChange={(e) =>
+                  update(it._id, {
+                    category_id: e.target.value,
+                    _userCategory: true,
+                    _remembered: false,
+                  })
+                }
                 className="rounded-md bg-bg-card px-2.5 py-1.5 text-sm text-white outline-none ring-1 ring-white/5 focus:ring-accent sm:w-44"
               >
                 <option value="">{t('preview.noCategory')}</option>
@@ -117,6 +133,32 @@ export default function ImportPreviewTable({ items, categories, onChange }) {
                 ))}
               </select>
             </div>
+
+            {/* "Recordar": si el usuario cambió la categoría a mano y aún no
+                hay una regla que lo cubra, ofrece guardarla. */}
+            {onRemember && it._userCategory && it.category_id && isExpense && (() => {
+              const keyword = extractKeyword(it.description)
+              if (!keyword) return null
+              const covered = matchUserRule(it.description, userRules) === it.category_id
+              if (it._remembered || covered) {
+                return (
+                  <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-success">
+                    <Check size={12} />
+                    {t('preview.ruleSaved', { keyword })}
+                  </p>
+                )
+              }
+              return (
+                <button
+                  type="button"
+                  onClick={() => remember(it, keyword)}
+                  className="mt-2 inline-flex items-center gap-1 rounded-md bg-accent/15 px-2 py-1 text-[11px] font-medium text-accent hover:bg-accent/25"
+                >
+                  <BookmarkPlus size={12} />
+                  {t('preview.rememberRule', { keyword })}
+                </button>
+              )
+            })()}
           </div>
         )
       })}

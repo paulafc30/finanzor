@@ -7,6 +7,7 @@ Para aplicar el esquema en un proyecto nuevo de Supabase, abre el **SQL Editor**
 3. `migrations/0003_seed_default_categories.sql` — trigger que siembra las 9 categorías por defecto al crear un usuario
 4. `migrations/0004` … `0012` — feedback, categorías archivables, ingresos fijos, métodos de pago, frecuencia semanal, etc. (cada archivo lleva su explicación al principio)
 5. `migrations/0013_demo_mode_and_fixes.sql` — modo demo (`seed_demo_data`), arreglo del trigger de categorías, policy de feedback
+6. `migrations/0015_category_rules.sql` — reglas de categorización propias del usuario (`category_rules`, con RLS)
 
 Con el CLI de Supabase basta `supabase db push`.
 

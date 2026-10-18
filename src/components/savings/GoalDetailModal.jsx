@@ -5,6 +5,7 @@ import Modal from '../ui/Modal.jsx'
 import Button from '../ui/Button.jsx'
 import GoalForm from './GoalForm.jsx'
 import ContributionForm from './ContributionForm.jsx'
+import GoalProjection from './GoalProjection.jsx'
 import {
   useGoalContributions,
   useDeleteContribution,
@@ -131,6 +132,11 @@ export default function GoalDetailModal({ goal, open, onClose }) {
               </p>
             )}
           </div>
+
+          {/* Proyección con slider (solo metas activas e incompletas) */}
+          {!goal.is_archived && (
+            <GoalProjection goal={goal} contributions={contributions} />
+          )}
 
           {/* Botón aportar */}
           <Button onClick={() => setView('contribute')} className="w-full">

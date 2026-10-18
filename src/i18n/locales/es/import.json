@@ -45,7 +45,9 @@
     "descriptionPlaceholder": "Descripción",
     "noCategory": "Sin categoría",
     "removeRowAria": "Eliminar fila",
-    "hint": "Click en \"Gasto\" / \"Ingreso\" para cambiar el tipo. Edita cualquier campo directamente. Pulsa la papelera para descartar una fila."
+    "hint": "Click en \"Gasto\" / \"Ingreso\" para cambiar el tipo. Edita cualquier campo directamente. Pulsa la papelera para descartar una fila.",
+    "rememberRule": "Recordar «{{keyword}}» para siempre",
+    "ruleSaved": "Regla «{{keyword}}» guardada"
   },
   "done": {
     "title": "¡Importación completada!",

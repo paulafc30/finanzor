@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom'
 import Modal from '../components/ui/Modal.jsx'
 import Button from '../components/ui/Button.jsx'
 import CategoryForm from '../components/categories/CategoryForm.jsx'
+import CategoryRulesCard from '../components/categories/CategoryRulesCard.jsx'
 import {
   useCategories,
   useArchiveCategory,
@@ -229,6 +230,8 @@ export default function Categories() {
           </ul>
         </div>
       )}
+
+      <CategoryRulesCard categories={active} />
 
       <p className="px-1 text-xs text-white/40">{t('footerNote')}</p>
 

@@ -51,5 +51,14 @@
     "duplicateName": "You already have a category with that name",
     "defaultNoArchive": "Default categories cannot be archived",
     "defaultNoDelete": "Default categories cannot be deleted"
+  },
+  "rules": {
+    "title": "Automatic rules",
+    "hint": "If a transaction's description contains the keyword, that category is assigned on import. Your rules take priority over the built-in ones.",
+    "keywordPlaceholder": "Keyword (e.g. mercadona)",
+    "categoryPlaceholder": "Category",
+    "add": "Add",
+    "delete": "Delete rule",
+    "error": "Could not save the rule"
   }
 }

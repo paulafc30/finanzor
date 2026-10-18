@@ -66,3 +66,65 @@ export function suggestCategoryByDescription(description) {
   }
   return null
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// Reglas del usuario (tabla `category_rules`) y utilidades de texto.
+// Las reglas del usuario se evalúan ANTES que las fijas de arriba.
+// ─────────────────────────────────────────────────────────────────────
+
+// Palabras que no identifican al comercio en un concepto bancario.
+const NOISE = new Set([
+  'compra', 'tarj', 'tarjeta', 'pago', 'pgo', 'recibo', 'bizum', 'transferencia',
+  'transf', 'trf', 'cargo', 'adeudo', 'domiciliacion', 'comercio', 'tpv', 'pos',
+  'sepa', 'visa', 'mastercard', 'www', 'com', 'net', 'org', 'con', 'del', 'los',
+  'las', 'por', 'para', 'efectivo', 'reintegro', 'cajero', 'movil',
+])
+
+/** minúsculas y sin tildes: "Café Ñandú" -> "cafe nandu" */
+export function normalizeText(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+}
+
+/** Palabras "útiles" de un concepto: sin números, sin ruido bancario. */
+export function meaningfulTokens(description) {
+  return normalizeText(description)
+    .replace(/[^a-z0-9&+]+/g, ' ')
+    .split(' ')
+    .filter((tok) => tok.length >= 3 && !/\d/.test(tok) && !NOISE.has(tok))
+}
+
+/**
+ * Palabra clave sugerida para recordar un comercio:
+ * "COMPRA TARJ. MERCADONA 0234" -> "mercadona". Null si no hay ninguna.
+ */
+export function extractKeyword(description) {
+  return meaningfulTokens(description)[0] ?? null
+}
+
+/** Normaliza una palabra clave escrita por el usuario (2..60 caracteres). */
+export function cleanKeyword(value) {
+  const k = normalizeText(value).replace(/[^a-z0-9&+]+/g, ' ').trim()
+  return k.length >= 2 && k.length <= 60 ? k : null
+}
+
+/**
+ * Devuelve el category_id de la regla del usuario que encaja con la
+ * descripción, o null. Se compara por palabras completas (la regla "dia"
+ * NO encaja en "media") y gana la palabra clave más larga (más específica).
+ */
+export function matchUserRule(description, rules = []) {
+  if (!description || rules.length === 0) return null
+  const haystack = ` ${normalizeText(description).replace(/[^a-z0-9&+]+/g, ' ').trim()} `
+  let best = null
+  for (const rule of rules) {
+    const kw = cleanKeyword(rule.keyword)
+    if (!kw) continue
+    if (haystack.includes(` ${kw} `) && (!best || kw.length > best.kwLength)) {
+      best = { kwLength: kw.length, categoryId: rule.category_id }
+    }
+  }
+  return best ? best.categoryId : null
+}

@@ -13,7 +13,9 @@ import {
   detectColumns,
   rowsToTransactions,
 } from '../lib/csvParser.js'
-import { suggestCategoryByDescription } from '../lib/categoryRules.js'
+import { suggestCategoryByDescription, matchUserRule } from '../lib/categoryRules.js'
+import { useCategoryRules, useCreateCategoryRule } from '../hooks/useCategoryRules.js'
+import SubscriptionsCard from '../components/insights/SubscriptionsCard.jsx'
 import { formatEuro } from '../lib/formatters.js'
 
 // Límites razonables para un extracto bancario (evita bloquear el navegador).
@@ -32,6 +34,8 @@ export default function ImportPage() {
   const { t } = useTranslation('import')
   const { data: categories = [] } = useCategories()
   const importMutation = useBulkImportTransactions()
+  const { data: userRules = [] } = useCategoryRules()
+  const createRule = useCreateCategoryRule()
 
   const [step, setStep] = useState('upload')
   const [csv, setCsv] = useState(null) // { headers, rows }
@@ -58,6 +62,9 @@ export default function ImportPage() {
       if (it.category_id) return it
       // Solo sugerimos categoría a gastos. A ingresos, sin categoría.
       if (it.type !== 'expense') return it
+      // 1) reglas propias del usuario, 2) reglas fijas, 3) "Otros"
+      const ruleCategoryId = matchUserRule(it.description, userRules)
+      if (ruleCategoryId) return { ...it, category_id: ruleCategoryId }
       const suggested = suggestCategoryByDescription(it.description)
       if (suggested) {
         const id = categoryIdByName.get(suggested)
@@ -116,6 +123,21 @@ export default function ImportPage() {
       )
       setItems(refreshed)
     }
+  }
+
+  // Guarda la regla y la aplica al resto de filas que encajen y que el
+  // usuario no haya tocado a mano.
+  async function handleRemember(keyword, categoryId) {
+    const saved = await createRule.mutateAsync({ keyword, category_id: categoryId })
+    setItems((prev) =>
+      prev.map((it) =>
+        it.type === 'expense' &&
+        !it._userCategory &&
+        matchUserRule(it.description, [{ keyword: saved.keyword, category_id: categoryId }])
+          ? { ...it, category_id: categoryId }
+          : it,
+      ),
+    )
   }
 
   function handleItemsChange(newItems) {
@@ -235,6 +257,8 @@ export default function ImportPage() {
                 <ImportPreviewTable
                   items={items}
                   categories={categories}
+                  userRules={userRules}
+                  onRemember={handleRemember}
                   onChange={handleItemsChange}
                 />
               </div>
@@ -292,6 +316,9 @@ export default function ImportPage() {
           </div>
         </div>
       )}
+
+      {/* Tras importar: suscripciones detectadas en el histórico */}
+      {step === 'done' && <SubscriptionsCard />}
     </section>
   )
 }

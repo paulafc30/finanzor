@@ -9,6 +9,8 @@ import MovementsFilters, {
   emptyFilter,
 } from '../components/transactions/MovementsFilters.jsx'
 import MovementsSummary from '../components/transactions/MovementsSummary.jsx'
+import SubscriptionsCard from '../components/insights/SubscriptionsCard.jsx'
+import PettySpendingCard from '../components/insights/PettySpendingCard.jsx'
 
 export default function Movements() {
   const { t } = useTranslation('transactions')
@@ -33,6 +35,9 @@ export default function Movements() {
       {/* Banner de totales + diagnóstico por origen. Solo aparece si hay
           al menos un movimiento; permite auditar a ojo las sumas. */}
       <MovementsSummary filter={filter} />
+
+      <SubscriptionsCard />
+      <PettySpendingCard />
 
       <TransactionList filter={filter} onEdit={(t) => setEditing(t)} />
 

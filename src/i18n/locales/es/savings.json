@@ -52,5 +52,17 @@
     "targetInvalid": "Objetivo inválido",
     "amountInvalid": "El importe debe ser mayor que 0",
     "dateRequired": "Fecha obligatoria"
+  },
+  "projection": {
+    "title": "Proyección",
+    "reach": "A {{amount}}/mes llegas a tu meta en {{date}}",
+    "months_one": "{{count}} mes",
+    "months_other": "{{count}} meses",
+    "tooFar": "A esta aportación tardarías más de 50 años. Sube la cantidad.",
+    "sliderAria": "Aportación mensual simulada",
+    "perMonth": "{{amount}}/mes",
+    "onTrack": "Llegas a tiempo a tu fecha objetivo.",
+    "offTrack": "No llegas a tu fecha objetivo: necesitas {{required}}/mes.",
+    "deadlinePassed": "La fecha objetivo ya ha pasado."
   }
 }

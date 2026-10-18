@@ -52,5 +52,17 @@
     "targetInvalid": "Invalid target",
     "amountInvalid": "The amount must be greater than 0",
     "dateRequired": "Date is required"
+  },
+  "projection": {
+    "title": "Projection",
+    "reach": "At {{amount}}/month you reach your goal in {{date}}",
+    "months_one": "{{count}} month",
+    "months_other": "{{count}} months",
+    "tooFar": "At this contribution it would take over 50 years. Increase the amount.",
+    "sliderAria": "Simulated monthly contribution",
+    "perMonth": "{{amount}}/month",
+    "onTrack": "You'll reach your target date on time.",
+    "offTrack": "You won't reach your target date: you need {{required}}/month.",
+    "deadlinePassed": "The target date has already passed."
   }
 }

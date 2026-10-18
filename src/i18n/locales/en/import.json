@@ -45,7 +45,9 @@
     "descriptionPlaceholder": "Description",
     "noCategory": "No category",
     "removeRowAria": "Remove row",
-    "hint": "Click \"Expense\" / \"Income\" to change the type. Edit any field directly. Tap the trash icon to discard a row."
+    "hint": "Click \"Expense\" / \"Income\" to change the type. Edit any field directly. Tap the trash icon to discard a row.",
+    "rememberRule": "Always remember “{{keyword}}”",
+    "ruleSaved": "Rule “{{keyword}}” saved"
   },
   "done": {
     "title": "Import complete!",

@@ -51,5 +51,14 @@
     "duplicateName": "Ya tienes una categoria con ese nombre",
     "defaultNoArchive": "Las categorias por defecto no se pueden archivar",
     "defaultNoDelete": "Las categorias por defecto no se pueden eliminar"
+  },
+  "rules": {
+    "title": "Reglas automáticas",
+    "hint": "Si el concepto de un movimiento contiene la palabra clave, se le asigna esa categoría al importar. Tus reglas van antes que las predefinidas.",
+    "keywordPlaceholder": "Palabra clave (ej. mercadona)",
+    "categoryPlaceholder": "Categoría",
+    "add": "Añadir",
+    "delete": "Eliminar regla",
+    "error": "No se pudo guardar la regla"
   }
 }

@@ -93,5 +93,27 @@
     "confirmDeleteIncome": "Delete this income of {{amount}}?",
     "deleteFailed": "Could not delete: {{message}}",
     "unknownError": "unknown error"
+  },
+  "insights": {
+    "subscriptions": {
+      "title": "Detected subscriptions",
+      "summary_one": "{{count}} recurring charge · {{total}}/month",
+      "summary_other": "{{count}} recurring charges · {{total}}/month",
+      "weekly": "weekly",
+      "monthlyDay": "monthly, day {{day}}",
+      "charges_one": "{{count}} charge",
+      "charges_other": "{{count}} charges",
+      "create": "Create recurring",
+      "creating": "Creating…",
+      "dismiss": "Dismiss",
+      "error": "Could not create the recurring item"
+    },
+    "petty": {
+      "title": "Small expenses",
+      "subtitle_one": "{{count}} purchase of {{max}} or less · last 30 days",
+      "subtitle_other": "{{count}} purchases of {{max}} or less · last 30 days",
+      "yearly": "At this pace, about {{amount}} a year.",
+      "noCategory": "No category"
+    }
   }
 }

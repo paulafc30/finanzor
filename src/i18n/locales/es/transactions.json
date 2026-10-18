@@ -93,5 +93,27 @@
     "confirmDeleteIncome": "¿Eliminar este ingreso de {{amount}}?",
     "deleteFailed": "No se pudo eliminar: {{message}}",
     "unknownError": "error desconocido"
+  },
+  "insights": {
+    "subscriptions": {
+      "title": "Suscripciones detectadas",
+      "summary_one": "{{count}} cargo periódico · {{total}}/mes",
+      "summary_other": "{{count}} cargos periódicos · {{total}}/mes",
+      "weekly": "semanal",
+      "monthlyDay": "mensual, día {{day}}",
+      "charges_one": "{{count}} cargo",
+      "charges_other": "{{count}} cargos",
+      "create": "Crear recurrente",
+      "creating": "Creando…",
+      "dismiss": "Ignorar",
+      "error": "No se pudo crear el recurrente"
+    },
+    "petty": {
+      "title": "Gastos hormiga",
+      "subtitle_one": "{{count}} compra de {{max}} o menos · últimos 30 días",
+      "subtitle_other": "{{count}} compras de {{max}} o menos · últimos 30 días",
+      "yearly": "A este ritmo, unos {{amount}} al año.",
+      "noCategory": "Sin categoría"
+    }
   }
 }
